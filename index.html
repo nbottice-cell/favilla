@@ -69,6 +69,28 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .loading{position:absolute;inset:0;background:var(--sl-bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;z-index:999;transition:opacity 0.4s;}
 .loading.gone{opacity:0;pointer-events:none;}
 @keyframes flicker{0%,100%{opacity:1}50%{opacity:0.72}}
+/* Candle flame animations */
+@keyframes flameDance{
+  0%,100%{transform:scaleX(1) scaleY(1) translateY(0);opacity:0.9;}
+  25%{transform:scaleX(0.88) scaleY(1.08) translateY(-1px);opacity:1;}
+  50%{transform:scaleX(1.06) scaleY(0.96) translateY(0.5px);opacity:0.85;}
+  75%{transform:scaleX(0.94) scaleY(1.04) translateY(-0.5px);opacity:0.95;}
+}
+@keyframes flameGlow{
+  0%,100%{opacity:0.5;}
+  40%{opacity:0.72;}
+  70%{opacity:0.38;}
+}
+@keyframes flameMid{
+  0%,100%{transform:scaleX(1) translateY(0);}
+  33%{transform:scaleX(0.9) translateY(-1px);}
+  66%{transform:scaleX(1.08) translateY(0.5px);}
+}
+.candle-wrap{display:flex;justify-content:center;margin-bottom:18px;}
+.candle-svg{filter:drop-shadow(0 0 8px rgba(255,90,50,0.35));}
+.flame-outer{transform-origin:26px 18px;animation:flameGlow 1.8s ease-in-out infinite;}
+.flame-mid{transform-origin:26px 20px;animation:flameMid 1.2s ease-in-out infinite;}
+.flame-inner{transform-origin:26px 22px;animation:flameDance 0.9s ease-in-out infinite;}
 .lf{animation:flicker 1.4s ease-in-out infinite;}
 .lt{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ash);letter-spacing:3px;}
 
@@ -181,6 +203,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .pdist-t{font-size:10px;color:var(--fl-lt);font-weight:600;}
 .pname{font-size:12px;color:var(--cr-dim);font-weight:500;white-space:nowrap;}
 .top-match-badge{background:rgba(255,90,50,0.13);border:0.5px solid rgba(255,90,50,0.35);border-radius:10px;padding:3px 10px;font-size:10px;color:var(--fl-lt);font-weight:600;}
+.pn-snippet{max-width:120px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--cr-dim);font-style:italic;line-height:1.4;margin-top:2px;}
 .you-center{position:absolute;top:50%;left:50%;z-index:10;transform:translate(-50%,-50%);}
 .you-dot{width:12px;height:12px;border-radius:50%;background:var(--fl);box-shadow:0 0 0 4px rgba(255,90,50,0.2);}
 
@@ -752,13 +775,22 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="ob-step" id="ob-3">
     <div class="step-lbl">Step three</div>
     <div class="step-h">Say something worth reading.</div>
-    <div class="step-sub">In Blind mode this is all anyone knows about you. Make it count. Fill in at least two.</div>
+    <div class="step-sub">In Blind mode this is all anyone knows about you. Make it count. Fill in at least two prompts.</div>
     <div class="pl">
       <div class="pi"><div class="pq">The most spontaneous thing I've actually done</div><textarea class="pta" id="p1" placeholder="No one believes me when I say…" rows="2"></textarea></div>
       <div class="pi"><div class="pq">I could go on about this forever</div><textarea class="pta" id="p2" placeholder="Fair warning: I have opinions…" rows="2"></textarea></div>
       <div class="pi"><div class="pq">A hill I will absolutely die on</div><textarea class="pta" id="p3" placeholder="Controversial take incoming…" rows="2"></textarea></div>
     </div>
-    <div style="font-size:12px;color:var(--ash);text-align:center;">Specific beats vague. Every time.</div>
+    <div style="height:0.5px;background:rgba(255,255,255,0.07);margin:18px 0 16px;"></div>
+    <div class="pi" style="background:rgba(255,90,50,0.06);border-color:rgba(255,90,50,0.25);">
+      <div class="pq" style="color:var(--fl-lt);">✦ Your icebreaker <span style="font-weight:400;color:var(--ash);letter-spacing:0;">(encouraged — 60 chars)</span></div>
+      <div style="position:relative;">
+        <textarea class="pta" id="ob-icebreaker" maxlength="60" placeholder="Give people a reason to say hi…" rows="2" oninput="updateIcebreakerCount(this)"></textarea>
+        <div id="icebreaker-count" style="position:absolute;bottom:2px;right:4px;font-size:10px;color:var(--ash);font-family:'Space Grotesk',sans-serif;">0/60</div>
+      </div>
+      <div style="font-size:11px;color:var(--ash);margin-top:4px;line-height:1.6;">This shows on your radial bubble so people know how to approach you. "Ask me about my worst travel story" beats "I like to laugh."</div>
+    </div>
+    <div style="font-size:12px;color:var(--ash);text-align:center;margin-top:14px;">Specific beats vague. Every time.</div>
   </div>
   <div class="ob-step" id="ob-4">
     <div class="step-lbl">Step four</div>
@@ -789,19 +821,36 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="venue-bar" id="venue-bar" onclick="doCheckInVenue()"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></div>
   <div class="streak-bar"><span style="font-size:16px;">🔥</span><span class="streak-text">3-week check-in streak — you're a regular</span><span class="streak-cnt">3🔥</span></div>
   <div class="sec-lbl" id="nearby-lbl">Who's here right now</div>
-  <!-- RADIAL LAYOUT — populated by JS -->
-  <div class="radial" id="radial-container">
+  <!-- RADIAL LAYOUT — populated by JS, hidden until others check in -->
+  <div class="radial" id="radial-container" style="display:none;">
     <div class="orbit" style="width:240px;height:240px;"></div>
     <div class="orbit" style="width:160px;height:160px;"></div>
     <div class="orbit" style="width:90px;height:90px;"></div>
     <div class="you-center"><div class="you-dot"></div></div>
-    <!-- real users injected here by renderPresence() -->
   </div>
-  <!-- Empty state — replaces radial when no one else is checked in -->
-  <div id="empty-state" style="display:none;text-align:center;padding:32px 36px 16px;">
-    <div style="font-size:36px;margin-bottom:14px;">🕯</div>
+  <!-- Empty state — animated candle, shown until someone else checks in -->
+  <div id="empty-state" style="text-align:center;padding:28px 36px 16px;">
+    <div class="candle-wrap">
+      <svg class="candle-svg" width="52" height="80" viewBox="0 0 52 80" fill="none">
+        <!-- Flame -->
+        <g class="flame-group">
+          <ellipse class="flame-outer" cx="26" cy="18" rx="8" ry="14" fill="#FF7A5A" opacity="0.5"/>
+          <ellipse class="flame-mid" cx="26" cy="20" rx="5" ry="10" fill="#FF5A32" opacity="0.8"/>
+          <ellipse class="flame-inner" cx="26" cy="22" rx="3" ry="6" fill="#FFD0A0" opacity="0.95"/>
+        </g>
+        <!-- Wick -->
+        <line x1="26" y1="32" x2="26" y2="36" stroke="#3D2A20" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Wax body -->
+        <rect x="14" y="36" width="24" height="36" rx="4" fill="#EDE7DF"/>
+        <rect x="14" y="36" width="24" height="6" rx="4" fill="#DDD5C8"/>
+        <!-- Drip -->
+        <path d="M18 42 Q16 50 17 56" stroke="#DDD5C8" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <!-- Base plate -->
+        <ellipse cx="26" cy="72" rx="16" ry="4" fill="#C0B0A0" opacity="0.4"/>
+      </svg>
+    </div>
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:8px;">Quiet in here.</div>
-    <div style="font-size:13px;color:var(--ash);line-height:1.7;">No one else is checked in yet. You'll appear to others the moment they arrive.</div>
+    <div style="font-size:13px;color:var(--ash);line-height:1.7;" id="empty-state-msg">Check in to appear when others arrive.</div>
   </div>
   <div class="enter-btn" id="enter-btn" onclick="doCheckInVenue()">
     <div class="enter-title" id="enter-title">Enter the Room</div>
@@ -830,6 +879,10 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
         </div>
       </div>
       <div class="sheet-body">
+        <div id="sheet-icebreaker-wrap" style="display:none;background:rgba(255,90,50,0.06);border:0.5px solid rgba(255,90,50,0.2);border-radius:14px;padding:12px 16px;margin-bottom:18px;">
+          <div style="font-size:10px;color:var(--fl-lt);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">✦ Icebreaker</div>
+          <div id="sheet-icebreaker" style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);font-style:italic;line-height:1.5;"></div>
+        </div>
         <div class="sheet-intention" id="sheet-intention"></div>
         <div id="sheet-prompts"></div>
         <div class="sheet-basics" id="sheet-basics"></div>
@@ -1267,7 +1320,40 @@ function openPP(){
   document.getElementById('profile-panel').classList.add('open');
 }
 function closePP(e){if(!e||e.target===document.getElementById('profile-panel'))document.getElementById('profile-panel').classList.remove('open');}
-function closePanelGo(id){document.getElementById('profile-panel').classList.remove('open');goTo(id,'s-spark');}
+function closePanelGo(id){
+  document.getElementById('profile-panel').classList.remove('open');
+  if(id==='s-onboard' && currentProfile){
+    /* Pre-fill all fields from saved profile so edit feels seamless */
+    setTimeout(()=>{
+      const n=document.getElementById('ob-name'); if(n)n.value=currentProfile.name||'';
+      const a=document.getElementById('ob-age');  if(a)a.value=currentProfile.age||'';
+      const p1=document.getElementById('p1'); if(p1)p1.value=currentProfile.prompt_1_a||'';
+      const p2=document.getElementById('p2'); if(p2)p2.value=currentProfile.prompt_2_a||'';
+      const p3=document.getElementById('p3'); if(p3)p3.value=currentProfile.prompt_3_a||'';
+      const ib=document.getElementById('ob-icebreaker');
+      if(ib){
+        ib.value=currentProfile.icebreaker||'';
+        updateIcebreakerCount(ib);
+      }
+      /* Re-select gender and intention */
+      if(currentProfile.gender){
+        document.querySelectorAll('.g-opt').forEach(o=>{
+          if(o.textContent.trim()===currentProfile.gender){o.classList.add('sel');}
+        });
+        obGender=currentProfile.gender;
+      }
+      if(currentProfile.intention){
+        document.querySelectorAll('.int-item').forEach(o=>{
+          if(o.dataset.val===currentProfile.intention||o.onclick?.toString().includes(currentProfile.intention)){
+            o.classList.add('sel');
+          }
+        });
+        obIntention=currentProfile.intention;
+      }
+    }, 100);
+  }
+  goTo(id,'s-spark');
+}
 let statusAvail=true;
 function toggleStatus(){
   statusAvail=!statusAvail;
@@ -1403,7 +1489,14 @@ function obUpdate(){
   document.getElementById('ob-lbl').textContent=obStep+' of 4';
   if(obStep===4)document.getElementById('ob-btn').textContent='Finish and go →';
 }
-function selG(el,v){document.querySelectorAll('.g-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');obGender=v;}
+function updateIcebreakerCount(el){
+  const len = el.value.length;
+  const counter = document.getElementById('icebreaker-count');
+  if(counter){
+    counter.textContent = len+'/60';
+    counter.style.color = len >= 55 ? 'var(--fl-lt)' : 'var(--ash)';
+  }
+}
 function selI(el,v){document.querySelectorAll('.int-item').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');obIntention=v;}
 function handlePhoto(e,i){
   const f=e.target.files[0];if(!f)return;
@@ -1433,6 +1526,7 @@ async function saveProfile(){
     prompt_1_q:"The most spontaneous thing I've actually done",prompt_1_a:document.getElementById('p1').value.trim(),
     prompt_2_q:"I could go on about this forever",prompt_2_a:document.getElementById('p2').value.trim(),
     prompt_3_q:"A hill I will absolutely die on",prompt_3_a:document.getElementById('p3').value.trim(),
+    icebreaker:document.getElementById('ob-icebreaker').value.trim()||null,
     photo_url:photoUrl,spark_enabled:true,blind_enabled:true,visibility:'matches_only'};
   const{error}=await sb.from('profiles').upsert(prof);
   btn.disabled=false;btn.textContent='Finish and go →';
@@ -1715,7 +1809,7 @@ async function loadPresence() {
   if (!currentUser) return;
   const {data, error} = await sb
     .from('check_ins')
-    .select('id, user_id, profiles(name, age, photo_url, prompt_1_q, prompt_1_a, prompt_2_q, prompt_2_a, prompt_3_q, prompt_3_a)')
+    .select('id, user_id, profiles(name, age, photo_url, icebreaker, prompt_1_q, prompt_1_a, prompt_2_q, prompt_2_a, prompt_3_q, prompt_3_a, intention, gender)')
     .eq('venue_id', VENUE_ID)
     .gt('expires_at', new Date().toISOString())
     .neq('user_id', currentUser.id);
@@ -1729,23 +1823,34 @@ async function loadPresence() {
 function renderPresence(users) {
   const container = document.getElementById('radial-container');
   const empty     = document.getElementById('empty-state');
+  const emptyMsg  = document.getElementById('empty-state-msg');
   const seeAll    = document.getElementById('see-all-btn');
   container.querySelectorAll('.pn').forEach(n => n.remove());
+
   if (users.length === 0) {
+    /* Show candle with context-aware message */
     container.style.display = 'none';
     empty.style.display = 'block';
     seeAll.style.display = 'none';
+    if (emptyMsg) {
+      emptyMsg.textContent = currentCheckInId
+        ? "You\'re in the room. Others will appear the moment they check in."
+        : "Check in to appear when others arrive.";
+    }
     return;
   }
+
+  /* Others are here — hide candle, show radial */
   container.style.display = '';
   empty.style.display = 'none';
-  /* show see-all if more than 5 people */
+
   if (users.length > 5) {
     seeAll.style.display = 'flex';
     document.getElementById('see-all-count').textContent = users.length;
   } else {
     seeAll.style.display = 'none';
   }
+
   users.slice(0, POSITIONS.length).forEach((row, i) => {
     const p = row.profiles; if (!p) return;
     const initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
@@ -1754,28 +1859,35 @@ function renderPresence(users) {
     const size    = AV_SIZES[i] || 'o';
     const bg      = BG_COLORS[i];
     const isFirst = i === 0;
-    const node    = document.createElement('div');
-    node.className = 'pn';
-    node.style.cssText = `left:${pos.left};top:${pos.top};`;
-    node.dataset.userId = row.user_id;
-    /* avatar — photo or initial */
+
+    /* Icebreaker snippet — use dedicated field, fall back to first prompt */
+    let snippet = '';
+    if (isFirst) {
+      const raw = p.icebreaker || p.prompt_1_a || '';
+      if (raw) snippet = raw.length > 42 ? raw.substring(0, 40) + '\u2026' : raw;
+    }
+
     const avContent = p.photo_url
       ? `<img src="${p.photo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
       : initial;
+
+    const node = document.createElement('div');
+    node.className = 'pn';
+    node.style.cssText = `left:${pos.left};top:${pos.top};`;
+    node.dataset.userId = row.user_id;
     node.innerHTML = `
-      <div class="pav ${size}" style="background:${bg};${isFirst?'border-color:rgba(255,90,50,0.65);':''}">
+      <div class="pav ${size}" style="background:${bg};${isFirst ? 'border-color:rgba(255,90,50,0.65);' : ''}">
         ${avContent}<div class="ponline"></div>
       </div>
-      <div class="${isFirst?'':'pname'}" style="${isFirst?'font-size:14px;color:var(--cr);font-weight:600;margin-top:7px;':''}">
+      <div class="${isFirst ? '' : 'pname'}" style="${isFirst ? 'font-size:14px;color:var(--cr);font-weight:600;margin-top:7px;' : ''}">
         ${label}
       </div>
-      ${isFirst ? '<div class="top-match-badge">✦ Top Spark</div>' : ''}
+      ${isFirst && snippet ? `<div class="pn-snippet">&ldquo;${snippet}&rdquo;</div>` : ''}
     `;
     node.onclick = () => openProfileSheet(row);
     container.appendChild(node);
   });
 }
-
 function updateVenueSub(count) {
   if (currentCheckInId) {
     document.getElementById('v-sub').textContent =
@@ -1807,6 +1919,15 @@ function openProfileSheet(row) {
   }
   document.getElementById('sheet-name').textContent = p.name || 'Someone';
   document.getElementById('sheet-age').textContent  = p.age || '';
+  /* icebreaker */
+  const ibWrap = document.getElementById('sheet-icebreaker-wrap');
+  const ibText = document.getElementById('sheet-icebreaker');
+  if (p.icebreaker) {
+    ibText.textContent = '\u201c' + p.icebreaker + '\u201d';
+    ibWrap.style.display = 'block';
+  } else {
+    ibWrap.style.display = 'none';
+  }
   /* intention */
   const intentionMap = {
     'something_real': '🔥 Something real',
