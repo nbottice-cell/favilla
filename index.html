@@ -1774,25 +1774,42 @@ async function doSpark() {
 }
 
 async function createMatch(otherUserId, otherProfile) {
-  /* Prevent duplicate — check first */
+  /* Prevent duplicate match */
   const {data: existing} = await sb.from('matches')
     .select('id')
     .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${currentUser.id})`)
     .maybeSingle();
-  if (existing) return; /* already matched */
+  if (existing) {
+    /* Match already exists — just show the overlay if not already showing */
+    if (!document.getElementById('match-overlay').classList.contains('show')) {
+      showMatchOverlay(otherProfile);
+    }
+    return;
+  }
 
-  await sb.from('matches').insert({
+  const {error} = await sb.from('matches').insert({
     user_id_1: currentUser.id, user_id_2: otherUserId, venue_id: VENUE_ID,
   });
+
+  if (error) {
+    console.error('createMatch insert error:', error.code, error.message);
+    /* Even if insert failed (e.g. already exists race condition), still show overlay */
+    showMatchOverlay(otherProfile);
+    return;
+  }
+
+  /* Show overlay for the person who completed the match (user_id_1).
+     The other person (user_id_2) gets it via subscribeMatches Realtime. */
   showMatchOverlay(otherProfile);
 }
 
-/* ── MATCH OVERLAY ───────────────── */
 function showMatchOverlay(otherProfile) {
   if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+
   /* You avatar */
   const youAv = document.getElementById('mo-av-you');
   youAv.textContent = currentProfile?.name?.charAt(0).toUpperCase() || 'Y';
+
   /* Them avatar */
   const themAv = document.getElementById('mo-av-them');
   if (otherProfile?.photo_url) {
@@ -1800,11 +1817,25 @@ function showMatchOverlay(otherProfile) {
   } else {
     themAv.textContent = otherProfile?.name?.charAt(0).toUpperCase() || '?';
   }
+
   document.getElementById('mo-name').textContent =
     'You and ' + (otherProfile?.name || 'someone') + ' both said yes.';
   document.getElementById('mo-loc').textContent =
     'Both at ' + VENUE_NAME + ' · right now';
-  document.getElementById('match-overlay').classList.add('show');
+
+  /* Reset animations so they replay fresh every time the overlay opens */
+  const overlay = document.getElementById('match-overlay');
+  const animated = overlay.querySelectorAll('.mo-avs,.mo-gem,.mo-eyebrow,.mo-name,.mo-sub,.mo-loc,.mo-chat,.mo-find');
+  animated.forEach(el => {
+    el.style.animation = 'none';
+    el.style.opacity = '0';
+    /* Force reflow so the browser registers the reset */
+    void el.offsetWidth;
+    el.style.animation = '';
+    el.style.opacity = '';
+  });
+
+  overlay.classList.add('show');
 }
 
 function dismissMatchGoChat() {
@@ -1862,36 +1893,76 @@ function subscribePresence() {
 
 function subscribeLikes() {
   if (likesSub) { sb.removeChannel(likesSub); }
-  likesSub = sb.channel('likes-' + currentUser.id)
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'likes',
-      filter:'liked_user_id=eq.' + currentUser.id},
-      async (payload) => {
-        /* Someone liked us — check if we liked them back */
-        const likerId = payload.new.user_id;
-        const {data: weAlsoLiked} = await sb.from('likes')
-          .select('id').eq('user_id', currentUser.id)
-          .eq('liked_user_id', likerId).maybeSingle();
-        if (weAlsoLiked) {
-          /* Find their profile to show in match overlay */
-          const them = presenceCache.find(r => r.user_id === likerId);
-          await createMatch(likerId, them?.profiles);
-        }
-      })
+  likesSub = sb.channel('likes-for-' + currentUser.id)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'likes',
+      filter: 'liked_user_id=eq.' + currentUser.id,
+    }, async (payload) => {
+      const likerId = payload.new.user_id;
+      /* Check if we already liked them back */
+      const {data: weAlsoLiked} = await sb.from('likes')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .eq('liked_user_id', likerId)
+        .maybeSingle();
+      if (!weAlsoLiked) return; /* not mutual yet */
+
+      /* Fetch their profile fresh in case presenceCache is stale */
+      let otherProfile = presenceCache.find(r => r.user_id === likerId)?.profiles;
+      if (!otherProfile) {
+        const {data: freshProfile} = await sb.from('profiles')
+          .select('name, age, photo_url')
+          .eq('id', likerId)
+          .single();
+        otherProfile = freshProfile;
+      }
+      await createMatch(likerId, otherProfile);
+    })
     .subscribe();
 }
 
 function subscribeMatches() {
   if (matchesSub) { sb.removeChannel(matchesSub); }
-  matchesSub = sb.channel('matches-' + currentUser.id)
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'matches',
-      filter:`user_id_2=eq.${currentUser.id}`},
-      async (payload) => {
-        /* We are user_id_2 meaning we were liked first, they confirmed */
-        const otherId = payload.new.user_id_1;
-        const them = presenceCache.find(r => r.user_id === otherId);
-        if (them) showMatchOverlay(them.profiles);
-      })
+  /* Listen on BOTH user columns so either person gets the overlay */
+  matchesSub = sb.channel('matches-for-' + currentUser.id)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'matches',
+      filter: 'user_id_1=eq.' + currentUser.id,
+    }, async (payload) => {
+      /* We are user_id_1 — but createMatch already called showMatchOverlay for us,
+         so only show if we somehow missed it (e.g. app was backgrounded) */
+      const otherId = payload.new.user_id_2;
+      if (!document.getElementById('match-overlay').classList.contains('show')) {
+        const otherProfile = await fetchProfileById(otherId);
+        showMatchOverlay(otherProfile);
+      }
+    })
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'matches',
+      filter: 'user_id_2=eq.' + currentUser.id,
+    }, async (payload) => {
+      /* We are user_id_2 — the other person completed the match, show our overlay */
+      const otherId = payload.new.user_id_1;
+      let otherProfile = presenceCache.find(r => r.user_id === otherId)?.profiles;
+      if (!otherProfile) otherProfile = await fetchProfileById(otherId);
+      showMatchOverlay(otherProfile);
+    })
     .subscribe();
+}
+
+/* Helper — fetch a profile by id when not in presenceCache */
+async function fetchProfileById(userId) {
+  const {data} = await sb.from('profiles')
+    .select('name, age, photo_url')
+    .eq('id', userId)
+    .single();
+  return data;
 }
 
 window.addEventListener('beforeunload', async () => {
