@@ -36,14 +36,35 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 @media(max-width:499px){.screen{padding-top:env(safe-area-inset-top,44px);}}
 .with-nav{padding-bottom:88px;}
 
-/* NAV — fixed to shell bottom always */
-.nav{position:absolute;bottom:0;left:0;right:0;background:var(--sl-hdr);border-top:0.5px solid rgba(255,90,50,0.12);display:flex;justify-content:space-around;padding:10px 8px;padding-bottom:max(24px,env(safe-area-inset-bottom,24px));z-index:200;}
+/* ==============================================
+   MASTER NAV — PERMANENT BOTTOM BAR
+   Single instance in shell, outside all screens.
+   position:absolute on desktop shell (390px box).
+   position:fixed on real mobile (full viewport).
+   z-index:300 — above screens, below overlays (500+).
+   DO NOT move this inside a .screen div.
+   DO NOT add more nav bars to individual screens.
+   ============================================== */
+.nav{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--sl-hdr);
+  border-top:0.5px solid rgba(255,90,50,0.12);
+  display:flex;justify-content:space-around;
+  padding:10px 8px;
+  padding-bottom:max(24px,env(safe-area-inset-bottom,24px));
+  z-index:300;
+}
+@media(max-width:499px){
+  .nav{position:fixed;bottom:0;left:0;right:0;}
+}
 .ni{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;min-width:60px;}
-.ni-lbl{font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.5px;}
+.ni-lbl{font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.5px;transition:color 0.2s;}
 .ni.on .ni-lbl{color:var(--fl);}
-.ni-dot{width:20px;height:2.5px;border-radius:1.5px;background:currentColor;opacity:0.4;color:var(--ash);margin:0 auto;}
+.ni-dot{width:20px;height:2.5px;border-radius:1.5px;background:currentColor;opacity:0.4;color:var(--ash);margin:0 auto;transition:opacity 0.2s,color 0.2s;}
 .ni.on .ni-dot{opacity:1;color:var(--fl);}
+/* Screens need bottom padding so content clears the nav bar */
 .with-nav{padding-bottom:88px;}
+.screen{padding-bottom:88px;}
 /* LOADING */
 .loading{position:absolute;inset:0;background:var(--sl-bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;z-index:999;transition:opacity 0.4s;}
 .loading.gone{opacity:0;pointer-events:none;}
@@ -593,6 +614,14 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 <!-- TOAST -->
 <div class="toast" id="toast"><div style="font-size:18px;">✦</div><div class="toast-text" id="toast-text"><strong>Welcome</strong></div></div>
 
+<!-- MASTER NAV — lives in shell, never scrolls, always visible -->
+<div class="nav" id="master-nav">
+  <div class="ni on" id="nav-spark" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+  <div class="ni" id="nav-blind" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+  <div class="ni" id="nav-map" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+  <div class="ni" id="nav-matches" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
+</div>
+
 <!-- PROFILE PANEL -->
 <div class="profile-panel" id="profile-panel" onclick="closePP(event)">
   <div class="pp-sheet">
@@ -786,12 +815,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <div style="flex:1;"><div class="nb-title">Bonfire at Rooftop 22 tonight</div><div class="nb-sub">28 active now · 0.3 mi away</div></div>
     <div class="nb-btn" onclick="navTo('s-heatmap')">View Map</div>
   </div>
-  <div class="nav" id="nav-spark">
-    <div class="ni on" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-  </div>
 </div>
 
 <!-- ═══ PROFILE CARD SHEET ═══ -->
@@ -949,12 +972,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="bl-acts"><button class="btn-pass" onclick="nextBlind()">Not for me</button><button class="btn-intrigue" onclick="blindMatch()">✦ I'm intrigued</button></div>
   <div class="bl-ctr" id="bl-ctr">Profile 1 of 4 · No photos until you both decide</div>
   <div class="bl-nav">
-    <div class="nav">
-      <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-      <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-      <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-      <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-    </div>
   </div>
 </div>
 
@@ -1041,12 +1058,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
       </div>
     </div>
   </div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-  </div>
 </div>
 
 <!-- ═══════════ VENUE PAGE ═══════════ -->
@@ -1097,12 +1108,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     </div>
   </div>
   <div class="venue-nav">
-    <div class="nav">
-      <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Spark</div></div>
-      <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Blind</div></div>
-      <div class="ni on"><div class="ni-dot" style="color:var(--wo);opacity:1;"></div><div class="ni-lbl" style="color:var(--wo);">Map</div></div>
-      <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Matches</div></div>
-    </div>
   </div>
 </div>
 
@@ -1128,12 +1133,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there right now.<br>Go check in.</div>
     <button onclick="navTo('s-spark')" style="margin-top:14px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;">Open Spark →</button>
   </div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-  </div>
 </div>
 
 <!-- ═══════════ ALMOST ═══════════ -->
@@ -1150,12 +1149,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <div class="al-item"><div class="al-av" style="background:rgba(140,90,180,0.16);">P</div><div style="flex:1;"><div class="al-name">Parker, 30</div><div class="al-sub">Was at The Anchor · same night</div><div class="al-timer">⏱ 3 hrs left</div></div><div class="al-btn" onclick="showToastMsg('Connection sent to Parker ✦')">Connect</div></div>
   </div>
   <div style="text-align:center;margin-top:18px;padding:0 28px;font-size:13px;color:var(--ash);line-height:1.7;">You were already in the same room.<br>These disappear in 24 hours.</div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-  </div>
 </div>
 
 <!-- ═══════════ FAVILLA NIGHTS ═══════════ -->
@@ -1189,12 +1182,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <div class="fn-up"><div class="fn-up-icon">🍷</div><div style="flex:1;"><div class="fn-up-name">Ember Lounge</div><div class="fn-up-date">Friday 4 April · Wine &amp; low-key vibes</div></div><button class="fn-nbtn" id="fn-ember" onclick="toggleNotify('fn-ember')">Notify me</button></div>
     <div class="fn-up"><div class="fn-up-icon">🎵</div><div style="flex:1;"><div class="fn-up-name">Blue Note</div><div class="fn-up-date">Friday 11 April · Live music night</div></div><button class="fn-nbtn" id="fn-blue" onclick="toggleNotify('fn-blue')">Notify me</button></div>
     <div class="fn-up"><div class="fn-up-icon">🌆</div><div style="flex:1;"><div class="fn-up-name">Rooftop 22</div><div class="fn-up-date">Friday 18 April · Rooftop season opener</div></div><button class="fn-nbtn" id="fn-roof" onclick="toggleNotify('fn-roof')">Notify me</button></div>
-  </div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
   </div>
 </div>
 
@@ -1243,12 +1230,42 @@ function _show(id){
   const el=document.getElementById(id);
   if(el)el.classList.add('active');
   const shell=document.querySelector('.shell');
-  const darkScreens=['s-splash','s-login','s-signup','s-onboard','s-spark','s-match','s-chat','s-confirmed','s-findthem','s-heatmap','s-matches','s-almost','s-nights','s-met'];
   const blindScreens=['s-blind'];
   const warmScreens=['s-venue'];
   if(blindScreens.includes(id)){shell.style.background='var(--vl-bg)';}
   else if(warmScreens.includes(id)){shell.style.background='var(--wm-bg)';}
   else{shell.style.background='var(--sl-bg)';}
+
+  /* Master nav — hide on auth/onboard screens, show everywhere else */
+  const nav=document.getElementById('master-nav');
+  const noNavScreens=['s-splash','s-login','s-signup','s-onboard'];
+  if(nav){
+    nav.style.display=noNavScreens.includes(id)?'none':'flex';
+
+    /* Update nav colours for Blind and Venue modes */
+    if(id==='s-blind'){
+      nav.style.background='var(--vl-hdr)';
+      nav.style.borderTopColor='rgba(155,95,224,0.15)';
+      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='var(--vc-dim)');
+      document.querySelectorAll('#master-nav .ni.on .ni-lbl').forEach(l=>l.style.color='var(--pu)');
+    } else if(id==='s-venue'){
+      nav.style.background='var(--wm-hdr)';
+      nav.style.borderTopColor='rgba(255,255,255,0.06)';
+      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='#7A6858');
+      document.querySelectorAll('#master-nav .ni.on .ni-lbl').forEach(l=>l.style.color='var(--wo)');
+    } else {
+      nav.style.background='var(--sl-hdr)';
+      nav.style.borderTopColor='rgba(255,90,50,0.12)';
+      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='');
+      document.querySelectorAll('#master-nav .ni.on .ni-lbl').forEach(l=>l.style.color='');
+    }
+
+    /* Set active tab */
+    const tabMap={'s-spark':'nav-spark','s-blind':'nav-blind','s-heatmap':'nav-map','s-venue':'nav-map','s-matches':'nav-matches'};
+    document.querySelectorAll('#master-nav .ni').forEach(n=>n.classList.remove('on'));
+    const activeTab=tabMap[id];
+    if(activeTab)document.getElementById(activeTab)?.classList.add('on');
+  }
 }
 
 /* ── PANELS ──────────────────────────── */
