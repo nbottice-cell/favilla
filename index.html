@@ -1273,29 +1273,48 @@ function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))docu
 
 /* ── BOOT ────────────────────────────── */
 window.addEventListener('DOMContentLoaded',async()=>{
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){
-    currentUser=session.user;
-    const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-    if(p){
-      currentProfile=p;
-      setInitial(p.name);
-      hideLoading();
-      _show('s-spark');
-      loadPresence();
-      subscribePresence();
-      subscribeLikes();
-      subscribeMatches();
+  /* Safety net — if anything throws, loading still disappears after 4s */
+  const safetyTimer = setTimeout(()=>{
+    try{hideLoading();}catch(e){}
+    try{_show('s-splash');}catch(e){}
+  }, 4000);
+
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    clearTimeout(safetyTimer);
+    if(session){
+      currentUser=session.user;
+      const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+      if(p){
+        currentProfile=p;
+        setInitial(p.name);
+        hideLoading();
+        _show('s-spark');
+        loadPresence();
+        subscribePresence();
+        subscribeLikes();
+        subscribeMatches();
+      } else {
+        hideLoading();
+        _show('s-onboard');
+      }
     } else {
       hideLoading();
-      _show('s-onboard');
+      _show('s-splash');
     }
-  } else {
+  } catch(err){
+    console.error('Boot error:', err);
+    clearTimeout(safetyTimer);
     hideLoading();
     _show('s-splash');
   }
 });
-function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
+function hideLoading(){
+  const el=document.getElementById('loading');
+  if(!el)return;
+  el.classList.add('gone');
+  setTimeout(()=>{if(el.parentNode)el.remove();},500);
+}
 function setInitial(name){
   const el=document.getElementById('user-initial');
   if(el&&name){el.textContent=name.charAt(0).toUpperCase();}
@@ -1844,3 +1863,9 @@ window.addEventListener('beforeunload', async () => {
 
 function toggleNotify(id){
   const b=document.getElementById(id);
+  if(b.classList.contains('set')){b.classList.remove('set');b.textContent='Notify me';}
+  else{b.classList.add('set');b.textContent='✓ Set';showToastMsg("We'll remind you the day before. 🎟");}
+}
+</script>
+</body>
+</html>
