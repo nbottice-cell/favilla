@@ -884,26 +884,25 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 <div class="screen" id="s-chat">
   <div class="ch-hdr">
     <button class="bk-btn" onclick="goBack()">←</button>
-    <div class="ch-av">S</div>
-    <div style="flex:1;"><div class="ch-name">Sofia</div><div class="ch-status">✦ Spark match · The Anchor &amp; Vine</div></div>
+    <div class="ch-av" id="ch-av">?</div>
+    <div style="flex:1;">
+      <div class="ch-name" id="ch-name">Loading…</div>
+      <div class="ch-status" id="ch-status">✦ Spark match · The Anchor &amp; Vine</div>
+    </div>
     <div style="font-size:20px;color:var(--ash);cursor:pointer;" onclick="goTo('s-findthem','s-chat')">📍</div>
   </div>
   <div class="ch-ctx">You're both here tonight · <span>Still nearby</span></div>
-  <div class="ice-card">
+  <div class="ice-card" id="ice-card" style="display:none;">
     <div class="ice-lbl">✦ Something to start with</div>
-    <div class="ice-text">You both answered the spontaneous question. She quit her job on a Friday. <span>You booked a flight on a Tuesday.</span> Go.</div>
+    <div class="ice-text" id="ice-text"></div>
   </div>
   <div class="msgs" id="chat-msgs">
-    <div class="msg them"><div class="bub">okay so I was NOT expecting a match tonight — hi 😅</div><div class="msg-t">10:48 pm</div></div>
-    <div class="msg me"><div class="bub">haha same. that animation got me. are you still here?</div><div class="msg-t">10:49 pm</div></div>
-    <div class="msg them"><div class="bub">yes! near the bar, dark green jacket. don't make it weird lol</div><div class="msg-t">10:50 pm</div></div>
-    <div class="msg me"><div class="bub">too late, already rehearsing my opener</div><div class="msg-t">10:51 pm</div></div>
-    <div class="msg them"><div class="bub">go for it. I'll pretend to be surprised.</div><div class="msg-t">10:52 pm</div></div>
+    <div id="chat-loading" style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Loading messages…</div>
   </div>
   <div class="nudge"><div style="font-size:16px;color:var(--gold);">✦</div><div class="nudge-t">You're both still at <span>The Anchor &amp; Vine</span> — the conversation's already started. Go finish it in person.</div></div>
   <div class="ch-input-row">
     <button class="plan-btn" onclick="showDateCard()">📅 Plan a date</button>
-    <input class="ch-input" id="ch-input" placeholder="Message Sofia…" onkeydown="if(event.key==='Enter')sendMsg()">
+    <input class="ch-input" id="ch-input" placeholder="Message…" onkeydown="if(event.key==='Enter')sendMsg()">
     <div class="ch-send" onclick="sendMsg()">↑</div>
   </div>
 </div>
@@ -1113,25 +1112,12 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 
 <!-- ═══════════ MATCHES ═══════════ -->
 <div class="screen with-nav" id="s-matches">
-  <div class="mx-hdr"><div class="mx-title">Matches</div><div style="font-size:12px;color:var(--ash);">3 conversations</div></div>
-  <div class="mx-item first" onclick="goTo('s-chat','s-matches')">
-    <div class="mx-avw"><div class="mx-av" style="background:rgba(255,90,50,0.18);">S</div><div class="mx-badge bsp" style="font-size:9px;">🔥</div></div>
-    <div style="flex:1;"><div class="mx-name">Sofia, 26</div><div class="mx-prev">go for it. I'll pretend to be surprised.</div></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">10:52 pm</div><div class="mx-unread"></div></div>
+  <div class="mx-hdr">
+    <div class="mx-title">Matches</div>
+    <div id="mx-count" style="font-size:12px;color:var(--ash);"></div>
   </div>
-  <div class="mx-item" onclick="goTo('s-chat','s-matches')">
-    <div class="mx-avw"><div class="mx-av" style="background:rgba(155,95,224,0.15);">J</div><div class="mx-badge bbl" style="font-size:8px;">✦</div></div>
-    <div style="flex:1;"><div class="mx-name">Jamie, 29</div><div class="mx-prev">okay hi — this is weird and great…</div></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">Yesterday</div></div>
-  </div>
-  <div class="mx-item">
-    <div class="mx-avw"><div class="mx-av" style="background:rgba(60,110,200,0.18);">M</div><div class="mx-badge bsp" style="font-size:9px;">🔥</div></div>
-    <div style="flex:1;"><div class="mx-name">Marcus, 28</div><div class="mx-prev">that was genuinely fun, we should…</div></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">Fri</div></div>
-  </div>
-  <div style="text-align:center;margin-top:24px;padding:0 36px;">
-    <div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there right now.<br>Go check in.</div>
-    <button onclick="navTo('s-spark')" style="margin-top:14px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;">Open Spark →</button>
+  <div id="mx-list" style="padding-top:8px;">
+    <div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Loading…</div>
   </div>
 </div>
 
@@ -1219,6 +1205,7 @@ function goBack(){
 function navTo(id){
   navStack.length=0;
   _show(id);
+  if (id === 's-matches') loadMatchesList();
 }
 function goHome(){
   navStack.length=0;
@@ -1490,13 +1477,154 @@ function selectOpt(el){
   const name=el.querySelector('.dc-oname').textContent;
   el.closest('.date-card').querySelector('.dc-btn.yes').textContent='✓ Propose '+name.split(' ')[0];
 }
-function sendMsg(){
-  const inp=document.getElementById('ch-input');
-  const txt=inp.value.trim();if(!txt)return;
-  const msgs=document.getElementById('chat-msgs');
-  const m=document.createElement('div');m.className='msg me';
-  m.innerHTML='<div class="bub">'+txt+'</div><div class="msg-t">Just now</div>';
-  msgs.appendChild(m);inp.value='';msgs.scrollTop=msgs.scrollHeight;
+/* ── REAL CHAT ───────────────────── */
+
+/* Open chat — loads history and subscribes to new messages */
+async function openChat(matchId, otherProfile) {
+  /* If we don't have a matchId yet, try to find the most recent match */
+  if (!matchId) {
+    const {data: latestMatch} = await sb.from('matches')
+      .select('id, user_id_1, user_id_2')
+      .or(`user_id_1.eq.${currentUser.id},user_id_2.eq.${currentUser.id}`)
+      .order('created_at', {ascending: false})
+      .limit(1)
+      .maybeSingle();
+    if (latestMatch) {
+      matchId = latestMatch.id;
+      if (!otherProfile) {
+        const otherId = latestMatch.user_id_1 === currentUser.id
+          ? latestMatch.user_id_2 : latestMatch.user_id_1;
+        otherProfile = await fetchProfileById(otherId);
+      }
+    }
+  }
+
+  currentMatchId      = matchId;
+  currentMatchProfile = otherProfile;
+
+  /* Update chat header */
+  const name    = otherProfile?.name || 'Match';
+  const initial = name.charAt(0).toUpperCase();
+  document.getElementById('ch-av').textContent   = initial;
+  document.getElementById('ch-name').textContent = name;
+  document.getElementById('ch-input').placeholder = `Message ${name}…`;
+
+  /* Generate icebreaker if both have prompts */
+  const myP  = currentProfile?.prompt_1_a;
+  const theirP = otherProfile?.prompt_1_a;
+  const iceCard = document.getElementById('ice-card');
+  const iceText = document.getElementById('ice-text');
+  if (myP && theirP) {
+    iceText.innerHTML = `You both answered the prompt. They said: <span>"${theirP}"</span>`;
+    iceCard.style.display = 'block';
+  } else {
+    iceCard.style.display = 'none';
+  }
+
+  /* Navigate first so the screen is visible */
+  _show('s-chat');
+  dateCardShown = false;
+
+  /* Load message history */
+  if (matchId) {
+    await loadMessages(matchId);
+    subscribeMsgs(matchId);
+  } else {
+    /* No matchId — show empty state */
+    const msgs = document.getElementById('chat-msgs');
+    msgs.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Say something. You\'re both here.</div>';
+  }
+}
+
+async function loadMessages(matchId) {
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML = '<div id="chat-loading" style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Loading…</div>';
+
+  const {data, error} = await sb.from('messages')
+    .select('id, sender_id, content, created_at')
+    .eq('match_id', matchId)
+    .order('created_at', {ascending: true});
+
+  if (error) {
+    console.error('[CHAT] loadMessages error:', error);
+    msgs.innerHTML = '<div style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Could not load messages.</div>';
+    return;
+  }
+
+  msgs.innerHTML = '';
+  if (data.length === 0) {
+    msgs.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Say something. You\'re both here.</div>';
+    return;
+  }
+  data.forEach(m => appendMessage(m));
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendMessage(msg) {
+  const msgs = document.getElementById('chat-msgs');
+  /* Remove empty state div if present */
+  const empty = msgs.querySelector('div:not(.msg)');
+  if (empty && !empty.classList.contains('date-card') && !empty.classList.contains('nudge')) {
+    empty.remove();
+  }
+  const isMe = msg.sender_id === currentUser.id;
+  const time  = new Date(msg.created_at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  const div   = document.createElement('div');
+  div.className = 'msg ' + (isMe ? 'me' : 'them');
+  div.dataset.msgId = msg.id;
+  div.innerHTML = `<div class="bub">${escapeHtml(msg.content)}</div><div class="msg-t">${time}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('ch-input');
+  const txt = inp.value.trim();
+  if (!txt || !currentMatchId || !currentUser) return;
+  inp.value = '';
+
+  /* Optimistic — add to UI immediately */
+  appendMessage({
+    id: 'temp-' + Date.now(),
+    sender_id: currentUser.id,
+    content: txt,
+    created_at: new Date().toISOString(),
+  });
+
+  const {error} = await sb.from('messages').insert({
+    match_id:  currentMatchId,
+    sender_id: currentUser.id,
+    content:   txt,
+  });
+
+  if (error) {
+    console.error('[CHAT] sendMsg error:', error);
+    showToastMsg('Message failed to send — try again.');
+  }
+  if (navigator.vibrate) navigator.vibrate(10);
+}
+
+function subscribeMsgs(matchId) {
+  if (msgSub) { sb.removeChannel(msgSub); msgSub = null; }
+  msgSub = sb.channel('msgs-' + matchId)
+    .on('postgres_changes', {
+      event:  'INSERT',
+      schema: 'public',
+      table:  'messages',
+      filter: 'match_id=eq.' + matchId,
+    }, (payload) => {
+      /* Only append if not from us — we already added it optimistically */
+      if (payload.new.sender_id !== currentUser.id) {
+        appendMessage(payload.new);
+      }
+    })
+    .subscribe((status) => {
+      console.log('[CHAT] msg subscription:', status);
+    });
 }
 
 let blindIdx=1;
@@ -1532,8 +1660,11 @@ let currentCheckInId = null;
 let presenceSub      = null;
 let likesSub         = null;
 let matchesSub       = null;
+let msgSub           = null;   // realtime chat subscription
 let presenceCache    = [];
-let activeSheetUser  = null; // profile data of person currently in sheet
+let activeSheetUser  = null;
+let currentMatchId   = null;   // id of active match for chat
+let currentMatchProfile = null; // other person's profile in current chat
 
 const POSITIONS = [
   {left:'50%',top:'50%'},{left:'22%',top:'22%'},{left:'78%',top:'22%'},
@@ -1735,76 +1866,89 @@ async function doSpark() {
   btn.disabled = true; btn.textContent = 'Flickering…';
 
   const likedId = activeSheetUser.user_id;
+  console.log('[SPARK] Liking user:', likedId, 'from:', currentUser.id);
 
-  /* First delete any existing like (to avoid unique constraint issues) */
+  /* Delete any existing like first */
   await sb.from('likes')
     .delete()
     .eq('user_id', currentUser.id)
     .eq('liked_user_id', likedId);
 
   /* Insert fresh like */
-  const {error} = await sb.from('likes').insert({
+  const {data: likeData, error} = await sb.from('likes').insert({
     user_id: currentUser.id,
     liked_user_id: likedId,
     venue_id: VENUE_ID,
-  });
+  }).select().single();
 
   if (error) {
-    console.error('Spark error:', error.code, error.message, error.details);
+    console.error('[SPARK] Insert error:', error.code, error.message);
     showToastMsg('Could not send spark: ' + (error.message || error.code));
     btn.disabled = false; btn.innerHTML = '✦ Spark';
     return;
   }
+  console.log('[SPARK] Like inserted OK:', likeData);
 
   closeSheet();
   showToastMsg('Flickering ✦ — if it\'s mutual you\'ll both know instantly.');
 
-  /* Check if they already liked us — if so it\'s mutual */
+  /* Immediately check if they already liked us back */
   const {data: mutual, error: mutualErr} = await sb.from('likes')
     .select('id')
     .eq('user_id', likedId)
     .eq('liked_user_id', currentUser.id)
     .maybeSingle();
 
-  if (mutualErr) console.error('Mutual check error:', mutualErr);
+  console.log('[SPARK] Mutual check — they liked us back?', mutual, mutualErr);
 
   if (mutual) {
+    console.log('[SPARK] MUTUAL DETECTED — calling createMatch');
     await createMatch(likedId, activeSheetUser.profiles);
+  } else {
+    console.log('[SPARK] Not mutual yet — waiting for Realtime to detect their like');
   }
 }
 
 async function createMatch(otherUserId, otherProfile) {
-  /* Prevent duplicate match */
-  const {data: existing} = await sb.from('matches')
+  console.log('[MATCH] createMatch called — me:', currentUser.id, 'them:', otherUserId);
+
+  const {data: existing, error: existErr} = await sb.from('matches')
     .select('id')
     .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${currentUser.id})`)
     .maybeSingle();
+
+  console.log('[MATCH] Existing check:', existing, existErr);
+
   if (existing) {
-    /* Match already exists — just show the overlay if not already showing */
+    console.log('[MATCH] Already matched — showing overlay directly');
     if (!document.getElementById('match-overlay').classList.contains('show')) {
       showMatchOverlay(otherProfile);
     }
     return;
   }
 
-  const {error} = await sb.from('matches').insert({
+  const {data: insertData, error} = await sb.from('matches').insert({
     user_id_1: currentUser.id, user_id_2: otherUserId, venue_id: VENUE_ID,
-  });
+  }).select().single();
+
+  console.log('[MATCH] Insert result:', insertData, error);
 
   if (error) {
-    console.error('createMatch insert error:', error.code, error.message);
-    /* Even if insert failed (e.g. already exists race condition), still show overlay */
-    showMatchOverlay(otherProfile);
+    console.error('[MATCH] Insert error:', error.code, error.message, error.hint);
+    showMatchOverlay(otherProfile, null);
     return;
   }
 
-  /* Show overlay for the person who completed the match (user_id_1).
-     The other person (user_id_2) gets it via subscribeMatches Realtime. */
-  showMatchOverlay(otherProfile);
+  console.log('[MATCH] Insert success — showing overlay for user_id_1');
+  showMatchOverlay(otherProfile, insertData.id);
 }
 
-function showMatchOverlay(otherProfile) {
+function showMatchOverlay(otherProfile, matchId) {
   if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+
+  /* Store for use when opening chat */
+  currentMatchId      = matchId || currentMatchId;
+  currentMatchProfile = otherProfile;
 
   /* You avatar */
   const youAv = document.getElementById('mo-av-you');
@@ -1840,11 +1984,83 @@ function showMatchOverlay(otherProfile) {
 
 function dismissMatchGoChat() {
   document.getElementById('match-overlay').classList.remove('show');
-  goTo('s-chat', 's-spark');
+  openChat(currentMatchId, currentMatchProfile);
 }
 function dismissMatchGoFind() {
   document.getElementById('match-overlay').classList.remove('show');
+  /* Update Find Them badge with match name */
+  const name = currentMatchProfile?.name || 'them';
+  const badge = document.querySelector('.ft-badge');
+  const blip  = document.querySelector('.r-blip-lbl');
+  if (badge) badge.textContent = name + ' nearby';
+  if (blip)  blip.textContent  = name;
   goTo('s-findthem', 's-spark');
+}
+
+/* ── MATCHES LIST ────────────────── */
+async function loadMatchesList() {
+  const list  = document.getElementById('mx-list');
+  const count = document.getElementById('mx-count');
+  if (!list || !currentUser) return;
+
+  list.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Loading…</div>';
+
+  const {data: matchRows, error} = await sb.from('matches')
+    .select('id, user_id_1, user_id_2, created_at')
+    .or(`user_id_1.eq.${currentUser.id},user_id_2.eq.${currentUser.id}`)
+    .order('created_at', {ascending: false});
+
+  if (error) {
+    console.error('[MATCHES] load error:', error);
+    list.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Could not load matches.</div>';
+    return;
+  }
+
+  if (!matchRows || matchRows.length === 0) {
+    count.textContent = '';
+    list.innerHTML = `<div style="text-align:center;padding:40px 36px;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:10px;">No matches yet.</div><div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there right now.<br>Go check in.</div><button onclick="navTo('s-spark')" style="margin-top:18px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;">Open Spark →</button></div>`;
+    return;
+  }
+
+  count.textContent = matchRows.length + ' conversation' + (matchRows.length === 1 ? '' : 's');
+
+  const items = await Promise.all(matchRows.map(async (match) => {
+    const otherId = match.user_id_1 === currentUser.id ? match.user_id_2 : match.user_id_1;
+    const [{data: profile}, {data: lastMsgs}] = await Promise.all([
+      sb.from('profiles').select('name, age, photo_url').eq('id', otherId).single(),
+      sb.from('messages').select('content, created_at, sender_id')
+        .eq('match_id', match.id).order('created_at', {ascending: false}).limit(1),
+    ]);
+    const lastMsg = lastMsgs?.[0];
+    const timeStr = lastMsg
+      ? new Date(lastMsg.created_at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})
+      : new Date(match.created_at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+    const preview = lastMsg
+      ? (lastMsg.sender_id === currentUser.id ? 'You: ' : '') + lastMsg.content
+      : 'Say something ✦';
+    return {match, profile, timeStr, preview};
+  }));
+
+  list.innerHTML = '';
+  items.forEach(({match, profile, timeStr, preview}, i) => {
+    const name    = profile?.name || 'Someone';
+    const initial = name.charAt(0).toUpperCase();
+    const row     = document.createElement('div');
+    row.className = 'mx-item' + (i === 0 ? ' first' : '');
+    row.innerHTML = `
+      <div class="mx-avw">
+        <div class="mx-av" style="background:rgba(255,90,50,0.18);">${initial}</div>
+        <div class="mx-badge bsp" style="font-size:9px;">🔥</div>
+      </div>
+      <div style="flex:1;">
+        <div class="mx-name">${name}${profile?.age ? ', ' + profile.age : ''}</div>
+        <div class="mx-prev">${escapeHtml(preview.substring(0,50))}${preview.length > 50 ? '…' : ''}</div>
+      </div>
+      <div style="font-size:11px;color:var(--ash);">${timeStr}</div>
+    `;
+    row.onclick = () => openChat(match.id, profile);
+    list.appendChild(row);
+  });
 }
 
 /* ── SEE ALL DRAWER ──────────────── */
@@ -1893,6 +2109,7 @@ function subscribePresence() {
 
 function subscribeLikes() {
   if (likesSub) { sb.removeChannel(likesSub); }
+  console.log('[REALTIME] Subscribing to likes for user:', currentUser.id);
   likesSub = sb.channel('likes-for-' + currentUser.id)
     .on('postgres_changes', {
       event: 'INSERT',
@@ -1900,32 +2117,33 @@ function subscribeLikes() {
       table: 'likes',
       filter: 'liked_user_id=eq.' + currentUser.id,
     }, async (payload) => {
+      console.log('[REALTIME] Someone liked us!', payload.new);
       const likerId = payload.new.user_id;
-      /* Check if we already liked them back */
       const {data: weAlsoLiked} = await sb.from('likes')
         .select('id')
         .eq('user_id', currentUser.id)
         .eq('liked_user_id', likerId)
         .maybeSingle();
-      if (!weAlsoLiked) return; /* not mutual yet */
-
-      /* Fetch their profile fresh in case presenceCache is stale */
+      console.log('[REALTIME] Did we like them back?', weAlsoLiked);
+      if (!weAlsoLiked) return;
       let otherProfile = presenceCache.find(r => r.user_id === likerId)?.profiles;
       if (!otherProfile) {
-        const {data: freshProfile} = await sb.from('profiles')
+        const {data: fresh} = await sb.from('profiles')
           .select('name, age, photo_url')
-          .eq('id', likerId)
-          .single();
-        otherProfile = freshProfile;
+          .eq('id', likerId).single();
+        otherProfile = fresh;
       }
+      console.log('[REALTIME] Mutual! Calling createMatch for:', likerId);
       await createMatch(likerId, otherProfile);
     })
-    .subscribe();
+    .subscribe((status) => {
+      console.log('[REALTIME] likes subscription status:', status);
+    });
 }
 
 function subscribeMatches() {
   if (matchesSub) { sb.removeChannel(matchesSub); }
-  /* Listen on BOTH user columns so either person gets the overlay */
+  console.log('[REALTIME] Subscribing to matches for user:', currentUser.id);
   matchesSub = sb.channel('matches-for-' + currentUser.id)
     .on('postgres_changes', {
       event: 'INSERT',
@@ -1933,12 +2151,12 @@ function subscribeMatches() {
       table: 'matches',
       filter: 'user_id_1=eq.' + currentUser.id,
     }, async (payload) => {
-      /* We are user_id_1 — but createMatch already called showMatchOverlay for us,
-         so only show if we somehow missed it (e.g. app was backgrounded) */
-      const otherId = payload.new.user_id_2;
+      console.log('[REALTIME] Match row inserted — we are user_id_1:', payload.new);
+      const otherId  = payload.new.user_id_2;
+      const matchId  = payload.new.id;
       if (!document.getElementById('match-overlay').classList.contains('show')) {
         const otherProfile = await fetchProfileById(otherId);
-        showMatchOverlay(otherProfile);
+        showMatchOverlay(otherProfile, matchId);
       }
     })
     .on('postgres_changes', {
@@ -1947,13 +2165,16 @@ function subscribeMatches() {
       table: 'matches',
       filter: 'user_id_2=eq.' + currentUser.id,
     }, async (payload) => {
-      /* We are user_id_2 — the other person completed the match, show our overlay */
-      const otherId = payload.new.user_id_1;
+      console.log('[REALTIME] Match row inserted — we are user_id_2:', payload.new);
+      const otherId  = payload.new.user_id_1;
+      const matchId  = payload.new.id;
       let otherProfile = presenceCache.find(r => r.user_id === otherId)?.profiles;
       if (!otherProfile) otherProfile = await fetchProfileById(otherId);
-      showMatchOverlay(otherProfile);
+      showMatchOverlay(otherProfile, matchId);
     })
-    .subscribe();
+    .subscribe((status) => {
+      console.log('[REALTIME] matches subscription status:', status);
+    });
 }
 
 /* Helper — fetch a profile by id when not in presenceCache */
