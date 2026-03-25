@@ -180,9 +180,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);margin:14px auto 0;flex-shrink:0;}
 .sheet-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .sheet-scroll::-webkit-scrollbar{display:none;}
-.sheet-hero{width:100%;height:260px;position:relative;overflow:hidden;background:rgba(255,90,50,0.1);flex-shrink:0;}
-.sheet-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;}
-.sheet-hero-initial{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:80px;color:var(--cr);font-weight:600;}
+.sheet-hero{width:100%;position:relative;background:#0D0F14;flex-shrink:0;}
+.sheet-hero img{width:100%;height:auto;display:block;max-height:400px;object-fit:contain;object-position:center;}
+.sheet-hero-initial{width:100%;height:220px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:80px;color:var(--cr);font-weight:600;}
 .sheet-hero-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 20px 16px;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);}
 .sheet-name{font-family:'Cormorant Garamond',serif;font-size:30px;color:#fff;font-weight:600;line-height:1.1;}
 .sheet-age{font-size:15px;color:rgba(255,255,255,0.8);margin-top:3px;}
@@ -194,7 +194,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .sheet-pa{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr-dim);font-style:italic;line-height:1.55;}
 .sheet-basics{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:0.5px solid rgba(255,255,255,0.05);}
 .sheet-basic-chip{background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.09);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--ash);}
-.sheet-actions{display:flex;gap:10px;padding:14px 22px;padding-bottom:max(24px,env(safe-area-inset-bottom,24px));border-top:0.5px solid rgba(255,255,255,0.06);flex-shrink:0;background:var(--sl-hdr);}
+.sheet-view-profile{text-align:center;padding:10px 22px 0;font-size:13px;color:var(--ash);cursor:pointer;font-family:'Space Grotesk',sans-serif;}
+.sheet-view-profile:active{color:var(--cr);}
+.sheet-actions{display:flex;gap:10px;padding:10px 22px;padding-bottom:max(24px,env(safe-area-inset-bottom,24px));border-top:0.5px solid rgba(255,255,255,0.06);flex-shrink:0;background:var(--sl-hdr);}
 .sheet-pass{flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.14);border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ash);cursor:pointer;font-weight:500;}
 .sheet-pass:active{background:rgba(255,255,255,0.05);}
 .sheet-spark{flex:2;background:var(--fl);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#fff;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;}
@@ -809,6 +811,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
         <div id="sheet-prompts"></div>
         <div class="sheet-basics" id="sheet-basics"></div>
       </div>
+    </div>
+    <div class="sheet-view-profile" id="sheet-view-profile-btn" onclick="viewFullProfile()">
+      View full profile →
     </div>
     <div class="sheet-actions">
       <button class="sheet-pass" onclick="closeSheet()">Pass</button>
@@ -1689,6 +1694,13 @@ function openProfileSheet(row) {
   sparkBtn.disabled = false;
   sparkBtn.innerHTML = '✦ Spark';
   document.getElementById('sheet-overlay').classList.add('open');
+}
+
+function viewFullProfile() {
+  /* Full public profile page — coming in next session */
+  if (!activeSheetUser) return;
+  const name = activeSheetUser.profiles?.name || 'this person';
+  showToastMsg(`Full profile for ${name} — coming soon ✦`);
 }
 
 function closeSheet() {
