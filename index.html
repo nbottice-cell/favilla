@@ -2033,6 +2033,7 @@ async function doSpark() {
 async function createMatch(otherUserId, otherProfile) {
   console.log('[MATCH] createMatch called — me:', currentUser.id, 'them:', otherUserId);
 
+  /* Check for existing match */
   const {data: existing, error: existErr} = await sb.from('matches')
     .select('id')
     .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${currentUser.id})`)
@@ -2041,10 +2042,10 @@ async function createMatch(otherUserId, otherProfile) {
   console.log('[MATCH] Existing check:', existing, existErr);
 
   if (existing) {
-    console.log('[MATCH] Already matched — showing overlay directly');
-    if (!document.getElementById('match-overlay').classList.contains('show')) {
-      showMatchOverlay(otherProfile);
-    }
+    /* A match row already exists — this is a stale row from a previous session.
+       Do NOT show the overlay again unless both users have active check-ins
+       right now (i.e. this is genuinely a re-match in the same venue tonight). */
+    console.log('[MATCH] Stale match row found — not showing overlay again');
     return;
   }
 
@@ -2055,12 +2056,12 @@ async function createMatch(otherUserId, otherProfile) {
   console.log('[MATCH] Insert result:', insertData, error);
 
   if (error) {
-    console.error('[MATCH] Insert error:', error.code, error.message, error.hint);
-    showMatchOverlay(otherProfile, null);
+    /* Most likely a race condition duplicate — do NOT show overlay */
+    console.error('[MATCH] Insert error (likely duplicate race):', error.code, error.message);
     return;
   }
 
-  console.log('[MATCH] Insert success — showing overlay for user_id_1');
+  console.log('[MATCH] New match created — showing overlay');
   showMatchOverlay(otherProfile, insertData.id);
 }
 
