@@ -205,7 +205,8 @@ button,[onclick]{touch-action:manipulation;}
 .pdist-t{font-size:10px;color:var(--fl-lt);font-weight:600;}
 .pname{font-size:12px;color:var(--cr-dim);font-weight:500;white-space:nowrap;}
 .top-match-badge{background:rgba(255,90,50,0.13);border:0.5px solid rgba(255,90,50,0.35);border-radius:10px;padding:3px 10px;font-size:10px;color:var(--fl-lt);font-weight:600;}
-.pn-snippet{max-width:120px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--cr-dim);font-style:italic;line-height:1.4;margin-top:2px;}
+.pn-snippet{max-width:130px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--cr-dim);font-style:italic;line-height:1.4;margin-top:2px;cursor:pointer;}
+.pn-snippet-tap{font-family:'Space Grotesk',sans-serif;font-style:normal;font-size:9px;color:rgba(255,90,50,0.55);letter-spacing:0.5px;margin-top:3px;text-transform:uppercase;}
 .you-center{position:absolute;top:50%;left:50%;z-index:10;transform:translate(-50%,-50%);}
 .you-dot{width:12px;height:12px;border-radius:50%;background:var(--fl);box-shadow:0 0 0 4px rgba(255,90,50,0.2);}
 
@@ -564,7 +565,23 @@ button,[onclick]{touch-action:manipulation;}
 .pp-ra{font-size:16px;color:var(--ash);margin-left:auto;}
 .pp-row.danger .pp-rt{color:#F09595;}
 
-/* NOTIFICATIONS TRAY */
+/* DELETE ACCOUNT OVERLAY */
+.delete-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:600;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
+.delete-overlay.open{opacity:1;pointer-events:all;}
+.delete-sheet{width:100%;background:var(--sl-card);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(226,75,74,0.3);padding:0 24px;padding-bottom:max(36px,env(safe-area-inset-bottom,36px));transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);}
+.delete-overlay.open .delete-sheet{transform:translateY(0);}
+.delete-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.1);margin:14px auto 22px;}
+.delete-icon{width:52px;height:52px;border-radius:16px;background:rgba(226,75,74,0.1);border:0.5px solid rgba(226,75,74,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;color:#F09595;margin:0 auto 16px;}
+.delete-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--cr);font-weight:600;text-align:center;margin-bottom:10px;}
+.delete-sub{font-size:13px;color:var(--ash);text-align:center;line-height:1.7;margin-bottom:24px;}
+.delete-confirm-row{margin-bottom:16px;}
+.delete-confirm-lbl{font-size:11px;color:var(--ash);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.delete-input{width:100%;background:var(--sl-hdr);border:0.5px solid rgba(226,75,74,0.25);border-radius:12px;padding:13px 16px;font-size:15px;color:var(--cr);font-family:'Space Grotesk',sans-serif;outline:none;letter-spacing:2px;}
+.delete-input:focus{border-color:rgba(226,75,74,0.6);}
+.delete-btn{width:100%;background:rgba(226,75,74,0.15);border:0.5px solid rgba(226,75,74,0.4);border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#F09595;cursor:pointer;font-weight:600;margin-bottom:10px;transition:background 0.2s,opacity 0.2s;}
+.delete-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.delete-btn.armed{background:rgba(226,75,74,0.3);border-color:rgba(226,75,74,0.7);color:#fff;}
+.delete-cancel{width:100%;background:transparent;border:0.5px solid rgba(255,255,255,0.1);border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ash);cursor:pointer;}
 .notif-tray{position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .notif-tray.open{opacity:1;pointer-events:all;}
 .nt-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--sl-card);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.2);padding:20px 22px;padding-bottom:max(32px,env(safe-area-inset-bottom,32px));transform:translateY(100%);transition:transform 0.3s ease;}
@@ -683,8 +700,25 @@ button,[onclick]{touch-action:manipulation;}
         <button class="pp-row" onclick="closePanelGo('s-nights')"><div class="pp-ri" style="background:rgba(212,146,26,0.12);">🎟</div><div class="pp-rt">Favilla Nights</div><div class="pp-ra">›</div></button>
         <button class="pp-row" onclick="closePanelGo('s-met')"><div class="pp-ri" style="background:rgba(212,146,26,0.1);">💛</div><div class="pp-rt">We met on Favilla</div><div class="pp-ra">›</div></button>
         <button class="pp-row danger" onclick="doSignOut()"><div class="pp-ri" style="background:rgba(226,75,74,0.1);">→</div><div class="pp-rt">Sign out</div></button>
+        <button class="pp-row danger" onclick="openDeleteConfirm()" style="margin-top:4px;"><div class="pp-ri" style="background:rgba(226,75,74,0.08);">✕</div><div class="pp-rt" style="color:rgba(240,149,149,0.7);font-size:13px;">Delete account</div></button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- DELETE ACCOUNT CONFIRM -->
+<div class="delete-overlay" id="delete-overlay">
+  <div class="delete-sheet">
+    <div class="delete-handle"></div>
+    <div class="delete-icon">✕</div>
+    <div class="delete-title">Delete your account?</div>
+    <div class="delete-sub">This permanently removes your profile, matches, messages, and all data. There is no undo.</div>
+    <div class="delete-confirm-row">
+      <div class="delete-confirm-lbl">Type DELETE to confirm</div>
+      <input class="delete-input" id="delete-confirm-input" type="text" placeholder="DELETE" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <button class="delete-btn" id="delete-btn" onclick="doDeleteAccount()">Delete my account</button>
+    <button class="delete-cancel" onclick="closeDeleteConfirm()">Cancel — keep my account</button>
   </div>
 </div>
 
@@ -1561,6 +1595,58 @@ async function doLogin(){
     _show('s-onboard');
   }
 }
+/* ── DELETE ACCOUNT ──────────────── */
+function openDeleteConfirm() {
+  document.getElementById('profile-panel').classList.remove('open');
+  const input = document.getElementById('delete-confirm-input');
+  const btn   = document.getElementById('delete-btn');
+  input.value = '';
+  btn.disabled = true;
+  btn.classList.remove('armed');
+  document.getElementById('delete-overlay').classList.add('open');
+  setTimeout(() => input.focus(), 400);
+
+  /* Watch the input — only arm the button when they type DELETE exactly */
+  input.oninput = () => {
+    const armed = input.value.trim() === 'DELETE';
+    btn.disabled = !armed;
+    btn.classList.toggle('armed', armed);
+  };
+}
+
+function closeDeleteConfirm() {
+  document.getElementById('delete-overlay').classList.remove('open');
+  document.getElementById('delete-confirm-input').value = '';
+}
+
+async function doDeleteAccount() {
+  const btn = document.getElementById('delete-btn');
+  if (document.getElementById('delete-confirm-input').value.trim() !== 'DELETE') return;
+
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+
+  try {
+    /* Call the Supabase function that wipes everything */
+    const { error } = await sb.rpc('delete_own_account');
+    if (error) throw error;
+
+    /* Sign out locally and go to splash */
+    await sb.auth.signOut();
+    currentUser    = null;
+    currentProfile = null;
+    navStack.length = 0;
+    closeDeleteConfirm();
+    _show('s-splash');
+    showToastMsg('Account deleted. Take care out there.');
+  } catch (err) {
+    console.error('Delete account error:', err);
+    btn.disabled = false;
+    btn.textContent = 'Delete my account';
+    showToastMsg('Something went wrong: ' + (err.message || 'please try again'));
+  }
+}
+
 async function doSignOut(){
   document.getElementById('profile-panel').classList.remove('open');
   await sb.auth.signOut();
@@ -2115,11 +2201,21 @@ function renderPresence(users) {
     const bg      = BG_COLORS[i];
     const isFirst = i === 0;
 
-    /* Icebreaker snippet — use dedicated field, fall back to first prompt */
+    /* Icebreaker snippet — truncate at word boundary, show tap cue if cut */
     let snippet = '';
+    let isTruncated = false;
     if (isFirst) {
       const raw = p.icebreaker || p.prompt_1_a || '';
-      if (raw) snippet = raw.length > 42 ? raw.substring(0, 40) + '\u2026' : raw;
+      if (raw) {
+        if (raw.length <= 38) {
+          snippet = raw;
+        } else {
+          /* Break at last space before 36 chars so we don't cut mid-word */
+          const cut = raw.lastIndexOf(' ', 36);
+          snippet = raw.substring(0, cut > 10 ? cut : 36);
+          isTruncated = true;
+        }
+      }
     }
 
     const avContent = p.photo_url
@@ -2137,7 +2233,7 @@ function renderPresence(users) {
       <div class="${isFirst ? '' : 'pname'}" style="${isFirst ? 'font-size:14px;color:var(--cr);font-weight:600;margin-top:7px;' : ''}">
         ${label}
       </div>
-      ${isFirst && snippet ? `<div class="pn-snippet">&ldquo;${snippet}&rdquo;</div>` : ''}
+      ${isFirst && snippet ? `<div class="pn-snippet">&ldquo;${snippet}${isTruncated ? '…' : ''}&rdquo;${isTruncated ? '<div class="pn-snippet-tap">tap to read more</div>' : ''}</div>` : ''}
     `;
     node.onclick = () => openProfileSheet(row);
     container.appendChild(node);
