@@ -765,11 +765,17 @@ button,[onclick]{touch-action:manipulation;}
     <div class="field"><label class="field-label">First name</label><input class="field-input" type="text" id="ob-name" placeholder="What people actually call you"></div>
     <div class="field"><label class="field-label">Age</label><input class="field-input" type="number" id="ob-age" placeholder="e.g. 26" min="18" max="99"></div>
     <div class="field"><label class="field-label" style="margin-bottom:10px;">I identify as</label>
-      <div class="g-grid">
+      <div class="g-grid" style="grid-template-columns:1fr 1fr 1fr;">
         <div class="g-opt" onclick="selG(this,'Woman')">Woman</div>
         <div class="g-opt" onclick="selG(this,'Man')">Man</div>
-        <div class="g-opt" onclick="selG(this,'Non-binary')">Non-binary</div>
-        <div class="g-opt" onclick="selG(this,'Other')">Something else</div>
+        <div class="g-opt" onclick="selG(this,'Something else')" style="grid-column:1/-1;">Something else</div>
+      </div>
+    </div>
+    <div class="field"><label class="field-label" style="margin-bottom:10px;">Interested in</label>
+      <div class="g-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="g-opt" onclick="selInt(this,'Women')">Women</div>
+        <div class="g-opt" onclick="selInt(this,'Men')">Men</div>
+        <div class="g-opt" onclick="selInt(this,'Everyone')" style="grid-column:1/-1;">Everyone</div>
       </div>
     </div>
   </div>
@@ -1337,7 +1343,7 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 let currentUser=null,currentProfile=null;
-let obStep=1,obGender='',obIntention='';
+let obStep=1,obGender='',obIntention='',obInterested='';
 let photoFiles=[null,null,null];
 const navStack=[];
 
@@ -1431,20 +1437,23 @@ function closePanelGo(id){
         ib.value=currentProfile.icebreaker||'';
         updateIcebreakerCount(ib);
       }
-      /* Re-select gender and intention */
+      /* Re-select gender — only within the gender grid (first g-grid) */
       if(currentProfile.gender){
-        document.querySelectorAll('.g-opt').forEach(o=>{
-          if(o.textContent.trim()===currentProfile.gender){o.classList.add('sel');}
+        const gGrids = document.querySelectorAll('.g-grid');
+        if(gGrids[0]) gGrids[0].querySelectorAll('.g-opt').forEach(o=>{
+          if(o.textContent.trim()===currentProfile.gender) o.classList.add('sel');
+          else o.classList.remove('sel');
         });
         obGender=currentProfile.gender;
       }
-      if(currentProfile.intention){
-        document.querySelectorAll('.int-item').forEach(o=>{
-          if(o.dataset.val===currentProfile.intention||o.onclick?.toString().includes(currentProfile.intention)){
-            o.classList.add('sel');
-          }
+      /* Re-select interested_in — within the second g-grid */
+      if(currentProfile.interested_in){
+        const gGrids = document.querySelectorAll('.g-grid');
+        if(gGrids[1]) gGrids[1].querySelectorAll('.g-opt').forEach(o=>{
+          if(o.textContent.trim()===currentProfile.interested_in) o.classList.add('sel');
+          else o.classList.remove('sel');
         });
-        obIntention=currentProfile.intention;
+        obInterested=currentProfile.interested_in;
       }
     }, 100);
   }
@@ -1570,6 +1579,7 @@ function obValidate(){
     const age=parseInt(document.getElementById('ob-age').value);
     if(!age||age<18||age>99){showToastMsg('Please enter a valid age.');return false;}
     if(!obGender){showToastMsg('Pick one — takes one tap.');return false;}
+    if(!obInterested){showToastMsg('Who are you interested in?');return false;}
   }
   if(obStep===2&&!obIntention){showToastMsg('Pick the honest one. They all work.');return false;}
   if(obStep===3){
@@ -1592,6 +1602,17 @@ function updateIcebreakerCount(el){
     counter.textContent = len+'/60';
     counter.style.color = len >= 55 ? 'var(--fl-lt)' : 'var(--ash)';
   }
+}
+function selG(el,v){
+  document.querySelectorAll('.g-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  obGender=v;
+}
+function selInt(el,v){
+  /* Only deselect within the "interested in" grid — leave gender selection intact */
+  el.closest('.g-grid').querySelectorAll('.g-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  obInterested=v;
 }
 function selI(el,v){document.querySelectorAll('.int-item').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');obIntention=v;}
 function handlePhoto(e,i){
@@ -1618,7 +1639,7 @@ async function saveProfile(){
     const{error:ue}=await sb.storage.from('avatars').upload(path,mp,{upsert:true});
     if(!ue){const{data:ud}=sb.storage.from('avatars').getPublicUrl(path);photoUrl=ud.publicUrl;}
   }
-  const prof={id:currentUser.id,name,age,gender:obGender,intention:obIntention,
+  const prof={id:currentUser.id,name,age,gender:obGender,interested_in:obInterested,intention:obIntention,
     prompt_1_q:"The most spontaneous thing I've actually done",prompt_1_a:document.getElementById('p1').value.trim(),
     prompt_2_q:"I could go on about this forever",prompt_2_a:document.getElementById('p2').value.trim(),
     prompt_3_q:"A hill I will absolutely die on",prompt_3_a:document.getElementById('p3').value.trim(),
@@ -2039,7 +2060,7 @@ function updateCheckInUI(in_) {
 }
 
 async function loadPresence() {
-  if (!currentUser) return;
+  if (!currentUser || !currentProfile) return;  /* don't run until profile exists */
   const {data, error} = await sb
     .from('check_ins')
     .select('id, user_id, profiles(name, age, photo_url, icebreaker, prompt_1_q, prompt_1_a, prompt_2_q, prompt_2_a, prompt_3_q, prompt_3_a, intention, gender)')
@@ -2047,7 +2068,8 @@ async function loadPresence() {
     .gt('expires_at', new Date().toISOString())
     .neq('user_id', currentUser.id);
   if (error) { console.error('Presence error', error); return; }
-  presenceCache = data || [];
+  /* Filter out any rows where the profile join returned null (deleted accounts etc) */
+  presenceCache = (data || []).filter(row => row.profiles);
   renderPresence(presenceCache);
   updateVenueSub(presenceCache.length);
   renderDrawerList(presenceCache);
@@ -2454,8 +2476,15 @@ function subscribePresence() {
   if (presenceSub) { sb.removeChannel(presenceSub); }
   presenceSub = sb.channel('presence-' + VENUE_ID)
     .on('postgres_changes', {event:'*', schema:'public', table:'check_ins',
-      filter:'venue_id=eq.' + VENUE_ID}, () => loadPresence())
-    .subscribe();
+      filter:'venue_id=eq.' + VENUE_ID}, () => {
+        /* Small delay so DB write is fully committed before we read */
+        setTimeout(loadPresence, 400);
+      })
+    .subscribe((status) => {
+      console.log('[PRESENCE] subscription status:', status);
+      /* Once subscribed, do an immediate fresh load */
+      if (status === 'SUBSCRIBED') loadPresence();
+    });
 }
 
 function subscribeLikes() {
