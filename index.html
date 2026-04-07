@@ -25,8 +25,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grotesk',sans-serif;overflow:hidden;}
-/* Global touch fix — all clickable elements respond immediately on mobile */
-button,[onclick]{touch-action:manipulation;}
 @media(min-width:500px){body{background:#0A0C10;display:flex;align-items:center;justify-content:center;}.shell{width:390px;height:844px;border-radius:48px;border:1.5px solid rgba(255,90,50,0.2);box-shadow:0 40px 120px rgba(0,0,0,0.9);}}
 .shell{width:100%;height:100%;background:var(--sl-bg);position:relative;overflow:hidden;}
 .notch{width:120px;height:34px;background:var(--sl-bg);border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:100;}
@@ -38,61 +36,18 @@ button,[onclick]{touch-action:manipulation;}
 @media(max-width:499px){.screen{padding-top:env(safe-area-inset-top,44px);}}
 .with-nav{padding-bottom:88px;}
 
-/* ==============================================
-   MASTER NAV — PERMANENT BOTTOM BAR
-   Single instance in shell, outside all screens.
-   position:absolute on desktop shell (390px box).
-   position:fixed on real mobile (full viewport).
-   z-index:300 — above screens, below overlays (500+).
-   DO NOT move this inside a .screen div.
-   DO NOT add more nav bars to individual screens.
-   ============================================== */
-.nav{
-  position:absolute;bottom:0;left:0;right:0;
-  background:var(--sl-hdr);
-  border-top:0.5px solid rgba(255,90,50,0.12);
-  display:flex;justify-content:space-around;
-  padding:10px 8px;
-  padding-bottom:max(24px,env(safe-area-inset-bottom,24px));
-  z-index:300;
-}
-@media(max-width:499px){
-  .nav{position:fixed;bottom:0;left:0;right:0;}
-}
+/* NAV — fixed to shell bottom always */
+.nav{position:absolute;bottom:0;left:0;right:0;background:var(--sl-hdr);border-top:0.5px solid rgba(255,90,50,0.12);display:flex;justify-content:space-around;padding:10px 8px;padding-bottom:max(24px,env(safe-area-inset-bottom,24px));z-index:200;}
 .ni{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;min-width:60px;}
-.ni-lbl{font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.5px;transition:color 0.2s;}
+.ni-lbl{font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.5px;}
 .ni.on .ni-lbl{color:var(--fl);}
-.ni-dot{width:20px;height:2.5px;border-radius:1.5px;background:currentColor;opacity:0.4;color:var(--ash);margin:0 auto;transition:opacity 0.2s,color 0.2s;}
+.ni-dot{width:20px;height:2.5px;border-radius:1.5px;background:currentColor;opacity:0.4;color:var(--ash);margin:0 auto;}
 .ni.on .ni-dot{opacity:1;color:var(--fl);}
-/* Screens need bottom padding so content clears the nav bar */
 .with-nav{padding-bottom:88px;}
-.screen{padding-bottom:88px;}
 /* LOADING */
 .loading{position:absolute;inset:0;background:var(--sl-bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;z-index:999;transition:opacity 0.4s;}
 .loading.gone{opacity:0;pointer-events:none;}
 @keyframes flicker{0%,100%{opacity:1}50%{opacity:0.72}}
-/* Candle flame animations */
-@keyframes flameDance{
-  0%,100%{transform:scaleX(1) scaleY(1) translateY(0);opacity:0.9;}
-  25%{transform:scaleX(0.88) scaleY(1.08) translateY(-1px);opacity:1;}
-  50%{transform:scaleX(1.06) scaleY(0.96) translateY(0.5px);opacity:0.85;}
-  75%{transform:scaleX(0.94) scaleY(1.04) translateY(-0.5px);opacity:0.95;}
-}
-@keyframes flameGlow{
-  0%,100%{opacity:0.5;}
-  40%{opacity:0.72;}
-  70%{opacity:0.38;}
-}
-@keyframes flameMid{
-  0%,100%{transform:scaleX(1) translateY(0);}
-  33%{transform:scaleX(0.9) translateY(-1px);}
-  66%{transform:scaleX(1.08) translateY(0.5px);}
-}
-.candle-wrap{display:flex;justify-content:center;margin-bottom:18px;}
-.candle-svg{filter:drop-shadow(0 0 8px rgba(255,90,50,0.35));}
-.flame-outer{transform-origin:26px 18px;animation:flameGlow 1.8s ease-in-out infinite;}
-.flame-mid{transform-origin:26px 20px;animation:flameMid 1.2s ease-in-out infinite;}
-.flame-inner{transform-origin:26px 22px;animation:flameDance 0.9s ease-in-out infinite;}
 .lf{animation:flicker 1.4s ease-in-out infinite;}
 .lt{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--ash);letter-spacing:3px;}
 
@@ -174,12 +129,12 @@ button,[onclick]{touch-action:manipulation;}
 
 /* SPARK */
 #s-spark{background:var(--sl-bg);padding-top:0;}
-.sp-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:400;}
+.sp-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:50;}
 .sp-logo{display:flex;align-items:center;gap:10px;}
 .sp-wm{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);letter-spacing:4px;text-transform:uppercase;font-weight:600;}
 .sp-right{display:flex;align-items:center;gap:10px;}
-.bell-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--fl-lt);font-size:16px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;z-index:401;}
-.pp-pill{width:40px;height:40px;border-radius:50%;background:rgba(255,90,50,0.18);border:1px solid rgba(255,90,50,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cr);cursor:pointer;font-weight:600;-webkit-tap-highlight-color:transparent;touch-action:manipulation;position:relative;z-index:401;}
+.bell-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--fl-lt);}
+.pp-pill{width:32px;height:32px;border-radius:50%;background:rgba(255,90,50,0.18);border:1px solid rgba(255,90,50,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cr);cursor:pointer;font-weight:600;}
 .venue-bar{margin:14px 18px;background:rgba(255,90,50,0.08);border:0.5px solid rgba(255,90,50,0.32);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 @keyframes vp{0%{box-shadow:0 0 0 0 rgba(255,90,50,0.5);}70%{box-shadow:0 0 0 8px rgba(255,90,50,0);}100%{box-shadow:0 0 0 0 rgba(255,90,50,0);}}
 .v-pulse{width:9px;height:9px;border-radius:50%;background:var(--fl);flex-shrink:0;animation:vp 2.2s infinite;}
@@ -205,8 +160,6 @@ button,[onclick]{touch-action:manipulation;}
 .pdist-t{font-size:10px;color:var(--fl-lt);font-weight:600;}
 .pname{font-size:12px;color:var(--cr-dim);font-weight:500;white-space:nowrap;}
 .top-match-badge{background:rgba(255,90,50,0.13);border:0.5px solid rgba(255,90,50,0.35);border-radius:10px;padding:3px 10px;font-size:10px;color:var(--fl-lt);font-weight:600;}
-.pn-snippet{max-width:130px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--cr-dim);font-style:italic;line-height:1.4;margin-top:2px;cursor:pointer;}
-.pn-snippet-tap{font-family:'Space Grotesk',sans-serif;font-style:normal;font-size:9px;color:rgba(255,90,50,0.55);letter-spacing:0.5px;margin-top:3px;text-transform:uppercase;}
 .you-center{position:absolute;top:50%;left:50%;z-index:10;transform:translate(-50%,-50%);}
 .you-dot{width:12px;height:12px;border-radius:50%;background:var(--fl);box-shadow:0 0 0 4px rgba(255,90,50,0.2);}
 
@@ -220,45 +173,43 @@ button,[onclick]{touch-action:manipulation;}
 .nb-btn{padding:7px 13px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.28);border-radius:9px;font-size:11px;color:var(--fl-lt);font-weight:600;cursor:pointer;white-space:nowrap;}
 
 /* PROFILE CARD SHEET */
-.sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.65);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:250;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .sheet-overlay.open{opacity:1;pointer-events:all;}
-.profile-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.2);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);height:90%;display:flex;flex-direction:column;overflow:hidden;}
+.profile-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.2);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);max-height:88%;display:flex;flex-direction:column;overflow:hidden;}
 .sheet-overlay.open .profile-sheet{transform:translateY(0);}
 .sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);margin:14px auto 0;flex-shrink:0;}
-.sheet-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+.sheet-scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
 .sheet-scroll::-webkit-scrollbar{display:none;}
-.sheet-hero{width:100%;position:relative;background:#0D0F14;flex-shrink:0;}
-.sheet-hero img{width:100%;height:auto;display:block;max-height:400px;object-fit:contain;object-position:center;}
-.sheet-hero-initial{width:100%;height:220px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:80px;color:var(--cr);font-weight:600;}
-.sheet-hero-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 20px 16px;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 60%,transparent 100%);}
-.sheet-name{font-family:'Cormorant Garamond',serif;font-size:30px;color:#fff;font-weight:600;line-height:1.1;}
-.sheet-age{font-size:15px;color:rgba(255,255,255,0.8);margin-top:3px;}
-.sheet-body{padding:18px 22px 24px;}
-.sheet-intention{display:inline-flex;align-items:center;gap:6px;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:6px 14px;font-size:12px;color:var(--fl-lt);margin-bottom:20px;}
-.sheet-prompt{margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px solid rgba(255,255,255,0.05);}
-.sheet-prompt:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
-.sheet-pq{font-size:10px;color:var(--ash);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;}
-.sheet-pa{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr-dim);font-style:italic;line-height:1.55;}
-.sheet-basics{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:0.5px solid rgba(255,255,255,0.05);}
-.sheet-basic-chip{background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.09);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--ash);}
-.sheet-view-profile{text-align:center;padding:10px 22px 0;font-size:13px;color:var(--ash);cursor:pointer;font-family:'Space Grotesk',sans-serif;}
-.sheet-view-profile:active{color:var(--cr);}
-.sheet-actions{display:flex;gap:10px;padding:10px 22px;padding-bottom:max(24px,env(safe-area-inset-bottom,24px));border-top:0.5px solid rgba(255,255,255,0.06);flex-shrink:0;background:var(--sl-hdr);}
-.sheet-pass{flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.14);border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ash);cursor:pointer;font-weight:500;}
+.sheet-hero{width:100%;height:220px;position:relative;overflow:hidden;background:rgba(255,90,50,0.1);flex-shrink:0;}
+.sheet-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.sheet-hero-initial{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:72px;color:var(--cr);font-weight:600;}
+.sheet-hero-overlay{position:absolute;bottom:0;left:0;right:0;padding:16px 20px 14px;background:linear-gradient(to top,rgba(0,0,0,0.78) 0%,transparent 100%);}
+.sheet-name{font-family:'Cormorant Garamond',serif;font-size:28px;color:#fff;font-weight:600;line-height:1.1;}
+.sheet-age{font-size:15px;color:rgba(255,255,255,0.75);margin-top:2px;}
+.sheet-body{padding:16px 22px 8px;}
+.sheet-intention{display:inline-flex;align-items:center;gap:6px;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:6px 14px;font-size:12px;color:var(--fl-lt);margin-bottom:18px;}
+.sheet-prompt{margin-bottom:14px;padding-bottom:14px;border-bottom:0.5px solid rgba(255,255,255,0.05);}
+.sheet-prompt:last-child{border-bottom:none;margin-bottom:0;}
+.sheet-pq{font-size:10px;color:var(--ash);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:5px;}
+.sheet-pa{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--cr-dim);font-style:italic;line-height:1.5;}
+.sheet-basics{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.sheet-basic-chip{background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--ash);}
+.sheet-actions{display:flex;gap:10px;padding:12px 22px;padding-bottom:max(20px,env(safe-area-inset-bottom,20px));border-top:0.5px solid rgba(255,255,255,0.06);flex-shrink:0;}
+.sheet-pass{flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.12);border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ash);cursor:pointer;font-weight:500;}
 .sheet-pass:active{background:rgba(255,255,255,0.05);}
-.sheet-spark{flex:2;background:var(--fl);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#fff;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;}
+.sheet-spark{flex:2;background:var(--fl);border:none;border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#fff;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;}
 .sheet-spark:active{opacity:0.85;}
 
 /* SEE ALL DRAWER */
 .see-all-btn{margin:8px 18px 10px;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.08);background:transparent;cursor:pointer;font-size:13px;color:var(--ash);font-family:'Space Grotesk',sans-serif;}
 .see-all-btn span{color:var(--fl-lt);font-weight:600;}
-.drawer-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.65);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.drawer-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:150;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .drawer-overlay.open{opacity:1;pointer-events:all;}
-.people-drawer{position:absolute;bottom:0;left:0;right:0;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.18);transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);max-height:80%;display:flex;flex-direction:column;}
+.people-drawer{position:absolute;bottom:0;left:0;right:0;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.18);padding-bottom:max(24px,env(safe-area-inset-bottom,24px));transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);max-height:75%;}
 .drawer-overlay.open .people-drawer{transform:translateY(0);}
-.drawer-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);margin:14px auto 6px;flex-shrink:0;}
-.drawer-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);padding:0 20px 12px;border-bottom:0.5px solid rgba(255,255,255,0.06);flex-shrink:0;}
-.drawer-list{overflow-y:auto;flex:1;padding:8px 0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+.drawer-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);margin:14px auto 6px;}
+.drawer-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);padding:0 20px 12px;border-bottom:0.5px solid rgba(255,255,255,0.06);}
+.drawer-list{overflow-y:auto;max-height:calc(75vh - 100px);padding:8px 0;}
 .drawer-list::-webkit-scrollbar{display:none;}
 .drawer-row{display:flex;align-items:center;gap:13px;padding:12px 20px;cursor:pointer;transition:background 0.15s;}
 .drawer-row:active{background:rgba(255,90,50,0.05);}
@@ -269,17 +220,16 @@ button,[onclick]{touch-action:manipulation;}
 .drawer-online{width:8px;height:8px;border-radius:50%;background:#4CAF50;flex-shrink:0;margin-left:auto;}
 
 /* MATCH ANIMATION OVERLAY */
-.match-overlay{position:absolute;inset:0;background:rgba(13,15,20,0.95);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 36px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.match-overlay{position:absolute;inset:0;background:rgba(13,15,20,0.92);z-index:250;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 36px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;}
 .match-overlay.show{opacity:1;pointer-events:all;}
 @keyframes matchPop{0%{transform:scale(0.7);opacity:0;}60%{transform:scale(1.08);}100%{transform:scale(1);opacity:1;}}
 @keyframes gemSpin{0%{transform:rotate(0deg) scale(0);}60%{transform:rotate(200deg) scale(1.2);}100%{transform:rotate(180deg) scale(1);}}
-.mo-avs{display:flex;align-items:center;margin-bottom:18px;animation:matchPop 0.5s 0.1s ease forwards;opacity:0;}
-.mo-av{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:40px;color:var(--cr);font-weight:600;overflow:hidden;flex-shrink:0;}
-.mo-av img{width:100%;height:100%;object-fit:cover;object-position:center top;}
-.mo-gem{width:44px;height:44px;border-radius:50%;background:var(--sl-bg);border:2px solid var(--fl);display:flex;align-items:center;justify-content:center;font-size:18px;margin:0 -14px;z-index:2;color:var(--fl);animation:gemSpin 0.6s 0.3s ease forwards;opacity:0;flex-shrink:0;}
+.mo-avs{display:flex;align-items:center;margin-bottom:6px;animation:matchPop 0.5s 0.1s ease forwards;opacity:0;}
+.mo-av{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--cr);font-weight:600;overflow:hidden;}
+.mo-gem{width:40px;height:40px;border-radius:50%;background:var(--sl-bg);border:2px solid var(--fl);display:flex;align-items:center;justify-content:center;font-size:16px;margin:0 -12px;z-index:2;color:var(--fl);animation:gemSpin 0.6s 0.3s ease forwards;opacity:0;}
 .mo-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--fl-lt);margin-bottom:10px;animation:fadeUp 0.4s 0.5s ease forwards;opacity:0;}
-.mo-name{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--cr);line-height:1.2;margin-bottom:8px;animation:fadeUp 0.4s 0.6s ease forwards;opacity:0;}
-.mo-sub{font-size:13px;color:var(--ash);line-height:1.7;margin-bottom:10px;animation:fadeUp 0.4s 0.7s ease forwards;opacity:0;}
+.mo-name{font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--cr);line-height:1.2;margin-bottom:8px;animation:fadeUp 0.4s 0.6s ease forwards;opacity:0;}
+.mo-sub{font-size:13px;color:var(--ash);line-height:1.7;margin-bottom:28px;animation:fadeUp 0.4s 0.7s ease forwards;opacity:0;}
 .mo-loc{font-size:12px;color:var(--ash);margin-bottom:28px;animation:fadeUp 0.4s 0.65s ease forwards;opacity:0;}
 .mo-chat{width:100%;background:var(--fl);color:#fff;border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;animation:fadeUp 0.4s 0.8s ease forwards;opacity:0;}
 .mo-find{width:100%;background:transparent;border:0.5px solid rgba(255,184,64,0.4);border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:#FFB840;cursor:pointer;animation:fadeUp 0.4s 0.9s ease forwards;opacity:0;}
@@ -298,8 +248,8 @@ button,[onclick]{touch-action:manipulation;}
 .m-skip{font-size:13px;color:var(--ash);cursor:pointer;animation:fadeUp 0.6s 0.6s ease forwards;opacity:0;background:none;border:none;font-family:'Space Grotesk',sans-serif;padding:8px;}
 
 /* CHAT */
-#s-chat{background:var(--sl-bg);padding-top:0;display:flex;flex-direction:column;}
-.ch-hdr{background:var(--sl-hdr);padding:14px 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,90,50,0.12);flex-shrink:0;position:sticky;top:0;z-index:400;}
+#s-chat{background:var(--sl-bg);padding-top:50px;display:flex;flex-direction:column;}
+.ch-hdr{background:var(--sl-hdr);padding:14px 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,90,50,0.12);flex-shrink:0;}
 .bk-btn{font-size:20px;color:var(--ash);cursor:pointer;padding:4px 8px 4px 0;min-width:44px;min-height:44px;display:flex;align-items:center;background:none;border:none;font-family:'Space Grotesk',sans-serif;flex-shrink:0;}
 .ch-av{width:40px;height:40px;border-radius:50%;background:rgba(255,90,50,0.18);border:1px solid rgba(255,90,50,0.35);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);font-weight:600;}
 .ch-name{font-size:16px;color:var(--cr);font-weight:600;}
@@ -360,13 +310,44 @@ button,[onclick]{touch-action:manipulation;}
 /* WE MET */
 #s-met{background:#0D0F14;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 36px;text-align:center;}
 
-/* FIND THEM — ROOM MAP + COMPASS ARROW */
+/* FIND THEM */
+#s-findthem{background:#0D0F14;padding-top:50px;display:flex;flex-direction:column;}
+.ft-hdr{background:#111520;padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);}
+.ft-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:2px;text-transform:uppercase;font-weight:600;}
+.ft-badge{background:rgba(255,90,50,0.14);border:0.5px solid rgba(255,90,50,0.35);border-radius:10px;padding:3px 10px;font-size:11px;color:var(--fl-lt);font-weight:600;}
+.radar-area{position:relative;height:220px;margin:12px 18px;}
+@keyframes radarSweep{0%{transform:translate(-50%,-50%) rotate(0deg);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+@keyframes radarPing{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.6;}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0;}}
+.r-ring{position:absolute;border-radius:50%;border:0.5px solid rgba(255,90,50,0.15);top:50%;left:50%;transform:translate(-50%,-50%);}
+.r-sweep{position:absolute;width:50%;height:1px;background:rgba(255,90,50,0.45);top:50%;left:50%;transform-origin:0 50%;animation:radarSweep 3s linear infinite;border-radius:0 1px 1px 0;}
+.r-ping{position:absolute;border-radius:50%;border:1px solid rgba(255,90,50,0.45);top:50%;left:50%;animation:radarPing 3s ease-out infinite;}
+.r-you{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;}
+.r-you-dot{width:12px;height:12px;border-radius:50%;background:var(--fl);box-shadow:0 0 0 4px rgba(255,90,50,0.2);}
+.r-blip{position:absolute;transform:translate(-50%,-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.r-blip-dot{width:10px;height:10px;border-radius:50%;background:#FFB840;box-shadow:0 0 0 3px rgba(255,184,64,0.22);}
+.r-blip-lbl{font-size:9px;color:#FFB840;font-weight:600;}
+@keyframes warmerPulse{0%,100%{border-color:rgba(255,184,64,0.35);}50%{border-color:rgba(255,184,64,0.75);}}
+.temp-card{margin:0 18px;background:#111520;border:0.5px solid rgba(255,184,64,0.35);border-radius:12px;padding:12px 14px;animation:warmerPulse 2s ease-in-out infinite;}
+.temp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.temp-lbl{font-size:12px;color:#FFB840;font-weight:600;}
+.temp-val{font-size:12px;color:var(--ash);}
+.temp-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+.temp-fill{height:100%;border-radius:3px;background:#FFB840;width:68%;}
+.hints-area{margin:10px 18px 0;}
+.hints-lbl{font-size:10px;color:var(--ash);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.hint-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.hint-pill{display:flex;align-items:center;gap:5px;background:var(--sl-hdr);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:6px 13px;cursor:pointer;}
+.hint-pill.active{border-color:rgba(255,184,64,0.45);background:rgba(255,184,64,0.07);}
+.hint-pill span{font-size:12px;color:var(--cr-dim);}
+.hint-pill.active span{color:#FFB840;}
+.drop-hint-btn{margin:12px 18px 0;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.3);border-radius:12px;padding:12px;text-align:center;font-size:13px;color:var(--fl-lt);font-weight:600;cursor:pointer;}
+
+
+/* FIND THEM -- ROOM MAP + COMPASS */
 #s-findthem{background:#0A0C12;padding-top:0;display:flex;flex-direction:column;}
 .ft-hdr{background:#111520;padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:400;}
 .ft-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:2px;text-transform:uppercase;font-weight:600;}
 .ft-badge{background:rgba(255,90,50,0.14);border:0.5px solid rgba(255,90,50,0.35);border-radius:10px;padding:3px 10px;font-size:11px;color:var(--fl-lt);font-weight:600;}
-
-/* Room map area */
 .ft-map-wrap{position:relative;height:260px;background:#0A0C12;overflow:hidden;flex-shrink:0;}
 .ft-map-svg{position:absolute;inset:0;width:100%;height:100%;}
 .ft-dist-badge{position:absolute;top:10px;right:12px;background:rgba(10,12,18,0.88);border:0.5px solid rgba(255,90,50,0.3);border-radius:10px;padding:6px 11px;text-align:center;}
@@ -377,33 +358,39 @@ button,[onclick]{touch-action:manipulation;}
 .ft-leg-dot{width:7px;height:7px;border-radius:50%;}
 .ft-leg-txt{font-size:9px;color:var(--ash);}
 .ft-orient-note{position:absolute;bottom:8px;right:12px;font-size:9px;color:rgba(255,90,50,0.4);}
-
-@keyframes themPulse{0%,100%{r:6px;}50%{r:7.5px;}}
 @keyframes threadFlow{to{stroke-dashoffset:-14;}}
 @keyframes ftScanLine{0%,100%{opacity:0.06;}50%{opacity:0.14;}}
-@keyframes youArrow{0%{transform:rotate(0deg);}33%{transform:rotate(-18deg);}66%{transform:rotate(14deg);}100%{transform:rotate(0deg);}}
-
-/* Temperature card */
 .ft-temp-card{margin:14px 18px 0;background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;}
 .ft-temp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .ft-temp-lbl{font-size:13px;font-weight:600;transition:color 0.8s;}
 .ft-temp-val{font-size:11px;color:var(--ash);}
 .ft-temp-bar-bg{height:7px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;}
-.ft-temp-bar-fill{height:100%;border-radius:4px;transition:width 1.2s ease, background-color 1.2s ease;}
-
-/* Hints */
+.ft-temp-bar-fill{height:100%;border-radius:4px;transition:width 1.2s ease,background-color 1.2s ease;}
 .ft-hints-area{margin:12px 18px 0;}
 .ft-hints-lbl{font-size:10px;color:var(--ash);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
 .ft-hint-pills{display:flex;flex-wrap:wrap;gap:6px;}
-.ft-hint-pill{display:flex;align-items:center;gap:5px;background:var(--sl-hdr);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:6px 13px;cursor:pointer;transition:all 0.2s;}
+.ft-hint-pill{display:flex;align-items:center;background:var(--sl-hdr);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:6px 13px;cursor:pointer;}
 .ft-hint-pill.active{border-color:rgba(255,184,64,0.45);background:rgba(255,184,64,0.07);}
 .ft-hint-pill span{font-size:12px;color:var(--cr-dim);}
 .ft-hint-pill.active span{color:#FFB840;}
 .ft-drop-btn{margin:12px 18px 14px;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.28);border-radius:12px;padding:13px;text-align:center;font-size:13px;color:var(--fl-lt);font-weight:600;cursor:pointer;}
+/* FAVILLA HOUR */
+.fh-banner{margin:0 18px 12px;background:rgba(255,90,50,0.09);border:0.5px solid rgba(255,90,50,0.35);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+@keyframes fhPulse{0%,100%{opacity:1;}50%{opacity:0.45;}}
+.fh-pulse{width:8px;height:8px;border-radius:50%;background:var(--fl);flex-shrink:0;animation:fhPulse 1.2s ease-in-out infinite;}
+.fh-text{flex:1;}
+.fh-title{font-size:13px;color:var(--cr);font-weight:600;}
+.fh-sub{font-size:11px;color:var(--ash);margin-top:2px;}
+.fh-count{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--fl-lt);font-weight:600;line-height:1;}
+.fh-count-lbl{font-size:9px;color:var(--ash);text-align:center;text-transform:uppercase;letter-spacing:0.5px;}
+/* REGULAR BADGE */
+.regular-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(212,146,26,0.12);border:0.5px solid rgba(212,146,26,0.4);border-radius:10px;padding:2px 8px;font-size:10px;color:var(--gold);font-weight:600;margin-top:3px;}
+.pn-snippet{max-width:130px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--cr-dim);font-style:italic;line-height:1.4;margin-top:2px;cursor:pointer;}
+.pn-snippet-tap{font-family:'Space Grotesk',sans-serif;font-style:normal;font-size:9px;color:rgba(255,90,50,0.55);letter-spacing:0.5px;margin-top:3px;text-transform:uppercase;}
 
 /* BLIND */
-#s-blind{background:var(--vl-bg);padding-top:0;}
-.bl-hdr{background:var(--vl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(155,95,224,0.14);position:sticky;top:0;z-index:400;}
+#s-blind{background:var(--vl-bg);padding-top:50px;}
+.bl-hdr{background:var(--vl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(155,95,224,0.14);}
 .bl-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--pu-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .bl-card{margin:16px 18px;background:var(--vl-card);border:0.5px solid rgba(155,95,224,0.22);border-radius:18px;overflow:hidden;}
 .bl-card-top{background:rgba(155,95,224,0.07);padding:15px 16px;display:flex;align-items:center;gap:13px;border-bottom:0.5px solid rgba(155,95,224,0.12);}
@@ -429,8 +416,8 @@ button,[onclick]{touch-action:manipulation;}
 .reveal-av{animation:revealFade 0.9s ease forwards,revealGlow 2.8s ease-in-out 0.7s infinite;}
 
 /* MAP */
-#s-heatmap{background:var(--sl-bg);padding-top:0;}
-.mp-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:400;}
+#s-heatmap{background:var(--sl-bg);padding-top:50px;}
+.mp-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);}
 .mp-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .mp-toggle{display:flex;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:3px;}
 .mt-btn{padding:5px 12px;border-radius:16px;font-size:11px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;border:none;background:transparent;color:var(--ash);}
@@ -469,8 +456,8 @@ button,[onclick]{touch-action:manipulation;}
 .evt-tag{font-size:9px;color:var(--fl-lt);background:rgba(255,90,50,0.12);border-radius:5px;padding:2px 7px;margin-left:4px;}
 
 /* VENUE PAGE */
-#s-venue{background:var(--wm-bg);padding-top:0;display:flex;flex-direction:column;}
-.vp-hdr{background:var(--wm-hdr);padding:14px 18px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:400;}
+#s-venue{background:var(--wm-bg);padding-top:50px;display:flex;flex-direction:column;}
+.vp-hdr{background:var(--wm-hdr);padding:14px 18px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .vp-bk{font-size:19px;color:#8A7060;cursor:pointer;padding:4px 8px 4px 0;min-width:44px;min-height:44px;display:flex;align-items:center;background:none;border:none;font-family:'Space Grotesk',sans-serif;}
 .vp-nh{font-family:'Cormorant Garamond',serif;font-size:16px;color:#F0E8DC;font-weight:600;flex:1;}
 .vp-sv{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:14px;color:#8A7060;}
@@ -518,8 +505,8 @@ button,[onclick]{touch-action:manipulation;}
 .venue-nav .ni.on .ni-dot{color:var(--wo);}
 
 /* MATCHES */
-#s-matches{background:var(--sl-bg);padding-top:0;}
-.mx-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.1);position:sticky;top:0;z-index:400;}
+#s-matches{background:var(--sl-bg);padding-top:50px;}
+.mx-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.1);}
 .mx-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--cr);font-weight:600;}
 .mx-item{margin:0 18px 10px;padding:15px 16px;background:var(--sl-card);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;display:flex;align-items:center;gap:13px;cursor:pointer;}
 .mx-item.first{margin-top:16px;}
@@ -534,14 +521,11 @@ button,[onclick]{touch-action:manipulation;}
 .mx-unread{width:8px;height:8px;border-radius:50%;background:var(--fl);flex-shrink:0;}
 
 /* PROFILE PANEL */
-.profile-panel{position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.profile-panel{position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:150;opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .profile-panel.open{opacity:1;pointer-events:all;}
-.pp-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--sl-card);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.2);transform:translateY(100%);transition:transform 0.3s ease;max-height:90%;display:flex;flex-direction:column;}
+.pp-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--sl-card);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.2);padding:20px 22px;padding-bottom:max(32px,env(safe-area-inset-bottom,32px));transform:translateY(100%);transition:transform 0.3s ease;}
 .profile-panel.open .pp-sheet{transform:translateY(0);}
-.pp-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);margin:14px auto 0;flex-shrink:0;}
-.pp-inner{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:20px 22px;padding-bottom:max(32px,env(safe-area-inset-bottom,32px));}
-.pp-inner::-webkit-scrollbar{display:none;}
-.pp-user{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+.pp-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);margin:0 auto 20px;}
 .pp-user{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
 .pp-av{width:46px;height:46px;border-radius:50%;background:rgba(255,90,50,0.18);border:1.5px solid rgba(255,90,50,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cr);font-weight:600;flex-shrink:0;position:relative;}
 .pp-edit{position:absolute;bottom:-1px;right:-1px;width:18px;height:18px;background:var(--fl);border-radius:50%;border:1.5px solid var(--sl-card);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;}
@@ -565,6 +549,8 @@ button,[onclick]{touch-action:manipulation;}
 .pp-ra{font-size:16px;color:var(--ash);margin-left:auto;}
 .pp-row.danger .pp-rt{color:#F09595;}
 
+/* NOTIFICATIONS TRAY */
+
 /* DELETE ACCOUNT OVERLAY */
 .delete-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:600;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
 .delete-overlay.open{opacity:1;pointer-events:all;}
@@ -582,7 +568,7 @@ button,[onclick]{touch-action:manipulation;}
 .delete-btn:disabled{opacity:0.35;cursor:not-allowed;}
 .delete-btn.armed{background:rgba(226,75,74,0.3);border-color:rgba(226,75,74,0.7);color:#fff;}
 .delete-cancel{width:100%;background:transparent;border:0.5px solid rgba(255,255,255,0.1);border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ash);cursor:pointer;}
-.notif-tray{position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.notif-tray{position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:150;opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .notif-tray.open{opacity:1;pointer-events:all;}
 .nt-sheet{position:absolute;bottom:0;left:0;right:0;background:var(--sl-card);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.2);padding:20px 22px;padding-bottom:max(32px,env(safe-area-inset-bottom,32px));transform:translateY(100%);transition:transform 0.3s ease;}
 .notif-tray.open .nt-sheet{transform:translateY(0);}
@@ -596,8 +582,8 @@ button,[onclick]{touch-action:manipulation;}
 .nt-arr{font-size:16px;color:var(--ash);}
 
 /* ALMOST CONNECTIONS */
-#s-almost{background:var(--sl-bg);padding-top:0;}
-.al-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:400;}
+#s-almost{background:var(--sl-bg);padding-top:50px;}
+.al-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);}
 .al-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .al-intro{margin:14px 18px;font-size:13px;color:var(--ash);line-height:1.7;background:rgba(255,90,50,0.06);border:0.5px solid rgba(255,90,50,0.18);border-radius:12px;padding:12px 14px;}
 .al-intro span{color:var(--cr-dim);}
@@ -610,8 +596,8 @@ button,[onclick]{touch-action:manipulation;}
 .al-btn{padding:8px 15px;border-radius:20px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);color:var(--fl-lt);font-size:12px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;flex-shrink:0;}
 
 /* FAVILLA NIGHTS */
-#s-nights{background:var(--sl-bg);padding-top:0;}
-.fn-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:400;}
+#s-nights{background:var(--sl-bg);padding-top:50px;}
+.fn-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);}
 .fn-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .fn-hero{margin:14px 18px;background:var(--sl-card);border:0.5px solid rgba(255,90,50,0.3);border-radius:18px;overflow:hidden;}
 .fn-hero-top{padding:18px 18px 14px;background:rgba(255,90,50,0.1);}
@@ -665,52 +651,42 @@ button,[onclick]{touch-action:manipulation;}
 <!-- TOAST -->
 <div class="toast" id="toast"><div style="font-size:18px;">✦</div><div class="toast-text" id="toast-text"><strong>Welcome</strong></div></div>
 
-<!-- MASTER NAV — lives in shell, never scrolls, always visible -->
-<div class="nav" id="master-nav">
-  <div class="ni on" id="nav-spark" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-  <div class="ni" id="nav-blind" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-  <div class="ni" id="nav-map" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-  <div class="ni" id="nav-matches" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-</div>
-
 <!-- PROFILE PANEL -->
 <div class="profile-panel" id="profile-panel" onclick="closePP(event)">
   <div class="pp-sheet">
     <div class="pp-handle"></div>
-    <div class="pp-inner">
-      <div class="pp-user">
-        <div class="pp-av" id="pp-av">?<div class="pp-edit">✎</div></div>
-        <div>
-          <div class="pp-name" id="pp-name">Your name</div>
-          <div class="pp-email" id="pp-email"></div>
-          <div class="status-toggle"><div class="st-dot"></div><div class="st-text">Status</div><div class="st-pill" id="status-pill" onclick="toggleStatus()">Available</div></div>
-        </div>
+    <div class="pp-user">
+      <div class="pp-av" id="pp-av">?<div class="pp-edit">✎</div></div>
+      <div>
+        <div class="pp-name" id="pp-name">Your name</div>
+        <div class="pp-email" id="pp-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4a33253f0a2f322b273a262f64292527">[email&#160;protected]</a></div>
+        <div class="status-toggle"><div class="st-dot"></div><div class="st-text">Status</div><div class="st-pill" id="status-pill" onclick="toggleStatus()">Available</div></div>
       </div>
-      <div class="pp-photos">
-        <div class="pp-sec-lbl">Photos</div>
-        <div class="pp-photo-grid">
-          <div class="pp-ps filled"><div class="pp-pi" id="pp-pi">Y</div></div>
-          <div class="pp-ps">+</div>
-          <div class="pp-ps">+</div>
-        </div>
+    </div>
+    <div class="pp-photos">
+      <div class="pp-sec-lbl">Photos</div>
+      <div class="pp-photo-grid">
+        <div class="pp-ps filled"><div class="pp-pi" id="pp-pi">Y</div></div>
+        <div class="pp-ps">+</div>
+        <div class="pp-ps">+</div>
       </div>
-      <div class="pp-items">
-        <button class="pp-row" onclick="closePanelGo('s-onboard')"><div class="pp-ri" style="background:rgba(255,90,50,0.12);">👤</div><div class="pp-rt">Edit profile</div><div class="pp-ra">›</div></button>
-        <button class="pp-row" onclick="closePanelGo('s-almost')"><div class="pp-ri" style="background:rgba(255,90,50,0.1);">✦</div><div class="pp-rt">Almost connections</div><div class="pp-ra">›</div></button>
-        <button class="pp-row" onclick="closePanelGo('s-nights')"><div class="pp-ri" style="background:rgba(212,146,26,0.12);">🎟</div><div class="pp-rt">Favilla Nights</div><div class="pp-ra">›</div></button>
-        <button class="pp-row" onclick="closePanelGo('s-met')"><div class="pp-ri" style="background:rgba(212,146,26,0.1);">💛</div><div class="pp-rt">We met on Favilla</div><div class="pp-ra">›</div></button>
-        <button class="pp-row danger" onclick="doSignOut()"><div class="pp-ri" style="background:rgba(226,75,74,0.1);">→</div><div class="pp-rt">Sign out</div></button>
-        <button class="pp-row danger" onclick="openDeleteConfirm()" style="margin-top:4px;"><div class="pp-ri" style="background:rgba(226,75,74,0.08);">✕</div><div class="pp-rt" style="color:rgba(240,149,149,0.7);font-size:13px;">Delete account</div></button>
-      </div>
+    </div>
+    <div class="pp-items">
+      <button class="pp-row" onclick="closePanelGo('s-onboard')"><div class="pp-ri" style="background:rgba(255,90,50,0.12);">👤</div><div class="pp-rt">Edit profile</div><div class="pp-ra">›</div></button>
+      <button class="pp-row" onclick="closePanelGo('s-almost')"><div class="pp-ri" style="background:rgba(255,90,50,0.1);">✦</div><div class="pp-rt">Almost connections</div><div class="pp-ra">›</div></button>
+      <button class="pp-row" onclick="closePanelGo('s-nights')"><div class="pp-ri" style="background:rgba(212,146,26,0.12);">🎟</div><div class="pp-rt">Favilla Nights</div><div class="pp-ra">›</div></button>
+      <button class="pp-row" onclick="closePanelGo('s-met')"><div class="pp-ri" style="background:rgba(212,146,26,0.1);">💛</div><div class="pp-rt">We met on Favilla</div><div class="pp-ra">›</div></button>
+      <button class="pp-row danger" onclick="doSignOut()"><div class="pp-ri" style="background:rgba(226,75,74,0.1);">→</div><div class="pp-rt">Sign out</div></button>
     </div>
   </div>
 </div>
+
 
 <!-- DELETE ACCOUNT CONFIRM -->
 <div class="delete-overlay" id="delete-overlay">
   <div class="delete-sheet">
     <div class="delete-handle"></div>
-    <div class="delete-icon">✕</div>
+    <div class="delete-icon">X</div>
     <div class="delete-title">Delete your account?</div>
     <div class="delete-sub">This permanently removes your profile, matches, messages, and all data. There is no undo.</div>
     <div class="delete-confirm-row">
@@ -718,10 +694,9 @@ button,[onclick]{touch-action:manipulation;}
       <input class="delete-input" id="delete-confirm-input" type="text" placeholder="DELETE" autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
     <button class="delete-btn" id="delete-btn" onclick="doDeleteAccount()">Delete my account</button>
-    <button class="delete-cancel" onclick="closeDeleteConfirm()">Cancel — keep my account</button>
+    <button class="delete-cancel" onclick="closeDeleteConfirm()">Cancel -- keep my account</button>
   </div>
 </div>
-
 <!-- NOTIFICATIONS TRAY -->
 <div class="notif-tray" id="notif-tray" onclick="closeNT(event)">
   <div class="nt-sheet">
@@ -826,22 +801,13 @@ button,[onclick]{touch-action:manipulation;}
   <div class="ob-step" id="ob-3">
     <div class="step-lbl">Step three</div>
     <div class="step-h">Say something worth reading.</div>
-    <div class="step-sub">In Blind mode this is all anyone knows about you. Make it count. Fill in at least two prompts.</div>
+    <div class="step-sub">In Blind mode this is all anyone knows about you. Make it count. Fill in at least two.</div>
     <div class="pl">
       <div class="pi"><div class="pq">The most spontaneous thing I've actually done</div><textarea class="pta" id="p1" placeholder="No one believes me when I say…" rows="2"></textarea></div>
       <div class="pi"><div class="pq">I could go on about this forever</div><textarea class="pta" id="p2" placeholder="Fair warning: I have opinions…" rows="2"></textarea></div>
       <div class="pi"><div class="pq">A hill I will absolutely die on</div><textarea class="pta" id="p3" placeholder="Controversial take incoming…" rows="2"></textarea></div>
     </div>
-    <div style="height:0.5px;background:rgba(255,255,255,0.07);margin:18px 0 16px;"></div>
-    <div class="pi" style="background:rgba(255,90,50,0.06);border-color:rgba(255,90,50,0.25);">
-      <div class="pq" style="color:var(--fl-lt);">✦ Your icebreaker <span style="font-weight:400;color:var(--ash);letter-spacing:0;">(encouraged — 60 chars)</span></div>
-      <div style="position:relative;">
-        <textarea class="pta" id="ob-icebreaker" maxlength="60" placeholder="Give people a reason to say hi…" rows="2" oninput="updateIcebreakerCount(this)"></textarea>
-        <div id="icebreaker-count" style="position:absolute;bottom:2px;right:4px;font-size:10px;color:var(--ash);font-family:'Space Grotesk',sans-serif;">0/60</div>
-      </div>
-      <div style="font-size:11px;color:var(--ash);margin-top:4px;line-height:1.6;">This shows on your radial bubble so people know how to approach you. "Ask me about my worst travel story" beats "I like to laugh."</div>
-    </div>
-    <div style="font-size:12px;color:var(--ash);text-align:center;margin-top:14px;">Specific beats vague. Every time.</div>
+    <div style="font-size:12px;color:var(--ash);text-align:center;">Specific beats vague. Every time.</div>
   </div>
   <div class="ob-step" id="ob-4">
     <div class="step-lbl">Step four</div>
@@ -865,43 +831,41 @@ button,[onclick]{touch-action:manipulation;}
       <div class="sp-wm">Favilla</div>
     </div>
     <div class="sp-right">
-      <button class="bell-btn" onclick="openNT()" aria-label="Notifications" style="touch-action:manipulation;">🔔</button>
-      <button class="pp-pill" id="user-initial" onclick="openPP()" aria-label="Profile" style="touch-action:manipulation;font-family:'Cormorant Garamond',serif;">?</button>
+      <div class="bell-btn" onclick="openNT()">🔔</div>
+      <div class="pp-pill" id="user-initial" onclick="openPP()">?</div>
     </div>
   </div>
   <div class="venue-bar" id="venue-bar" onclick="doCheckInVenue()"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></div>
   <div class="streak-bar"><span style="font-size:16px;">🔥</span><span class="streak-text">3-week check-in streak — you're a regular</span><span class="streak-cnt">3🔥</span></div>
   <div class="sec-lbl" id="nearby-lbl">Who's here right now</div>
-  <!-- RADIAL LAYOUT — populated by JS, hidden until others check in -->
-  <div class="radial" id="radial-container" style="display:none;">
+  <!-- RADIAL LAYOUT — populated by JS -->
+  <div class="radial" id="radial-container">
     <div class="orbit" style="width:240px;height:240px;"></div>
     <div class="orbit" style="width:160px;height:160px;"></div>
     <div class="orbit" style="width:90px;height:90px;"></div>
     <div class="you-center"><div class="you-dot"></div></div>
+    <!-- real users injected here by renderPresence() -->
   </div>
-  <!-- Empty state — animated candle, shown until someone else checks in -->
+  <!-- Empty state — replaces radial when no one else is checked in -->
+    <!-- RADIAL LAYOUT hidden until others check in -->
   <div id="empty-state" style="text-align:center;padding:28px 36px 16px;">
-    <div class="candle-wrap">
-      <svg class="candle-svg" width="52" height="80" viewBox="0 0 52 80" fill="none">
-        <!-- Flame -->
-        <g class="flame-group">
-          <ellipse class="flame-outer" cx="26" cy="18" rx="8" ry="14" fill="#FF7A5A" opacity="0.5"/>
-          <ellipse class="flame-mid" cx="26" cy="20" rx="5" ry="10" fill="#FF5A32" opacity="0.8"/>
-          <ellipse class="flame-inner" cx="26" cy="22" rx="3" ry="6" fill="#FFD0A0" opacity="0.95"/>
-        </g>
-        <!-- Wick -->
+    <div style="display:flex;justify-content:center;margin-bottom:18px;">
+      <svg width="52" height="80" viewBox="0 0 52 80" fill="none" style="filter:drop-shadow(0 0 8px rgba(255,90,50,0.35));">
+        <ellipse cx="26" cy="18" rx="8" ry="14" fill="#FF7A5A" opacity="0.5" style="transform-origin:26px 18px;animation:flameGlow 1.8s ease-in-out infinite;"/>
+        <ellipse cx="26" cy="20" rx="5" ry="10" fill="#FF5A32" opacity="0.8" style="transform-origin:26px 20px;animation:flameMid 1.2s ease-in-out infinite;"/>
+        <ellipse cx="26" cy="22" rx="3" ry="6" fill="#FFD0A0" opacity="0.95" style="transform-origin:26px 22px;animation:flameDance 0.9s ease-in-out infinite;"/>
         <line x1="26" y1="32" x2="26" y2="36" stroke="#3D2A20" stroke-width="1.5" stroke-linecap="round"/>
-        <!-- Wax body -->
         <rect x="14" y="36" width="24" height="36" rx="4" fill="#EDE7DF"/>
         <rect x="14" y="36" width="24" height="6" rx="4" fill="#DDD5C8"/>
-        <!-- Drip -->
         <path d="M18 42 Q16 50 17 56" stroke="#DDD5C8" stroke-width="3" stroke-linecap="round" fill="none"/>
-        <!-- Base plate -->
         <ellipse cx="26" cy="72" rx="16" ry="4" fill="#C0B0A0" opacity="0.4"/>
       </svg>
     </div>
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:8px;">Quiet in here.</div>
     <div style="font-size:13px;color:var(--ash);line-height:1.7;" id="empty-state-msg">Check in to appear when others arrive.</div>
+  </div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:8px;">Quiet in here.</div>
+    <div style="font-size:13px;color:var(--ash);line-height:1.7;">No one else is checked in yet. You'll appear to others the moment they arrive.</div>
   </div>
   <div class="enter-btn" id="enter-btn" onclick="doCheckInVenue()">
     <div class="enter-title" id="enter-title">Enter the Room</div>
@@ -914,6 +878,12 @@ button,[onclick]{touch-action:manipulation;}
     <div class="nb-icon"><svg width="16" height="16" viewBox="0 0 36 36" fill="none"><path d="M18 2C18 2 20 12 26 18C20 24 18 34 18 34C18 34 16 24 10 18C16 12 18 2 18 2Z" fill="#FF5A32"/><path d="M2 18C2 18 12 16 18 10C24 16 34 18 34 18C34 18 24 20 18 26C12 20 2 18 2 18Z" fill="#FF7A5A" opacity="0.7"/></svg></div>
     <div style="flex:1;"><div class="nb-title">Bonfire at Rooftop 22 tonight</div><div class="nb-sub">28 active now · 0.3 mi away</div></div>
     <div class="nb-btn" onclick="navTo('s-heatmap')">View Map</div>
+  </div>
+  <div class="nav" id="nav-spark">
+    <div class="ni on" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
   </div>
 </div>
 
@@ -930,8 +900,9 @@ button,[onclick]{touch-action:manipulation;}
         </div>
       </div>
       <div class="sheet-body">
+        <div id="sheet-regular-wrap" style="display:none;margin-bottom:12px;"><div style="display:inline-flex;align-items:center;gap:5px;background:rgba(212,146,26,0.1);border:0.5px solid rgba(212,146,26,0.35);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold);">&#x1F525; Regular here</div></div>
         <div id="sheet-icebreaker-wrap" style="display:none;background:rgba(255,90,50,0.06);border:0.5px solid rgba(255,90,50,0.2);border-radius:14px;padding:12px 16px;margin-bottom:18px;">
-          <div style="font-size:10px;color:var(--fl-lt);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">✦ Icebreaker</div>
+          <div style="font-size:10px;color:var(--fl-lt);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">&#x2746; Icebreaker</div>
           <div id="sheet-icebreaker" style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);font-style:italic;line-height:1.5;"></div>
         </div>
         <div class="sheet-intention" id="sheet-intention"></div>
@@ -939,8 +910,7 @@ button,[onclick]{touch-action:manipulation;}
         <div class="sheet-basics" id="sheet-basics"></div>
       </div>
     </div>
-    <div class="sheet-view-profile" id="sheet-view-profile-btn" onclick="viewFullProfile()">
-      View full profile →
+    <div style="text-align:center;padding:10px 22px 0;font-size:13px;color:var(--ash);cursor:pointer;" onclick="viewFullProfile()">View full profile &rarr;</div>
     </div>
     <div class="sheet-actions">
       <button class="sheet-pass" onclick="closeSheet()">Pass</button>
@@ -988,25 +958,26 @@ button,[onclick]{touch-action:manipulation;}
 <div class="screen" id="s-chat">
   <div class="ch-hdr">
     <button class="bk-btn" onclick="goBack()">←</button>
-    <div class="ch-av" id="ch-av">?</div>
-    <div style="flex:1;">
-      <div class="ch-name" id="ch-name">Loading…</div>
-      <div class="ch-status" id="ch-status">✦ Spark match · The Anchor &amp; Vine</div>
-    </div>
-    <div style="font-size:20px;color:var(--ash);cursor:pointer;" onclick="goTo('s-findthem','s-chat');setTimeout(()=>initFindThem(currentMatchProfile?.name),100);">📍</div>
+    <div class="ch-av">S</div>
+    <div style="flex:1;"><div class="ch-name">Sofia</div><div class="ch-status">✦ Spark match · The Anchor &amp; Vine</div></div>
+    <div style="font-size:20px;color:var(--ash);cursor:pointer;" onclick="goTo('s-findthem','s-chat');setTimeout(function(){initFindThem(currentMatchProfile&&currentMatchProfile.name);},100);">📍</div>
   </div>
   <div class="ch-ctx">You're both here tonight · <span>Still nearby</span></div>
-  <div class="ice-card" id="ice-card" style="display:none;">
+  <div class="ice-card">
     <div class="ice-lbl">✦ Something to start with</div>
-    <div class="ice-text" id="ice-text"></div>
+    <div class="ice-text">You both answered the spontaneous question. She quit her job on a Friday. <span>You booked a flight on a Tuesday.</span> Go.</div>
   </div>
   <div class="msgs" id="chat-msgs">
-    <div id="chat-loading" style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Loading messages…</div>
+    <div class="msg them"><div class="bub">okay so I was NOT expecting a match tonight — hi 😅</div><div class="msg-t">10:48 pm</div></div>
+    <div class="msg me"><div class="bub">haha same. that animation got me. are you still here?</div><div class="msg-t">10:49 pm</div></div>
+    <div class="msg them"><div class="bub">yes! near the bar, dark green jacket. don't make it weird lol</div><div class="msg-t">10:50 pm</div></div>
+    <div class="msg me"><div class="bub">too late, already rehearsing my opener</div><div class="msg-t">10:51 pm</div></div>
+    <div class="msg them"><div class="bub">go for it. I'll pretend to be surprised.</div><div class="msg-t">10:52 pm</div></div>
   </div>
   <div class="nudge"><div style="font-size:16px;color:var(--gold);">✦</div><div class="nudge-t">You're both still at <span>The Anchor &amp; Vine</span> — the conversation's already started. Go finish it in person.</div></div>
   <div class="ch-input-row">
     <button class="plan-btn" onclick="showDateCard()">📅 Plan a date</button>
-    <input class="ch-input" id="ch-input" placeholder="Message…" onkeydown="if(event.key==='Enter')sendMsg()">
+    <input class="ch-input" id="ch-input" placeholder="Message Sofia…" onkeydown="if(event.key==='Enter')sendMsg()">
     <div class="ch-send" onclick="sendMsg()">↑</div>
   </div>
 </div>
@@ -1029,35 +1000,19 @@ button,[onclick]{touch-action:manipulation;}
 <!-- ═══════════ FIND THEM ═══════════ -->
 <div class="screen" id="s-findthem">
   <div class="ft-hdr">
-    <button class="bk-btn" onclick="goBack()">←</button>
+    <button class="bk-btn" onclick="goBack()">&#8592;</button>
     <div class="ft-title">Find Them</div>
     <div class="ft-badge" id="ft-badge">Sofia nearby</div>
   </div>
-
-  <!-- ROOM MAP -->
   <div class="ft-map-wrap">
-    <svg class="ft-map-svg" id="ft-map-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="ft-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-          <path d="M2 1L8 5L2 9" fill="none" stroke="#FF5A32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </marker>
-      </defs>
-
-      <!-- Venue boundary -->
+    <svg class="ft-map-svg" viewBox="0 0 360 260" fill="none">
+      <defs><marker id="ft-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#FF5A32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
       <rect x="8" y="8" width="344" height="244" rx="8" fill="rgba(255,90,50,0.015)" stroke="rgba(255,90,50,0.12)" stroke-width="1"/>
-
-      <!-- Scan line -->
       <rect x="8" y="8" width="344" height="3" rx="1" fill="rgba(255,90,50,0.12)" style="animation:ftScanLine 3s ease-in-out infinite;"/>
-
-      <!-- Bar counter top-left -->
       <rect x="8" y="8" width="110" height="32" rx="4" fill="rgba(255,90,50,0.05)" stroke="rgba(255,90,50,0.16)" stroke-width="0.5"/>
       <text x="63" y="28" text-anchor="middle" font-size="9" fill="rgba(255,90,50,0.38)" font-family="Space Grotesk" letter-spacing="2">B A R</text>
-
-      <!-- Stage top-right -->
       <rect x="280" y="8" width="72" height="72" rx="4" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
       <text x="316" y="48" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.14)" font-family="Space Grotesk">STAGE</text>
-
-      <!-- Tables -->
       <circle cx="60" cy="120" r="18" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
       <circle cx="120" cy="120" r="18" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
       <circle cx="60" cy="180" r="18" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
@@ -1065,82 +1020,45 @@ button,[onclick]{touch-action:manipulation;}
       <circle cx="195" cy="150" r="20" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
       <circle cx="255" cy="120" r="18" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
       <circle cx="255" cy="180" r="18" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
-
-      <!-- Lounge bottom -->
       <rect x="8" y="220" width="150" height="32" rx="4" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
       <text x="83" y="240" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.12)" font-family="Space Grotesk" letter-spacing="1">LOUNGE</text>
-
-      <!-- Entrance -->
       <rect x="316" y="234" width="36" height="18" rx="2" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
       <text x="334" y="247" text-anchor="middle" font-size="7" fill="rgba(255,255,255,0.18)" font-family="Space Grotesk">IN / OUT</text>
-
-      <!-- Thread: you → them -->
-      <line id="ft-thread" x1="200" y1="210" x2="72" y2="28"
-        stroke="#FF5A32" stroke-width="1" stroke-dasharray="5 4" opacity="0.4"
-        style="animation:threadFlow 1.2s linear infinite;"/>
-
-      <!-- Distance label on thread midpoint -->
-      <rect id="ft-mid-rect" x="122" y="106" width="44" height="16" rx="4" fill="#0A0C12" stroke="rgba(255,90,50,0.25)" stroke-width="0.5"/>
+      <line id="ft-thread" x1="200" y1="210" x2="72" y2="28" stroke="#FF5A32" stroke-width="1" stroke-dasharray="5 4" opacity="0.4" style="animation:threadFlow 1.2s linear infinite;"/>
+      <rect x="122" y="106" width="44" height="16" rx="4" fill="#0A0C12" stroke="rgba(255,90,50,0.25)" stroke-width="0.5"/>
       <text id="ft-mid-txt" x="144" y="118" text-anchor="middle" font-size="9" fill="#FF7A5A" font-family="Space Grotesk">~12 ft</text>
-
-      <!-- THEM DOT (near bar) -->
       <circle cx="72" cy="28" r="11" fill="rgba(255,184,64,0.1)" stroke="rgba(255,184,64,0.4)" stroke-width="1" stroke-dasharray="2.5 2"/>
-      <circle id="ft-them-dot" cx="72" cy="28" r="5" fill="#FFB840"/>
+      <circle cx="72" cy="28" r="5" fill="#FFB840"/>
       <text x="72" y="16" text-anchor="middle" font-size="8" fill="#FFB840" font-family="Space Grotesk" id="ft-them-lbl">Sofia</text>
-
-      <!-- YOU DOT with directional arrow -->
-      <!-- Accuracy halo -->
       <circle cx="200" cy="210" r="28" fill="rgba(255,90,50,0.04)" stroke="rgba(255,90,50,0.08)" stroke-width="0.5"/>
-      <!-- Outer ring -->
       <circle cx="200" cy="210" r="14" fill="rgba(255,90,50,0.1)" stroke="rgba(255,90,50,0.4)" stroke-width="1"/>
-      <!-- Inner dot -->
       <circle cx="200" cy="210" r="5" fill="#FF5A32"/>
-      <!-- Directional arrow — rotates with device heading -->
       <g id="ft-arrow-group" style="transform-origin:200px 210px;">
-        <line x1="200" y1="193" x2="200" y2="180"
-          stroke="#FF5A32" stroke-width="2.5" stroke-linecap="round"
-          marker-end="url(#ft-arr)"/>
+        <line x1="200" y1="193" x2="200" y2="180" stroke="#FF5A32" stroke-width="2.5" stroke-linecap="round" marker-end="url(#ft-arr)"/>
       </g>
       <text x="200" y="232" text-anchor="middle" font-size="8" fill="#FF7A5A" font-family="Space Grotesk">You</text>
     </svg>
-
-    <!-- Distance badge -->
-    <div class="ft-dist-badge">
-      <div class="ft-dist-num" id="ft-dist-num">12</div>
-      <div class="ft-dist-lbl">ft away</div>
-    </div>
-
-    <!-- Legend -->
+    <div class="ft-dist-badge"><div class="ft-dist-num" id="ft-dist-num">12</div><div class="ft-dist-lbl">ft away</div></div>
     <div class="ft-legend">
       <div class="ft-leg-item"><div class="ft-leg-dot" style="background:#FF5A32;"></div><div class="ft-leg-txt">You</div></div>
       <div class="ft-leg-item"><div class="ft-leg-dot" style="background:#FFB840;margin-left:4px;"></div><div class="ft-leg-txt" id="ft-them-legend">Sofia (approx)</div></div>
     </div>
     <div class="ft-orient-note" id="ft-orient-note">Arrow follows your heading</div>
   </div>
-
-  <!-- TEMPERATURE BAR -->
   <div class="ft-temp-card">
-    <div class="ft-temp-row">
-      <div class="ft-temp-lbl" id="ft-temp-lbl">Getting warmer</div>
-      <div class="ft-temp-val" id="ft-temp-val">~12 ft away</div>
-    </div>
-    <div class="ft-temp-bar-bg">
-      <div class="ft-temp-bar-fill" id="ft-temp-fill" style="width:72%;background:#FF5A32;"></div>
-    </div>
+    <div class="ft-temp-row"><div class="ft-temp-lbl" id="ft-temp-lbl" style="color:#FF5A32;">Getting warmer</div><div class="ft-temp-val" id="ft-temp-val">~12 ft away</div></div>
+    <div class="ft-temp-bar-bg"><div class="ft-temp-bar-fill" id="ft-temp-fill" style="width:72%;background:#FF5A32;"></div></div>
   </div>
-
-  <!-- HINTS -->
   <div class="ft-hints-area">
-    <div class="ft-hints-lbl" id="ft-hints-lbl">Her hints</div>
+    <div class="ft-hints-lbl" id="ft-hints-lbl">Their hints</div>
     <div class="ft-hint-pills">
       <div class="ft-hint-pill active"><span>Near the bar</span></div>
       <div class="ft-hint-pill"><span>Dark jacket</span></div>
       <div class="ft-hint-pill"><span>Sitting down</span></div>
     </div>
   </div>
-  <div class="ft-drop-btn" onclick="showToastMsg('Hint sent ✦')">Drop a hint →</div>
+  <div class="ft-drop-btn" onclick="showToastMsg('Hint sent')">Drop a hint &#8594;</div>
 </div>
-
 <!-- ═══════════ BLIND ═══════════ -->
 <div class="screen with-nav" id="s-blind">
   <div class="bl-hdr">
@@ -1158,6 +1076,12 @@ button,[onclick]{touch-action:manipulation;}
   <div class="bl-acts"><button class="btn-pass" onclick="nextBlind()">Not for me</button><button class="btn-intrigue" onclick="blindMatch()">✦ I'm intrigued</button></div>
   <div class="bl-ctr" id="bl-ctr">Profile 1 of 4 · No photos until you both decide</div>
   <div class="bl-nav">
+    <div class="nav">
+      <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+      <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+      <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+      <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
+    </div>
   </div>
 </div>
 
@@ -1244,6 +1168,12 @@ button,[onclick]{touch-action:manipulation;}
       </div>
     </div>
   </div>
+  <div class="nav">
+    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+    <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
+  </div>
 </div>
 
 <!-- ═══════════ VENUE PAGE ═══════════ -->
@@ -1294,17 +1224,42 @@ button,[onclick]{touch-action:manipulation;}
     </div>
   </div>
   <div class="venue-nav">
+    <div class="nav">
+      <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Spark</div></div>
+      <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Blind</div></div>
+      <div class="ni on"><div class="ni-dot" style="color:var(--wo);opacity:1;"></div><div class="ni-lbl" style="color:var(--wo);">Map</div></div>
+      <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Matches</div></div>
+    </div>
   </div>
 </div>
 
 <!-- ═══════════ MATCHES ═══════════ -->
 <div class="screen with-nav" id="s-matches">
-  <div class="mx-hdr">
-    <div class="mx-title">Matches</div>
-    <div id="mx-count" style="font-size:12px;color:var(--ash);"></div>
+  <div class="mx-hdr"><div class="mx-title">Matches</div><div style="font-size:12px;color:var(--ash);">3 conversations</div></div>
+  <div class="mx-item first" onclick="goTo('s-chat','s-matches')">
+    <div class="mx-avw"><div class="mx-av" style="background:rgba(255,90,50,0.18);">S</div><div class="mx-badge bsp" style="font-size:9px;">🔥</div></div>
+    <div style="flex:1;"><div class="mx-name">Sofia, 26</div><div class="mx-prev">go for it. I'll pretend to be surprised.</div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">10:52 pm</div><div class="mx-unread"></div></div>
   </div>
-  <div id="mx-list" style="padding-top:8px;">
-    <div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Loading…</div>
+  <div class="mx-item" onclick="goTo('s-chat','s-matches')">
+    <div class="mx-avw"><div class="mx-av" style="background:rgba(155,95,224,0.15);">J</div><div class="mx-badge bbl" style="font-size:8px;">✦</div></div>
+    <div style="flex:1;"><div class="mx-name">Jamie, 29</div><div class="mx-prev">okay hi — this is weird and great…</div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">Yesterday</div></div>
+  </div>
+  <div class="mx-item">
+    <div class="mx-avw"><div class="mx-av" style="background:rgba(60,110,200,0.18);">M</div><div class="mx-badge bsp" style="font-size:9px;">🔥</div></div>
+    <div style="flex:1;"><div class="mx-name">Marcus, 28</div><div class="mx-prev">that was genuinely fun, we should…</div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">Fri</div></div>
+  </div>
+  <div style="text-align:center;margin-top:24px;padding:0 36px;">
+    <div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there right now.<br>Go check in.</div>
+    <button onclick="navTo('s-spark')" style="margin-top:14px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;">Open Spark →</button>
+  </div>
+  <div class="nav">
+    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+    <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
   </div>
 </div>
 
@@ -1322,6 +1277,12 @@ button,[onclick]{touch-action:manipulation;}
     <div class="al-item"><div class="al-av" style="background:rgba(140,90,180,0.16);">P</div><div style="flex:1;"><div class="al-name">Parker, 30</div><div class="al-sub">Was at The Anchor · same night</div><div class="al-timer">⏱ 3 hrs left</div></div><div class="al-btn" onclick="showToastMsg('Connection sent to Parker ✦')">Connect</div></div>
   </div>
   <div style="text-align:center;margin-top:18px;padding:0 28px;font-size:13px;color:var(--ash);line-height:1.7;">You were already in the same room.<br>These disappear in 24 hours.</div>
+  <div class="nav">
+    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
+  </div>
 </div>
 
 <!-- ═══════════ FAVILLA NIGHTS ═══════════ -->
@@ -1355,6 +1316,12 @@ button,[onclick]{touch-action:manipulation;}
     <div class="fn-up"><div class="fn-up-icon">🍷</div><div style="flex:1;"><div class="fn-up-name">Ember Lounge</div><div class="fn-up-date">Friday 4 April · Wine &amp; low-key vibes</div></div><button class="fn-nbtn" id="fn-ember" onclick="toggleNotify('fn-ember')">Notify me</button></div>
     <div class="fn-up"><div class="fn-up-icon">🎵</div><div style="flex:1;"><div class="fn-up-name">Blue Note</div><div class="fn-up-date">Friday 11 April · Live music night</div></div><button class="fn-nbtn" id="fn-blue" onclick="toggleNotify('fn-blue')">Notify me</button></div>
     <div class="fn-up"><div class="fn-up-icon">🌆</div><div style="flex:1;"><div class="fn-up-name">Rooftop 22</div><div class="fn-up-date">Friday 18 April · Rooftop season opener</div></div><button class="fn-nbtn" id="fn-roof" onclick="toggleNotify('fn-roof')">Notify me</button></div>
+  </div>
+  <div class="nav">
+    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
   </div>
 </div>
 
@@ -1392,7 +1359,6 @@ function goBack(){
 function navTo(id){
   navStack.length=0;
   _show(id);
-  if (id === 's-matches') loadMatchesList();
 }
 function goHome(){
   navStack.length=0;
@@ -1404,44 +1370,12 @@ function _show(id){
   const el=document.getElementById(id);
   if(el)el.classList.add('active');
   const shell=document.querySelector('.shell');
-  if(id !== 's-findthem') stopFindThem();
-
+  const darkScreens=['s-splash','s-login','s-signup','s-onboard','s-spark','s-match','s-chat','s-confirmed','s-findthem','s-heatmap','s-matches','s-almost','s-nights','s-met'];
   const blindScreens=['s-blind'];
   const warmScreens=['s-venue'];
   if(blindScreens.includes(id)){shell.style.background='var(--vl-bg)';}
   else if(warmScreens.includes(id)){shell.style.background='var(--wm-bg)';}
   else{shell.style.background='var(--sl-bg)';}
-
-  /* Master nav — hide on auth/onboard screens, show everywhere else */
-  const nav=document.getElementById('master-nav');
-  const noNavScreens=['s-splash','s-login','s-signup','s-onboard'];
-  if(nav){
-    nav.style.display=noNavScreens.includes(id)?'none':'flex';
-
-    /* Update nav colours for Blind and Venue modes */
-    if(id==='s-blind'){
-      nav.style.background='var(--vl-hdr)';
-      nav.style.borderTopColor='rgba(155,95,224,0.15)';
-      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='var(--vc-dim)');
-      document.querySelectorAll('#master-nav .ni.on .ni-lbl').forEach(l=>l.style.color='var(--pu)');
-    } else if(id==='s-venue'){
-      nav.style.background='var(--wm-hdr)';
-      nav.style.borderTopColor='rgba(255,255,255,0.06)';
-      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='#7A6858');
-      document.querySelectorAll('#master-nav .ni.on .ni-lbl').forEach(l=>l.style.color='var(--wo)');
-    } else {
-      nav.style.background='var(--sl-hdr)';
-      nav.style.borderTopColor='rgba(255,90,50,0.12)';
-      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='');
-      document.querySelectorAll('#master-nav .ni.on .ni-lbl').forEach(l=>l.style.color='');
-    }
-
-    /* Set active tab */
-    const tabMap={'s-spark':'nav-spark','s-blind':'nav-blind','s-heatmap':'nav-map','s-venue':'nav-map','s-matches':'nav-matches'};
-    document.querySelectorAll('#master-nav .ni').forEach(n=>n.classList.remove('on'));
-    const activeTab=tabMap[id];
-    if(activeTab)document.getElementById(activeTab)?.classList.add('on');
-  }
 }
 
 /* ── PANELS ──────────────────────────── */
@@ -1456,43 +1390,7 @@ function openPP(){
   document.getElementById('profile-panel').classList.add('open');
 }
 function closePP(e){if(!e||e.target===document.getElementById('profile-panel'))document.getElementById('profile-panel').classList.remove('open');}
-function closePanelGo(id){
-  document.getElementById('profile-panel').classList.remove('open');
-  if(id==='s-onboard' && currentProfile){
-    /* Pre-fill all fields from saved profile so edit feels seamless */
-    setTimeout(()=>{
-      const n=document.getElementById('ob-name'); if(n)n.value=currentProfile.name||'';
-      const a=document.getElementById('ob-age');  if(a)a.value=currentProfile.age||'';
-      const p1=document.getElementById('p1'); if(p1)p1.value=currentProfile.prompt_1_a||'';
-      const p2=document.getElementById('p2'); if(p2)p2.value=currentProfile.prompt_2_a||'';
-      const p3=document.getElementById('p3'); if(p3)p3.value=currentProfile.prompt_3_a||'';
-      const ib=document.getElementById('ob-icebreaker');
-      if(ib){
-        ib.value=currentProfile.icebreaker||'';
-        updateIcebreakerCount(ib);
-      }
-      /* Re-select gender — only within the gender grid (first g-grid) */
-      if(currentProfile.gender){
-        const gGrids = document.querySelectorAll('.g-grid');
-        if(gGrids[0]) gGrids[0].querySelectorAll('.g-opt').forEach(o=>{
-          if(o.textContent.trim()===currentProfile.gender) o.classList.add('sel');
-          else o.classList.remove('sel');
-        });
-        obGender=currentProfile.gender;
-      }
-      /* Re-select interested_in — within the second g-grid */
-      if(currentProfile.interested_in){
-        const gGrids = document.querySelectorAll('.g-grid');
-        if(gGrids[1]) gGrids[1].querySelectorAll('.g-opt').forEach(o=>{
-          if(o.textContent.trim()===currentProfile.interested_in) o.classList.add('sel');
-          else o.classList.remove('sel');
-        });
-        obInterested=currentProfile.interested_in;
-      }
-    }, 100);
-  }
-  goTo(id,'s-spark');
-}
+function closePanelGo(id){document.getElementById('profile-panel').classList.remove('open');goTo(id,'s-spark');}
 let statusAvail=true;
 function toggleStatus(){
   statusAvail=!statusAvail;
@@ -1507,48 +1405,29 @@ function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))docu
 
 /* ── BOOT ────────────────────────────── */
 window.addEventListener('DOMContentLoaded',async()=>{
-  /* Safety net — if anything throws, loading still disappears after 4s */
-  const safetyTimer = setTimeout(()=>{
-    try{hideLoading();}catch(e){}
-    try{_show('s-splash');}catch(e){}
-  }, 4000);
-
-  try{
-    const{data:{session}}=await sb.auth.getSession();
-    clearTimeout(safetyTimer);
-    if(session){
-      currentUser=session.user;
-      const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-      if(p){
-        currentProfile=p;
-        setInitial(p.name);
-        hideLoading();
-        _show('s-spark');
-        loadPresence();
-        subscribePresence();
-        subscribeLikes();
-        subscribeMatches();
-      } else {
-        hideLoading();
-        _show('s-onboard');
-      }
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentUser=session.user;
+    const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+    if(p){
+      currentProfile=p;
+      setInitial(p.name);
+      hideLoading();
+      _show('s-spark');
+      loadPresence();
+      subscribePresence();
+      subscribeLikes();
+      subscribeMatches();
     } else {
       hideLoading();
-      _show('s-splash');
+      _show('s-onboard');
     }
-  } catch(err){
-    console.error('Boot error:', err);
-    clearTimeout(safetyTimer);
+  } else {
     hideLoading();
     _show('s-splash');
   }
 });
-function hideLoading(){
-  const el=document.getElementById('loading');
-  if(!el)return;
-  el.classList.add('gone');
-  setTimeout(()=>{if(el.parentNode)el.remove();},500);
-}
+function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
 function setInitial(name){
   const el=document.getElementById('user-initial');
   if(el&&name){el.textContent=name.charAt(0).toUpperCase();}
@@ -1595,58 +1474,42 @@ async function doLogin(){
     _show('s-onboard');
   }
 }
-/* ── DELETE ACCOUNT ──────────────── */
-function openDeleteConfirm() {
-  document.getElementById('profile-panel').classList.remove('open');
-  const input = document.getElementById('delete-confirm-input');
-  const btn   = document.getElementById('delete-btn');
-  input.value = '';
-  btn.disabled = true;
-  btn.classList.remove('armed');
-  document.getElementById('delete-overlay').classList.add('open');
-  setTimeout(() => input.focus(), 400);
 
-  /* Watch the input — only arm the button when they type DELETE exactly */
-  input.oninput = () => {
-    const armed = input.value.trim() === 'DELETE';
-    btn.disabled = !armed;
-    btn.classList.toggle('armed', armed);
+/* ---- DELETE ACCOUNT ---- */
+function openDeleteConfirm(){
+  document.getElementById('profile-panel').classList.remove('open');
+  var input=document.getElementById('delete-confirm-input');
+  var btn=document.getElementById('delete-btn');
+  if(!input||!btn)return;
+  input.value='';btn.disabled=true;btn.classList.remove('armed');
+  document.getElementById('delete-overlay').classList.add('open');
+  setTimeout(function(){input.focus();},400);
+  input.oninput=function(){
+    var armed=input.value.trim()==='DELETE';
+    btn.disabled=!armed;btn.classList.toggle('armed',armed);
   };
 }
-
-function closeDeleteConfirm() {
+function closeDeleteConfirm(){
   document.getElementById('delete-overlay').classList.remove('open');
-  document.getElementById('delete-confirm-input').value = '';
+  document.getElementById('delete-confirm-input').value='';
 }
-
-async function doDeleteAccount() {
-  const btn = document.getElementById('delete-btn');
-  if (document.getElementById('delete-confirm-input').value.trim() !== 'DELETE') return;
-
-  btn.disabled = true;
-  btn.textContent = 'Deleting…';
-
-  try {
-    /* Call the Supabase function that wipes everything */
-    const { error } = await sb.rpc('delete_own_account');
-    if (error) throw error;
-
-    /* Sign out locally and go to splash */
+async function doDeleteAccount(){
+  var btn=document.getElementById('delete-btn');
+  if(document.getElementById('delete-confirm-input').value.trim()!=='DELETE')return;
+  btn.disabled=true;btn.textContent='Deleting...';
+  try{
+    var res=await sb.rpc('delete_own_account');
+    if(res.error)throw res.error;
     await sb.auth.signOut();
-    currentUser    = null;
-    currentProfile = null;
-    navStack.length = 0;
-    closeDeleteConfirm();
-    _show('s-splash');
+    currentUser=null;currentProfile=null;navStack.length=0;
+    closeDeleteConfirm();_show('s-splash');
     showToastMsg('Account deleted. Take care out there.');
-  } catch (err) {
-    console.error('Delete account error:', err);
-    btn.disabled = false;
-    btn.textContent = 'Delete my account';
-    showToastMsg('Something went wrong: ' + (err.message || 'please try again'));
+  }catch(err){
+    console.error('Delete error:',err);
+    btn.disabled=false;btn.textContent='Delete my account';
+    showToastMsg('Something went wrong: '+(err.message||'try again'));
   }
 }
-
 async function doSignOut(){
   document.getElementById('profile-panel').classList.remove('open');
   await sb.auth.signOut();
@@ -1664,7 +1527,7 @@ function obValidate(){
     if(!document.getElementById('ob-name').value.trim()){showToastMsg('What should people call you?');return false;}
     const age=parseInt(document.getElementById('ob-age').value);
     if(!age||age<18||age>99){showToastMsg('Please enter a valid age.');return false;}
-    if(!obGender){showToastMsg('Pick one — takes one tap.');return false;}
+    if(!obGender){showToastMsg('Pick one -- takes one tap.');return false;}
     if(!obInterested){showToastMsg('Who are you interested in?');return false;}
   }
   if(obStep===2&&!obIntention){showToastMsg('Pick the honest one. They all work.');return false;}
@@ -1681,25 +1544,8 @@ function obUpdate(){
   document.getElementById('ob-lbl').textContent=obStep+' of 4';
   if(obStep===4)document.getElementById('ob-btn').textContent='Finish and go →';
 }
-function updateIcebreakerCount(el){
-  const len = el.value.length;
-  const counter = document.getElementById('icebreaker-count');
-  if(counter){
-    counter.textContent = len+'/60';
-    counter.style.color = len >= 55 ? 'var(--fl-lt)' : 'var(--ash)';
-  }
-}
-function selG(el,v){
-  document.querySelectorAll('.g-opt').forEach(o=>o.classList.remove('sel'));
-  el.classList.add('sel');
-  obGender=v;
-}
-function selInt(el,v){
-  /* Only deselect within the "interested in" grid — leave gender selection intact */
-  el.closest('.g-grid').querySelectorAll('.g-opt').forEach(o=>o.classList.remove('sel'));
-  el.classList.add('sel');
-  obInterested=v;
-}
+function selG(el,v){el.closest('.g-grid').querySelectorAll('.g-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');obGender=v;}
+function selInt(el,v){el.closest('.g-grid').querySelectorAll('.g-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');obInterested=v;}
 function selI(el,v){document.querySelectorAll('.int-item').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');obIntention=v;}
 function handlePhoto(e,i){
   const f=e.target.files[0];if(!f)return;
@@ -1729,7 +1575,6 @@ async function saveProfile(){
     prompt_1_q:"The most spontaneous thing I've actually done",prompt_1_a:document.getElementById('p1').value.trim(),
     prompt_2_q:"I could go on about this forever",prompt_2_a:document.getElementById('p2').value.trim(),
     prompt_3_q:"A hill I will absolutely die on",prompt_3_a:document.getElementById('p3').value.trim(),
-    icebreaker:document.getElementById('ob-icebreaker').value.trim()||null,
     photo_url:photoUrl,spark_enabled:true,blind_enabled:true,visibility:'matches_only'};
   const{error}=await sb.from('profiles').upsert(prof);
   btn.disabled=false;btn.textContent='Finish and go →';
@@ -1774,291 +1619,88 @@ function selectOpt(el){
   const name=el.querySelector('.dc-oname').textContent;
   el.closest('.date-card').querySelector('.dc-btn.yes').textContent='✓ Propose '+name.split(' ')[0];
 }
-/* ── FIND THEM MODE ──────────────── */
-let ftOrientationActive = false;
-let ftSimInterval       = null;   // fallback simulation when no real sensor
 
-function initFindThem(matchName) {
-  /* Update name labels */
-  const name = matchName || currentMatchProfile?.name || 'them';
-  const badge = document.getElementById('ft-badge');
-  const themLbl = document.getElementById('ft-them-lbl');
-  const themLegend = document.getElementById('ft-them-legend');
-  const hintsLbl = document.getElementById('ft-hints-lbl');
-  if (badge) badge.textContent = name + ' nearby';
-  if (themLbl) themLbl.textContent = name;
-  if (themLegend) themLegend.textContent = name + ' (approx)';
-  if (hintsLbl) {
-    /* "Her hints" / "His hints" / "Their hints" — use Their for now */
-    hintsLbl.textContent = 'Their hints';
-  }
-
-  /* Set initial temperature state — simulate ~12ft / warmer */
+/* ---- FIND THEM MODE ---- */
+var ftOrientationActive=false, ftSimInterval=null;
+function initFindThem(matchName){
+  var name=matchName||(currentMatchProfile&&currentMatchProfile.name)||'them';
+  var badge=document.getElementById('ft-badge');
+  var themLbl=document.getElementById('ft-them-lbl');
+  var themLegend=document.getElementById('ft-them-legend');
+  if(badge)badge.textContent=name+' nearby';
+  if(themLbl)themLbl.textContent=name;
+  if(themLegend)themLegend.textContent=name+' (approx)';
   setTemperature(72);
-
-  /* Try to get real device orientation */
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
-    /* iOS 13+ — needs explicit permission */
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     DeviceOrientationEvent.requestPermission()
-      .then(state => {
-        if (state === 'granted') startOrientationListener();
-        else startSimulatedArrow();
-      })
-      .catch(() => startSimulatedArrow());
-  } else if (window.DeviceOrientationEvent) {
-    /* Android / desktop — fires without prompt */
-    startOrientationListener();
-  } else {
-    startSimulatedArrow();
-  }
+      .then(function(s){if(s==='granted')startOrientationListener();else startSimulatedArrow();})
+      .catch(function(){startSimulatedArrow();});
+  }else if(window.DeviceOrientationEvent){startOrientationListener();}
+  else{startSimulatedArrow();}
+}
+function startOrientationListener(){
+  ftOrientationActive=true;
+  var note=document.getElementById('ft-orient-note');
+  if(note)note.textContent='Arrow follows your heading';
+  window.addEventListener('deviceorientation',handleOrientation,true);
+}
+function handleOrientation(e){rotateArrow(e.alpha||0);}
+function rotateArrow(deg){var g=document.getElementById('ft-arrow-group');if(g)g.style.transform='rotate('+deg+'deg)';}
+function startSimulatedArrow(){
+  var note=document.getElementById('ft-orient-note');
+  if(note)note.textContent='Turn your phone to find them';
+  var angle=0,dir=1;
+  if(ftSimInterval)clearInterval(ftSimInterval);
+  ftSimInterval=setInterval(function(){angle+=dir*1.2;if(angle>25||angle<-25)dir*=-1;rotateArrow(angle);},40);
+}
+function stopFindThem(){
+  if(ftOrientationActive){window.removeEventListener('deviceorientation',handleOrientation,true);ftOrientationActive=false;}
+  if(ftSimInterval){clearInterval(ftSimInterval);ftSimInterval=null;}
+}
+function setTemperature(pct){
+  pct=Math.max(0,Math.min(100,pct));
+  var stops=[[0,[91,184,255]],[25,[112,200,224]],[50,[255,184,64]],[75,[255,122,90]],[100,[255,45,26]]];
+  var lo=stops[0],hi=stops[stops.length-1];
+  for(var i=0;i<stops.length-1;i++){if(pct>=stops[i][0]&&pct<=stops[i+1][0]){lo=stops[i];hi=stops[i+1];break;}}
+  var t=(pct-lo[0])/(hi[0]-lo[0]);
+  function lerp(a,b){return Math.round(a+(b-a)*t);}
+  var hex='#'+[lerp(lo[1][0],hi[1][0]),lerp(lo[1][1],hi[1][1]),lerp(lo[1][2],hi[1][2])].map(function(v){return v.toString(16).padStart(2,'0');}).join('');
+  var fill=document.getElementById('ft-temp-fill');
+  if(fill){fill.style.width=pct+'%';fill.style.backgroundColor=hex;}
+  var lbl=document.getElementById('ft-temp-lbl');
+  if(lbl){lbl.style.color=hex;lbl.textContent=pct>=75?'Getting hot':pct>=50?'Getting warmer':pct>=25?'Getting cooler':'Ice cold -- turn around';}
+  var val=document.getElementById('ft-temp-val');
+  var distNum=document.getElementById('ft-dist-num');
+  var ft=Math.round((1-pct/100)*40);
+  if(val)val.textContent=ft<=0?'Right here!':'~'+ft+' ft away';
+  if(distNum)distNum.textContent=ft<=0?'0':ft;
+}
+function updateFavillaHour(count){
+  var el=document.getElementById('fh-count');
+  if(el)el.textContent=count;
 }
 
-function startOrientationListener() {
-  ftOrientationActive = true;
-  const note = document.getElementById('ft-orient-note');
-  if (note) note.textContent = 'Arrow follows your heading';
-  window.addEventListener('deviceorientation', handleOrientation, true);
+/* ---- REGULAR BADGE HELPERS ---- */
+var REGULAR_THRESHOLD=3;
+async function recordCheckinHistory(venueId,venueName){
+  if(!currentUser)return;
+  await sb.from('checkin_history').insert({user_id:currentUser.id,venue_id:venueId,venue_name:venueName});
+}
+async function getRegularVenues(userId){
+  var res=await sb.from('checkin_history').select('venue_id').eq('user_id',userId);
+  if(!res.data)return new Set();
+  var counts={};
+  res.data.forEach(function(r){counts[r.venue_id]=(counts[r.venue_id]||0)+1;});
+  return new Set(Object.keys(counts).filter(function(v){return counts[v]>=REGULAR_THRESHOLD;}));
 }
 
-function handleOrientation(e) {
-  /* alpha = compass heading in degrees (0 = north, clockwise) */
-  const heading = e.alpha || 0;
-  rotateArrow(heading);
-}
-
-function rotateArrow(degrees) {
-  const g = document.getElementById('ft-arrow-group');
-  if (g) g.style.transform = `rotate(${degrees}deg)`;
-}
-
-function startSimulatedArrow() {
-  /* Gentle sway when no real sensor — shows the concept */
-  const note = document.getElementById('ft-orient-note');
-  if (note) note.textContent = 'Turn your phone to find them';
-  let angle = 0;
-  let dir = 1;
-  if (ftSimInterval) clearInterval(ftSimInterval);
-  ftSimInterval = setInterval(() => {
-    angle += dir * 1.2;
-    if (angle > 25 || angle < -25) dir *= -1;
-    rotateArrow(angle);
-  }, 40);
-}
-
-function stopFindThem() {
-  if (ftOrientationActive) {
-    window.removeEventListener('deviceorientation', handleOrientation, true);
-    ftOrientationActive = false;
-  }
-  if (ftSimInterval) { clearInterval(ftSimInterval); ftSimInterval = null; }
-}
-
-/*
-  setTemperature(pct) — 0 = ice cold (40+ ft), 100 = on fire (0 ft)
-  Colour gradient:
-    0%   → #5BB8FF  (icy blue)
-    25%  → #70C8E0  (cool teal)
-    50%  → #FFB840  (amber — neutral)
-    75%  → #FF7A5A  (warm orange)
-    100% → #FF2D1A  (red hot)
-*/
-function setTemperature(pct) {
-  pct = Math.max(0, Math.min(100, pct));
-
-  /* Interpolate colour through the 5-stop gradient */
-  const stops = [
-    [0,   [91,  184, 255]],   /* icy blue   */
-    [25,  [112, 200, 224]],   /* cool teal  */
-    [50,  [255, 184, 64 ]],   /* amber      */
-    [75,  [255, 122, 90 ]],   /* warm orange*/
-    [100, [255, 45,  26 ]],   /* red hot    */
-  ];
-
-  let lo = stops[0], hi = stops[stops.length - 1];
-  for (let i = 0; i < stops.length - 1; i++) {
-    if (pct >= stops[i][0] && pct <= stops[i+1][0]) { lo = stops[i]; hi = stops[i+1]; break; }
-  }
-  const t   = (pct - lo[0]) / (hi[0] - lo[0]);
-  const r   = Math.round(lo[1][0] + (hi[1][0] - lo[1][0]) * t);
-  const g   = Math.round(lo[1][1] + (hi[1][1] - lo[1][1]) * t);
-  const b   = Math.round(lo[1][2] + (hi[1][2] - lo[1][2]) * t);
-  const hex = '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-
-  /* Update bar fill */
-  const fill = document.getElementById('ft-temp-fill');
-  if (fill) { fill.style.width = pct + '%'; fill.style.backgroundColor = hex; }
-
-  /* Update label colour and text */
-  const lbl = document.getElementById('ft-temp-lbl');
-  if (lbl) {
-    lbl.style.color = hex;
-    if (pct >= 75) lbl.textContent = 'Getting hot';
-    else if (pct >= 50) lbl.textContent = 'Getting warmer';
-    else if (pct >= 25) lbl.textContent = 'Getting cooler';
-    else lbl.textContent = 'Ice cold — turn around';
-  }
-
-  /* Update distance text (rough simulation: 100% = 0ft, 0% = 40+ft) */
-  const val = document.getElementById('ft-temp-val');
-  const distNum = document.getElementById('ft-dist-num');
-  const approxFt = Math.round((1 - pct / 100) * 40);
-  if (val) val.textContent = approxFt <= 0 ? 'Right here!' : '~' + approxFt + ' ft away';
-  if (distNum) distNum.textContent = approxFt <= 0 ? '0' : approxFt;
-}
-
-/* Demo slider for testing temperature gradient without GPS */
-function ftDemoTick() {
-  /* In a real build this is driven by Bluetooth RSSI or GPS delta.
-     For now we expose setTemperature() so it can be called from outside. */
-}
-
-/* Open chat — loads history and subscribes to new messages */
-async function openChat(matchId, otherProfile) {
-  /* If we don't have a matchId yet, try to find the most recent match */
-  if (!matchId) {
-    const {data: latestMatch} = await sb.from('matches')
-      .select('id, user_id_1, user_id_2')
-      .or(`user_id_1.eq.${currentUser.id},user_id_2.eq.${currentUser.id}`)
-      .order('created_at', {ascending: false})
-      .limit(1)
-      .maybeSingle();
-    if (latestMatch) {
-      matchId = latestMatch.id;
-      if (!otherProfile) {
-        const otherId = latestMatch.user_id_1 === currentUser.id
-          ? latestMatch.user_id_2 : latestMatch.user_id_1;
-        otherProfile = await fetchProfileById(otherId);
-      }
-    }
-  }
-
-  currentMatchId      = matchId;
-  currentMatchProfile = otherProfile;
-
-  /* Update chat header */
-  const name    = otherProfile?.name || 'Match';
-  const initial = name.charAt(0).toUpperCase();
-  document.getElementById('ch-av').textContent   = initial;
-  document.getElementById('ch-name').textContent = name;
-  document.getElementById('ch-input').placeholder = `Message ${name}…`;
-
-  /* Generate icebreaker if both have prompts */
-  const myP  = currentProfile?.prompt_1_a;
-  const theirP = otherProfile?.prompt_1_a;
-  const iceCard = document.getElementById('ice-card');
-  const iceText = document.getElementById('ice-text');
-  if (myP && theirP) {
-    iceText.innerHTML = `You both answered the prompt. They said: <span>"${theirP}"</span>`;
-    iceCard.style.display = 'block';
-  } else {
-    iceCard.style.display = 'none';
-  }
-
-  /* Navigate first so the screen is visible */
-  _show('s-chat');
-  dateCardShown = false;
-
-  /* Load message history */
-  if (matchId) {
-    await loadMessages(matchId);
-    subscribeMsgs(matchId);
-  } else {
-    /* No matchId — show empty state */
-    const msgs = document.getElementById('chat-msgs');
-    msgs.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Say something. You\'re both here.</div>';
-  }
-}
-
-async function loadMessages(matchId) {
-  const msgs = document.getElementById('chat-msgs');
-  msgs.innerHTML = '<div id="chat-loading" style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Loading…</div>';
-
-  const {data, error} = await sb.from('messages')
-    .select('id, sender_id, content, created_at')
-    .eq('match_id', matchId)
-    .order('created_at', {ascending: true});
-
-  if (error) {
-    console.error('[CHAT] loadMessages error:', error);
-    msgs.innerHTML = '<div style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Could not load messages.</div>';
-    return;
-  }
-
-  msgs.innerHTML = '';
-  if (data.length === 0) {
-    msgs.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Say something. You\'re both here.</div>';
-    return;
-  }
-  data.forEach(m => appendMessage(m));
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function appendMessage(msg) {
-  const msgs = document.getElementById('chat-msgs');
-  /* Remove empty state div if present */
-  const empty = msgs.querySelector('div:not(.msg)');
-  if (empty && !empty.classList.contains('date-card') && !empty.classList.contains('nudge')) {
-    empty.remove();
-  }
-  const isMe = msg.sender_id === currentUser.id;
-  const time  = new Date(msg.created_at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
-  const div   = document.createElement('div');
-  div.className = 'msg ' + (isMe ? 'me' : 'them');
-  div.dataset.msgId = msg.id;
-  div.innerHTML = `<div class="bub">${escapeHtml(msg.content)}</div><div class="msg-t">${time}</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-async function sendMsg() {
-  const inp = document.getElementById('ch-input');
-  const txt = inp.value.trim();
-  if (!txt || !currentMatchId || !currentUser) return;
-  inp.value = '';
-
-  /* Optimistic — add to UI immediately */
-  appendMessage({
-    id: 'temp-' + Date.now(),
-    sender_id: currentUser.id,
-    content: txt,
-    created_at: new Date().toISOString(),
-  });
-
-  const {error} = await sb.from('messages').insert({
-    match_id:  currentMatchId,
-    sender_id: currentUser.id,
-    content:   txt,
-  });
-
-  if (error) {
-    console.error('[CHAT] sendMsg error:', error);
-    showToastMsg('Message failed to send — try again.');
-  }
-  if (navigator.vibrate) navigator.vibrate(10);
-}
-
-function subscribeMsgs(matchId) {
-  if (msgSub) { sb.removeChannel(msgSub); msgSub = null; }
-  msgSub = sb.channel('msgs-' + matchId)
-    .on('postgres_changes', {
-      event:  'INSERT',
-      schema: 'public',
-      table:  'messages',
-      filter: 'match_id=eq.' + matchId,
-    }, (payload) => {
-      /* Only append if not from us — we already added it optimistically */
-      if (payload.new.sender_id !== currentUser.id) {
-        appendMessage(payload.new);
-      }
-    })
-    .subscribe((status) => {
-      console.log('[CHAT] msg subscription:', status);
-    });
+function sendMsg(){
+  const inp=document.getElementById('ch-input');
+  const txt=inp.value.trim();if(!txt)return;
+  const msgs=document.getElementById('chat-msgs');
+  const m=document.createElement('div');m.className='msg me';
+  m.innerHTML='<div class="bub">'+txt+'</div><div class="msg-t">Just now</div>';
+  msgs.appendChild(m);inp.value='';msgs.scrollTop=msgs.scrollHeight;
 }
 
 let blindIdx=1;
@@ -2094,11 +1736,8 @@ let currentCheckInId = null;
 let presenceSub      = null;
 let likesSub         = null;
 let matchesSub       = null;
-let msgSub           = null;   // realtime chat subscription
 let presenceCache    = [];
-let activeSheetUser  = null;
-let currentMatchId   = null;   // id of active match for chat
-let currentMatchProfile = null; // other person's profile in current chat
+let activeSheetUser  = null; // profile data of person currently in sheet
 
 const POSITIONS = [
   {left:'50%',top:'50%'},{left:'22%',top:'22%'},{left:'78%',top:'22%'},
@@ -2129,7 +1768,8 @@ async function doCheckInVenue() {
   currentCheckInId = data.id;
   updateCheckInUI(true);
   showToastMsg('You\'re in. Visible to other Favilla users here. ✦');
-  if (navigator.vibrate) navigator.vibrate(20);
+  if(navigator.vibrate)navigator.vibrate(20);
+  recordCheckinHistory(VENUE_ID,VENUE_NAME);
   loadPresence();
 }
 
@@ -2145,100 +1785,66 @@ function updateCheckInUI(in_) {
     in_ ? 'rgba(255,90,50,0.5)' : '';
 }
 
-async function loadPresence() {
-  if (!currentUser || !currentProfile) return;  /* don't run until profile exists */
-  const {data, error} = await sb
-    .from('check_ins')
-    .select('id, user_id, profiles(name, age, photo_url, icebreaker, prompt_1_q, prompt_1_a, prompt_2_q, prompt_2_a, prompt_3_q, prompt_3_a, intention, gender)')
-    .eq('venue_id', VENUE_ID)
-    .gt('expires_at', new Date().toISOString())
-    .neq('user_id', currentUser.id);
-  if (error) { console.error('Presence error', error); return; }
-  /* Filter out any rows where the profile join returned null (deleted accounts etc) */
-  presenceCache = (data || []).filter(row => row.profiles);
-  renderPresence(presenceCache);
+async function loadPresence(){
+  if(!currentUser||!currentProfile)return;
+  var res=await sb.from('check_ins')
+    .select('id,user_id,profiles(name,age,photo_url,icebreaker,prompt_1_q,prompt_1_a,prompt_2_q,prompt_2_a,prompt_3_q,prompt_3_a,intention,gender)')
+    .eq('venue_id',VENUE_ID)
+    .gt('expires_at',new Date().toISOString())
+    .neq('user_id',currentUser.id);
+  if(res.error){console.error('Presence error',res.error);return;}
+  presenceCache=(res.data||[]).filter(function(r){return r.profiles;});
+  updateFavillaHour(presenceCache.length+(currentCheckInId?1:0));
+  var regularSets={};
+  await Promise.all(presenceCache.map(async function(row){
+    regularSets[row.user_id]=await getRegularVenues(row.user_id);
+  }));
+  renderPresence(presenceCache,regularSets);
   updateVenueSub(presenceCache.length);
   renderDrawerList(presenceCache);
 }
 
-function renderPresence(users) {
-  const container = document.getElementById('radial-container');
-  const empty     = document.getElementById('empty-state');
-  const emptyMsg  = document.getElementById('empty-state-msg');
-  const seeAll    = document.getElementById('see-all-btn');
-  container.querySelectorAll('.pn').forEach(n => n.remove());
-
-  if (users.length === 0) {
-    /* Show candle with context-aware message */
-    container.style.display = 'none';
-    empty.style.display = 'block';
-    seeAll.style.display = 'none';
-    if (emptyMsg) {
-      emptyMsg.textContent = currentCheckInId
-        ? "You\'re in the room. Others will appear the moment they check in."
-        : "Check in to appear when others arrive.";
-    }
+function renderPresence(users,regularSets){
+  var container=document.getElementById('radial-container');
+  var empty=document.getElementById('empty-state');
+  var emptyMsg=document.getElementById('empty-state-msg');
+  var seeAll=document.getElementById('see-all-btn');
+  container.querySelectorAll('.pn').forEach(function(n){n.remove();});
+  if(users.length===0){
+    container.style.display='none';empty.style.display='block';seeAll.style.display='none';
+    if(emptyMsg)emptyMsg.textContent=currentCheckInId?"You're in the room. Others will appear the moment they check in.":"Check in to appear when others arrive.";
     return;
   }
-
-  /* Others are here — hide candle, show radial */
-  container.style.display = '';
-  empty.style.display = 'none';
-
-  if (users.length > 5) {
-    seeAll.style.display = 'flex';
-    document.getElementById('see-all-count').textContent = users.length;
-  } else {
-    seeAll.style.display = 'none';
-  }
-
-  users.slice(0, POSITIONS.length).forEach((row, i) => {
-    const p = row.profiles; if (!p) return;
-    const initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
-    const label   = p.name + (p.age ? ', ' + p.age : '');
-    const pos     = POSITIONS[i];
-    const size    = AV_SIZES[i] || 'o';
-    const bg      = BG_COLORS[i];
-    const isFirst = i === 0;
-
-    /* Icebreaker snippet — truncate at word boundary, show tap cue if cut */
-    let snippet = '';
-    let isTruncated = false;
-    if (isFirst) {
-      const raw = p.icebreaker || p.prompt_1_a || '';
-      if (raw) {
-        if (raw.length <= 38) {
-          snippet = raw;
-        } else {
-          /* Break at last space before 36 chars so we don't cut mid-word */
-          const cut = raw.lastIndexOf(' ', 36);
-          snippet = raw.substring(0, cut > 10 ? cut : 36);
-          isTruncated = true;
-        }
-      }
+  container.style.display='';empty.style.display='none';
+  if(users.length>5){seeAll.style.display='flex';document.getElementById('see-all-count').textContent=users.length;}
+  else{seeAll.style.display='none';}
+  users.slice(0,POSITIONS.length).forEach(function(row,i){
+    var p=row.profiles;if(!p)return;
+    var initial=p.name?p.name.charAt(0).toUpperCase():'?';
+    var label=p.name+(p.age?', '+p.age:'');
+    var pos=POSITIONS[i],size=AV_SIZES[i]||'o',bg=BG_COLORS[i];
+    var isFirst=i===0;
+    var isReg=regularSets&&regularSets[row.user_id]&&regularSets[row.user_id].has(VENUE_ID);
+    var snippet='',isTrunc=false;
+    if(isFirst){
+      var raw=p.icebreaker||p.prompt_1_a||'';
+      if(raw){if(raw.length<=38){snippet=raw;}else{var cut=raw.lastIndexOf(' ',36);snippet=raw.substring(0,cut>10?cut:36);isTrunc=true;}}
     }
-
-    const avContent = p.photo_url
-      ? `<img src="${p.photo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-      : initial;
-
-    const node = document.createElement('div');
-    node.className = 'pn';
-    node.style.cssText = `left:${pos.left};top:${pos.top};`;
-    node.dataset.userId = row.user_id;
-    node.innerHTML = `
-      <div class="pav ${size}" style="background:${bg};${isFirst ? 'border-color:rgba(255,90,50,0.65);' : ''}">
-        ${avContent}<div class="ponline"></div>
-      </div>
-      <div class="${isFirst ? '' : 'pname'}" style="${isFirst ? 'font-size:14px;color:var(--cr);font-weight:600;margin-top:7px;' : ''}">
-        ${label}
-      </div>
-      ${isFirst && snippet ? `<div class="pn-snippet">&ldquo;${snippet}${isTruncated ? '…' : ''}&rdquo;${isTruncated ? '<div class="pn-snippet-tap">tap to read more</div>' : ''}</div>` : ''}
-    `;
-    node.onclick = () => openProfileSheet(row);
+    var avContent=p.photo_url?('<img src="'+p.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'):initial;
+    var node=document.createElement('div');
+    node.className='pn';
+    node.style.cssText='left:'+pos.left+';top:'+pos.top+';';
+    node.dataset.userId=row.user_id;
+    node.innerHTML=
+      '<div class="pav '+size+'" style="background:'+bg+';'+(isFirst?'border-color:rgba(255,90,50,0.65);':'')+'">'+avContent+'<div class="ponline"></div></div>'+
+      '<div class="'+(isFirst?'':'pname')+'" style="'+(isFirst?'font-size:14px;color:var(--cr);font-weight:600;margin-top:7px;':'')+'">'+label+'</div>'+
+      (isReg?'<div class="regular-badge">Regular</div>':'')+
+      (isFirst&&snippet?'<div class="pn-snippet">"'+snippet+(isTrunc?'...':'')+'"'+(isTrunc?'<div class="pn-snippet-tap">tap to read more</div>':'')+'</div>':'');
+    node.onclick=function(){openProfileSheet(row,isReg);};
     container.appendChild(node);
   });
 }
+
 function updateVenueSub(count) {
   if (currentCheckInId) {
     document.getElementById('v-sub').textContent =
@@ -2251,78 +1857,66 @@ function updateVenueSub(count) {
 }
 
 /* ── PROFILE SHEET ──────────────── */
-function openProfileSheet(row) {
-  const p = row.profiles; if (!p) return;
-  activeSheetUser = row;
-  /* hero photo or initial */
-  const hero = document.getElementById('sheet-hero');
-  const heroInitial = document.getElementById('sheet-hero-initial');
-  const existingImg = hero.querySelector('img');
-  if (existingImg) existingImg.remove();
-  if (p.photo_url) {
-    heroInitial.style.display = 'none';
-    const img = document.createElement('img');
-    img.src = p.photo_url;
-    hero.insertBefore(img, hero.querySelector('.sheet-hero-overlay'));
-  } else {
-    heroInitial.style.display = 'flex';
-    heroInitial.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+function openProfileSheet(row,isRegular){
+  var p=row.profiles;if(!p)return;
+  activeSheetUser=row;
+  var hero=document.getElementById('sheet-hero');
+  var heroInitial=document.getElementById('sheet-hero-initial');
+  var existingImg=hero.querySelector('img');
+  if(existingImg)existingImg.remove();
+  if(p.photo_url){
+    heroInitial.style.display='none';
+    var img=document.createElement('img');
+    img.src=p.photo_url;
+    img.style.cssText='width:100%;height:auto;display:block;max-height:400px;object-fit:contain;object-position:center;';
+    hero.insertBefore(img,hero.querySelector('.sheet-hero-overlay'));
+  }else{
+    heroInitial.style.display='flex';
+    heroInitial.textContent=p.name?p.name.charAt(0).toUpperCase():'?';
   }
-  document.getElementById('sheet-name').textContent = p.name || 'Someone';
-  document.getElementById('sheet-age').textContent  = p.age || '';
-  /* icebreaker */
-  const ibWrap = document.getElementById('sheet-icebreaker-wrap');
-  const ibText = document.getElementById('sheet-icebreaker');
-  if (p.icebreaker) {
-    ibText.textContent = '\u201c' + p.icebreaker + '\u201d';
-    ibWrap.style.display = 'block';
-  } else {
-    ibWrap.style.display = 'none';
+  document.getElementById('sheet-name').textContent=p.name||'Someone';
+  document.getElementById('sheet-age').textContent=p.age||'';
+  var regWrap=document.getElementById('sheet-regular-wrap');
+  if(regWrap)regWrap.style.display=isRegular?'block':'none';
+  var ibWrap=document.getElementById('sheet-icebreaker-wrap');
+  var ibText=document.getElementById('sheet-icebreaker');
+  if(ibWrap&&ibText){
+    if(p.icebreaker){ibText.textContent='"'+p.icebreaker+'"';ibWrap.style.display='block';}
+    else{ibWrap.style.display='none';}
   }
-  /* intention */
-  const intentionMap = {
-    'something_real': '🔥 Something real',
-    'casual':         '✦ Keeping it light',
-    'not_sure':       '🌱 Still figuring it out',
-    'Something real': '🔥 Something real',
-    'Keeping it light': '✦ Keeping it light',
-    'Still figuring it out': '🌱 Still figuring it out'
+  var intentionMap={
+    'something_real':'Something real','casual':'Keeping it light','not_sure':'Still figuring it out',
+    'Something real':'Something real','Keeping it light':'Keeping it light','Still figuring it out':'Still figuring it out'
   };
-  const intentionEl = document.getElementById('sheet-intention');
-  const intentionText = intentionMap[p.intention] || p.intention || '';
-  intentionEl.textContent = intentionText;
-  intentionEl.style.display = intentionText ? 'inline-flex' : 'none';
-  /* prompts */
-  const prompts = document.getElementById('sheet-prompts');
-  prompts.innerHTML = '';
-  [[p.prompt_1_q, p.prompt_1_a],[p.prompt_2_q, p.prompt_2_a],[p.prompt_3_q, p.prompt_3_a]]
-    .filter(([q,a]) => q && a)
-    .forEach(([q, a]) => {
-      const div = document.createElement('div');
-      div.className = 'sheet-prompt';
-      div.innerHTML = `<div class="sheet-pq">${q}</div><div class="sheet-pa">\u201c${a}\u201d</div>`;
+  var intentionEl=document.getElementById('sheet-intention');
+  var intentionText=intentionMap[p.intention]||p.intention||'';
+  intentionEl.textContent=intentionText?('&#x1F525; '+intentionText):'';
+  intentionEl.style.display=intentionText?'inline-flex':'none';
+  var prompts=document.getElementById('sheet-prompts');
+  prompts.innerHTML='';
+  [[p.prompt_1_q,p.prompt_1_a],[p.prompt_2_q,p.prompt_2_a],[p.prompt_3_q,p.prompt_3_a]]
+    .filter(function(qa){return qa[0]&&qa[1];})
+    .forEach(function(qa){
+      var div=document.createElement('div');div.className='sheet-prompt';
+      div.innerHTML='<div class="sheet-pq">'+qa[0]+'</div><div class="sheet-pa">"'+qa[1]+'"</div>';
       prompts.appendChild(div);
     });
-  /* basics */
-  const basics = document.getElementById('sheet-basics');
-  basics.innerHTML = '';
-  if (p.gender) basics.innerHTML += `<div class="sheet-basic-chip">${p.gender}</div>`;
-  basics.innerHTML += `<div class="sheet-basic-chip">At ${VENUE_NAME} right now</div>`;
-  /* reset scroll, spark button, and open */
-  document.getElementById('sheet-scroll').scrollTop = 0;
-  const sparkBtn = document.getElementById('sheet-spark-btn');
-  sparkBtn.disabled = false;
-  sparkBtn.innerHTML = '✦ Spark';
+  var basics=document.getElementById('sheet-basics');
+  basics.innerHTML='';
+  if(p.gender)basics.innerHTML+='<div class="sheet-basic-chip">'+p.gender+'</div>';
+  basics.innerHTML+='<div class="sheet-basic-chip">At '+VENUE_NAME+' right now</div>';
+  document.getElementById('sheet-scroll').scrollTop=0;
+  var sparkBtn=document.getElementById('sheet-spark-btn');
+  sparkBtn.disabled=false;sparkBtn.innerHTML='&#x2746; Spark';
   document.getElementById('sheet-overlay').classList.add('open');
 }
 
-function viewFullProfile() {
-  /* Full public profile page — coming in next session */
-  if (!activeSheetUser) return;
-  const name = activeSheetUser.profiles?.name || 'this person';
-  showToastMsg(`Full profile for ${name} — coming soon ✦`);
-}
 
+function viewFullProfile(){
+  if(!activeSheetUser)return;
+  var name=(activeSheetUser.profiles&&activeSheetUser.profiles.name)||'this person';
+  showToastMsg('Full profile for '+name+' -- coming soon');
+}
 function closeSheet() {
   document.getElementById('sheet-overlay').classList.remove('open');
   activeSheetUser = null;
@@ -2335,98 +1929,57 @@ function closeSheetOutside(e) {
 async function doSpark() {
   if (!currentUser || !activeSheetUser) return;
   const btn = document.getElementById('sheet-spark-btn');
-  btn.disabled = true; btn.textContent = 'Flickering…';
+  btn.disabled = true; btn.textContent = 'Sparking…';
 
   const likedId = activeSheetUser.user_id;
-  console.log('[SPARK] Liking user:', likedId, 'from:', currentUser.id);
 
-  /* Delete any existing like first */
-  await sb.from('likes')
-    .delete()
-    .eq('user_id', currentUser.id)
-    .eq('liked_user_id', likedId);
-
-  /* Insert fresh like */
-  const {data: likeData, error} = await sb.from('likes').insert({
-    user_id: currentUser.id,
-    liked_user_id: likedId,
-    venue_id: VENUE_ID,
-  }).select().single();
+  /* Write the like */
+  const {error} = await sb.from('likes').upsert({
+    user_id: currentUser.id, liked_user_id: likedId, venue_id: VENUE_ID,
+  }, {onConflict: 'user_id,liked_user_id'});
 
   if (error) {
-    console.error('[SPARK] Insert error:', error.code, error.message);
-    showToastMsg('Could not send spark: ' + (error.message || error.code));
+    showToastMsg('Something went wrong — try again.');
     btn.disabled = false; btn.innerHTML = '✦ Spark';
     return;
   }
-  console.log('[SPARK] Like inserted OK:', likeData);
 
   closeSheet();
-  showToastMsg('Flickering ✦ — if it\'s mutual you\'ll both know instantly.');
+  showToastMsg('Spark sent ✦ — if it\'s mutual you\'ll both know instantly.');
 
-  /* Immediately check if they already liked us back */
-  const {data: mutual, error: mutualErr} = await sb.from('likes')
+  /* Check if they already liked us (mutual) */
+  const {data: mutual} = await sb.from('likes')
     .select('id')
     .eq('user_id', likedId)
     .eq('liked_user_id', currentUser.id)
     .maybeSingle();
 
-  console.log('[SPARK] Mutual check — they liked us back?', mutual, mutualErr);
-
   if (mutual) {
-    console.log('[SPARK] MUTUAL DETECTED — calling createMatch');
+    /* It's mutual — write the match */
     await createMatch(likedId, activeSheetUser.profiles);
-  } else {
-    console.log('[SPARK] Not mutual yet — waiting for Realtime to detect their like');
   }
 }
 
 async function createMatch(otherUserId, otherProfile) {
-  console.log('[MATCH] createMatch called — me:', currentUser.id, 'them:', otherUserId);
-
-  /* Check for existing match */
-  const {data: existing, error: existErr} = await sb.from('matches')
+  /* Prevent duplicate — check first */
+  const {data: existing} = await sb.from('matches')
     .select('id')
     .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${currentUser.id})`)
     .maybeSingle();
+  if (existing) return; /* already matched */
 
-  console.log('[MATCH] Existing check:', existing, existErr);
-
-  if (existing) {
-    /* A match row already exists — this is a stale row from a previous session.
-       Do NOT show the overlay again unless both users have active check-ins
-       right now (i.e. this is genuinely a re-match in the same venue tonight). */
-    console.log('[MATCH] Stale match row found — not showing overlay again');
-    return;
-  }
-
-  const {data: insertData, error} = await sb.from('matches').insert({
+  await sb.from('matches').insert({
     user_id_1: currentUser.id, user_id_2: otherUserId, venue_id: VENUE_ID,
-  }).select().single();
-
-  console.log('[MATCH] Insert result:', insertData, error);
-
-  if (error) {
-    /* Most likely a race condition duplicate — do NOT show overlay */
-    console.error('[MATCH] Insert error (likely duplicate race):', error.code, error.message);
-    return;
-  }
-
-  console.log('[MATCH] New match created — showing overlay');
-  showMatchOverlay(otherProfile, insertData.id);
+  });
+  showMatchOverlay(otherProfile);
 }
 
-function showMatchOverlay(otherProfile, matchId) {
+/* ── MATCH OVERLAY ───────────────── */
+function showMatchOverlay(otherProfile) {
   if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
-
-  /* Store for use when opening chat */
-  currentMatchId      = matchId || currentMatchId;
-  currentMatchProfile = otherProfile;
-
   /* You avatar */
   const youAv = document.getElementById('mo-av-you');
   youAv.textContent = currentProfile?.name?.charAt(0).toUpperCase() || 'Y';
-
   /* Them avatar */
   const themAv = document.getElementById('mo-av-them');
   if (otherProfile?.photo_url) {
@@ -2434,102 +1987,22 @@ function showMatchOverlay(otherProfile, matchId) {
   } else {
     themAv.textContent = otherProfile?.name?.charAt(0).toUpperCase() || '?';
   }
-
   document.getElementById('mo-name').textContent =
     'You and ' + (otherProfile?.name || 'someone') + ' both said yes.';
   document.getElementById('mo-loc').textContent =
     'Both at ' + VENUE_NAME + ' · right now';
-
-  /* Reset animations so they replay fresh every time the overlay opens */
-  const overlay = document.getElementById('match-overlay');
-  const animated = overlay.querySelectorAll('.mo-avs,.mo-gem,.mo-eyebrow,.mo-name,.mo-sub,.mo-loc,.mo-chat,.mo-find');
-  animated.forEach(el => {
-    el.style.animation = 'none';
-    el.style.opacity = '0';
-    /* Force reflow so the browser registers the reset */
-    void el.offsetWidth;
-    el.style.animation = '';
-    el.style.opacity = '';
-  });
-
-  overlay.classList.add('show');
+  document.getElementById('match-overlay').classList.add('show');
 }
 
 function dismissMatchGoChat() {
   document.getElementById('match-overlay').classList.remove('show');
-  openChat(currentMatchId, currentMatchProfile);
+  goTo('s-chat', 's-spark');
 }
-function dismissMatchGoFind() {
+function dismissMatchGoFind(){
   document.getElementById('match-overlay').classList.remove('show');
-  const name = currentMatchProfile?.name || 'them';
-  goTo('s-findthem', 's-spark');
-  setTimeout(() => initFindThem(name), 100);
-}
-
-/* ── MATCHES LIST ────────────────── */
-async function loadMatchesList() {
-  const list  = document.getElementById('mx-list');
-  const count = document.getElementById('mx-count');
-  if (!list || !currentUser) return;
-
-  list.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Loading…</div>';
-
-  const {data: matchRows, error} = await sb.from('matches')
-    .select('id, user_id_1, user_id_2, created_at')
-    .or(`user_id_1.eq.${currentUser.id},user_id_2.eq.${currentUser.id}`)
-    .order('created_at', {ascending: false});
-
-  if (error) {
-    console.error('[MATCHES] load error:', error);
-    list.innerHTML = '<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Could not load matches.</div>';
-    return;
-  }
-
-  if (!matchRows || matchRows.length === 0) {
-    count.textContent = '';
-    list.innerHTML = `<div style="text-align:center;padding:40px 36px;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:10px;">No matches yet.</div><div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there right now.<br>Go check in.</div><button onclick="navTo('s-spark')" style="margin-top:18px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;">Open Spark →</button></div>`;
-    return;
-  }
-
-  count.textContent = matchRows.length + ' conversation' + (matchRows.length === 1 ? '' : 's');
-
-  const items = await Promise.all(matchRows.map(async (match) => {
-    const otherId = match.user_id_1 === currentUser.id ? match.user_id_2 : match.user_id_1;
-    const [{data: profile}, {data: lastMsgs}] = await Promise.all([
-      sb.from('profiles').select('name, age, photo_url').eq('id', otherId).single(),
-      sb.from('messages').select('content, created_at, sender_id')
-        .eq('match_id', match.id).order('created_at', {ascending: false}).limit(1),
-    ]);
-    const lastMsg = lastMsgs?.[0];
-    const timeStr = lastMsg
-      ? new Date(lastMsg.created_at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})
-      : new Date(match.created_at).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
-    const preview = lastMsg
-      ? (lastMsg.sender_id === currentUser.id ? 'You: ' : '') + lastMsg.content
-      : 'Say something ✦';
-    return {match, profile, timeStr, preview};
-  }));
-
-  list.innerHTML = '';
-  items.forEach(({match, profile, timeStr, preview}, i) => {
-    const name    = profile?.name || 'Someone';
-    const initial = name.charAt(0).toUpperCase();
-    const row     = document.createElement('div');
-    row.className = 'mx-item' + (i === 0 ? ' first' : '');
-    row.innerHTML = `
-      <div class="mx-avw">
-        <div class="mx-av" style="background:rgba(255,90,50,0.18);">${initial}</div>
-        <div class="mx-badge bsp" style="font-size:9px;">🔥</div>
-      </div>
-      <div style="flex:1;">
-        <div class="mx-name">${name}${profile?.age ? ', ' + profile.age : ''}</div>
-        <div class="mx-prev">${escapeHtml(preview.substring(0,50))}${preview.length > 50 ? '…' : ''}</div>
-      </div>
-      <div style="font-size:11px;color:var(--ash);">${timeStr}</div>
-    `;
-    row.onclick = () => openChat(match.id, profile);
-    list.appendChild(row);
-  });
+  var name=(currentMatchProfile&&currentMatchProfile.name)||'them';
+  goTo('s-findthem','s-spark');
+  setTimeout(function(){initFindThem(name);},100);
 }
 
 /* ── SEE ALL DRAWER ──────────────── */
@@ -2572,94 +2045,42 @@ function subscribePresence() {
   if (presenceSub) { sb.removeChannel(presenceSub); }
   presenceSub = sb.channel('presence-' + VENUE_ID)
     .on('postgres_changes', {event:'*', schema:'public', table:'check_ins',
-      filter:'venue_id=eq.' + VENUE_ID}, () => {
-        /* Small delay so DB write is fully committed before we read */
-        setTimeout(loadPresence, 400);
-      })
-    .subscribe((status) => {
-      console.log('[PRESENCE] subscription status:', status);
-      /* Once subscribed, do an immediate fresh load */
-      if (status === 'SUBSCRIBED') loadPresence();
-    });
+      filter:'venue_id=eq.' + VENUE_ID}, () => loadPresence())
+    .subscribe();
 }
 
 function subscribeLikes() {
   if (likesSub) { sb.removeChannel(likesSub); }
-  console.log('[REALTIME] Subscribing to likes for user:', currentUser.id);
-  likesSub = sb.channel('likes-for-' + currentUser.id)
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'likes',
-      filter: 'liked_user_id=eq.' + currentUser.id,
-    }, async (payload) => {
-      console.log('[REALTIME] Someone liked us!', payload.new);
-      const likerId = payload.new.user_id;
-      const {data: weAlsoLiked} = await sb.from('likes')
-        .select('id')
-        .eq('user_id', currentUser.id)
-        .eq('liked_user_id', likerId)
-        .maybeSingle();
-      console.log('[REALTIME] Did we like them back?', weAlsoLiked);
-      if (!weAlsoLiked) return;
-      let otherProfile = presenceCache.find(r => r.user_id === likerId)?.profiles;
-      if (!otherProfile) {
-        const {data: fresh} = await sb.from('profiles')
-          .select('name, age, photo_url')
-          .eq('id', likerId).single();
-        otherProfile = fresh;
-      }
-      console.log('[REALTIME] Mutual! Calling createMatch for:', likerId);
-      await createMatch(likerId, otherProfile);
-    })
-    .subscribe((status) => {
-      console.log('[REALTIME] likes subscription status:', status);
-    });
+  likesSub = sb.channel('likes-' + currentUser.id)
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'likes',
+      filter:'liked_user_id=eq.' + currentUser.id},
+      async (payload) => {
+        /* Someone liked us — check if we liked them back */
+        const likerId = payload.new.user_id;
+        const {data: weAlsoLiked} = await sb.from('likes')
+          .select('id').eq('user_id', currentUser.id)
+          .eq('liked_user_id', likerId).maybeSingle();
+        if (weAlsoLiked) {
+          /* Find their profile to show in match overlay */
+          const them = presenceCache.find(r => r.user_id === likerId);
+          await createMatch(likerId, them?.profiles);
+        }
+      })
+    .subscribe();
 }
 
 function subscribeMatches() {
   if (matchesSub) { sb.removeChannel(matchesSub); }
-  console.log('[REALTIME] Subscribing to matches for user:', currentUser.id);
-  matchesSub = sb.channel('matches-for-' + currentUser.id)
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'matches',
-      filter: 'user_id_1=eq.' + currentUser.id,
-    }, async (payload) => {
-      console.log('[REALTIME] Match row inserted — we are user_id_1:', payload.new);
-      const otherId  = payload.new.user_id_2;
-      const matchId  = payload.new.id;
-      if (!document.getElementById('match-overlay').classList.contains('show')) {
-        const otherProfile = await fetchProfileById(otherId);
-        showMatchOverlay(otherProfile, matchId);
-      }
-    })
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'matches',
-      filter: 'user_id_2=eq.' + currentUser.id,
-    }, async (payload) => {
-      console.log('[REALTIME] Match row inserted — we are user_id_2:', payload.new);
-      const otherId  = payload.new.user_id_1;
-      const matchId  = payload.new.id;
-      let otherProfile = presenceCache.find(r => r.user_id === otherId)?.profiles;
-      if (!otherProfile) otherProfile = await fetchProfileById(otherId);
-      showMatchOverlay(otherProfile, matchId);
-    })
-    .subscribe((status) => {
-      console.log('[REALTIME] matches subscription status:', status);
-    });
-}
-
-/* Helper — fetch a profile by id when not in presenceCache */
-async function fetchProfileById(userId) {
-  const {data} = await sb.from('profiles')
-    .select('name, age, photo_url')
-    .eq('id', userId)
-    .single();
-  return data;
+  matchesSub = sb.channel('matches-' + currentUser.id)
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'matches',
+      filter:`user_id_2=eq.${currentUser.id}`},
+      async (payload) => {
+        /* We are user_id_2 meaning we were liked first, they confirmed */
+        const otherId = payload.new.user_id_1;
+        const them = presenceCache.find(r => r.user_id === otherId);
+        if (them) showMatchOverlay(them.profiles);
+      })
+    .subscribe();
 }
 
 window.addEventListener('beforeunload', async () => {
@@ -2671,7 +2092,7 @@ window.addEventListener('beforeunload', async () => {
 function toggleNotify(id){
   const b=document.getElementById(id);
   if(b.classList.contains('set')){b.classList.remove('set');b.textContent='Notify me';}
-  else{b.classList.add('set');b.textContent='✓ Set';showToastMsg("We'll remind you the day before. 🎟");}
+  else{b.classList.add('set');b.textContent='Set';showToastMsg("We'll remind you the day before.");}
 }
 </script>
 </body>
