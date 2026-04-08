@@ -37,7 +37,16 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .with-nav{padding-bottom:88px;}
 
 /* NAV — fixed to shell bottom always */
-.nav{position:absolute;bottom:0;left:0;right:0;background:var(--sl-hdr);border-top:0.5px solid rgba(255,90,50,0.12);display:flex;justify-content:space-around;padding:10px 8px;padding-bottom:max(24px,env(safe-area-inset-bottom,24px));z-index:200;}
+.nav{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--sl-hdr);
+  border-top:0.5px solid rgba(255,90,50,0.12);
+  display:flex;justify-content:space-around;
+  padding:10px 8px;
+  padding-bottom:max(24px,env(safe-area-inset-bottom,24px));
+  z-index:300;
+}
+@media(max-width:499px){.nav{position:fixed;bottom:0;left:0;right:0;}}
 .ni{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;min-width:60px;}
 .ni-lbl{font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.5px;}
 .ni.on .ni-lbl{color:var(--fl);}
@@ -389,7 +398,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .pn-snippet-tap{font-family:'Space Grotesk',sans-serif;font-style:normal;font-size:9px;color:rgba(255,90,50,0.55);letter-spacing:0.5px;margin-top:3px;text-transform:uppercase;}
 
 /* BLIND */
-#s-blind{background:var(--vl-bg);padding-top:50px;}
+#s-blind{background:var(--vl-bg);padding-top:0;}
 .bl-hdr{background:var(--vl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(155,95,224,0.14);}
 .bl-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--pu-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .bl-card{margin:16px 18px;background:var(--vl-card);border:0.5px solid rgba(155,95,224,0.22);border-radius:18px;overflow:hidden;}
@@ -416,7 +425,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .reveal-av{animation:revealFade 0.9s ease forwards,revealGlow 2.8s ease-in-out 0.7s infinite;}
 
 /* MAP */
-#s-heatmap{background:var(--sl-bg);padding-top:50px;}
+#s-heatmap{background:var(--sl-bg);padding-top:0;}
 .mp-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);}
 .mp-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .mp-toggle{display:flex;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:3px;}
@@ -505,7 +514,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .venue-nav .ni.on .ni-dot{color:var(--wo);}
 
 /* MATCHES */
-#s-matches{background:var(--sl-bg);padding-top:50px;}
+#s-matches{background:var(--sl-bg);padding-top:0;}
 .mx-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.1);}
 .mx-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--cr);font-weight:600;}
 .mx-item{margin:0 18px 10px;padding:15px 16px;background:var(--sl-card);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;display:flex;align-items:center;gap:13px;cursor:pointer;}
@@ -582,7 +591,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .nt-arr{font-size:16px;color:var(--ash);}
 
 /* ALMOST CONNECTIONS */
-#s-almost{background:var(--sl-bg);padding-top:50px;}
+#s-almost{background:var(--sl-bg);padding-top:0;}
 .al-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);}
 .al-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .al-intro{margin:14px 18px;font-size:13px;color:var(--ash);line-height:1.7;background:rgba(255,90,50,0.06);border:0.5px solid rgba(255,90,50,0.18);border-radius:12px;padding:12px 14px;}
@@ -596,7 +605,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .al-btn{padding:8px 15px;border-radius:20px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);color:var(--fl-lt);font-size:12px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;flex-shrink:0;}
 
 /* FAVILLA NIGHTS */
-#s-nights{background:var(--sl-bg);padding-top:50px;}
+#s-nights{background:var(--sl-bg);padding-top:0;}
 .fn-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);}
 .fn-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fl-lt);letter-spacing:3px;text-transform:uppercase;font-weight:600;}
 .fn-hero{margin:14px 18px;background:var(--sl-card);border:0.5px solid rgba(255,90,50,0.3);border-radius:18px;overflow:hidden;}
@@ -650,6 +659,14 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 
 <!-- TOAST -->
 <div class="toast" id="toast"><div style="font-size:18px;">✦</div><div class="toast-text" id="toast-text"><strong>Welcome</strong></div></div>
+
+<!-- MASTER NAV — single instance, outside all screens, never scrolls -->
+<div class="nav" id="master-nav" style="display:none;">
+  <div class="ni" id="nav-spark" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+  <div class="ni" id="nav-blind" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
+  <div class="ni" id="nav-map" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+  <div class="ni" id="nav-matches" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
+</div>
 
 <!-- PROFILE PANEL -->
 <div class="profile-panel" id="profile-panel" onclick="closePP(event)">
@@ -879,12 +896,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <div style="flex:1;"><div class="nb-title">Bonfire at Rooftop 22 tonight</div><div class="nb-sub">28 active now · 0.3 mi away</div></div>
     <div class="nb-btn" onclick="navTo('s-heatmap')">View Map</div>
   </div>
-  <div class="nav" id="nav-spark">
-    <div class="ni on" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-  </div>
 </div>
 
 <!-- ═══ PROFILE CARD SHEET ═══ -->
@@ -1076,12 +1087,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="bl-acts"><button class="btn-pass" onclick="nextBlind()">Not for me</button><button class="btn-intrigue" onclick="blindMatch()">✦ I'm intrigued</button></div>
   <div class="bl-ctr" id="bl-ctr">Profile 1 of 4 · No photos until you both decide</div>
   <div class="bl-nav">
-    <div class="nav">
-      <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-      <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-      <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-      <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-    </div>
   </div>
 </div>
 
@@ -1168,12 +1173,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
       </div>
     </div>
   </div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-  </div>
 </div>
 
 <!-- ═══════════ VENUE PAGE ═══════════ -->
@@ -1224,45 +1223,19 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     </div>
   </div>
   <div class="venue-nav">
-    <div class="nav">
-      <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Spark</div></div>
-      <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Blind</div></div>
-      <div class="ni on"><div class="ni-dot" style="color:var(--wo);opacity:1;"></div><div class="ni-lbl" style="color:var(--wo);">Map</div></div>
-      <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl" style="color:#7A6858;">Matches</div></div>
-    </div>
   </div>
 </div>
 
 <!-- ═══════════ MATCHES ═══════════ -->
 <div class="screen with-nav" id="s-matches">
-  <div class="mx-hdr"><div class="mx-title">Matches</div><div style="font-size:12px;color:var(--ash);">3 conversations</div></div>
-  <div class="mx-item first" onclick="goTo('s-chat','s-matches')">
-    <div class="mx-avw"><div class="mx-av" style="background:rgba(255,90,50,0.18);">S</div><div class="mx-badge bsp" style="font-size:9px;">🔥</div></div>
-    <div style="flex:1;"><div class="mx-name">Sofia, 26</div><div class="mx-prev">go for it. I'll pretend to be surprised.</div></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">10:52 pm</div><div class="mx-unread"></div></div>
+  <div class="mx-hdr" style="background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.1);position:sticky;top:0;z-index:400;">
+    <div class="mx-title">Matches</div>
+    <div id="mx-count" style="font-size:12px;color:var(--ash);"></div>
   </div>
-  <div class="mx-item" onclick="goTo('s-chat','s-matches')">
-    <div class="mx-avw"><div class="mx-av" style="background:rgba(155,95,224,0.15);">J</div><div class="mx-badge bbl" style="font-size:8px;">✦</div></div>
-    <div style="flex:1;"><div class="mx-name">Jamie, 29</div><div class="mx-prev">okay hi — this is weird and great…</div></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">Yesterday</div></div>
-  </div>
-  <div class="mx-item">
-    <div class="mx-avw"><div class="mx-av" style="background:rgba(60,110,200,0.18);">M</div><div class="mx-badge bsp" style="font-size:9px;">🔥</div></div>
-    <div style="flex:1;"><div class="mx-name">Marcus, 28</div><div class="mx-prev">that was genuinely fun, we should…</div></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="mx-time">Fri</div></div>
-  </div>
-  <div style="text-align:center;margin-top:24px;padding:0 36px;">
-    <div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there right now.<br>Go check in.</div>
-    <button onclick="navTo('s-spark')" style="margin-top:14px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;font-weight:600;">Open Spark →</button>
-  </div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni on"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
+  <div id="mx-list" style="padding-top:8px;">
+    <div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Loading...</div>
   </div>
 </div>
-
 <!-- ═══════════ ALMOST ═══════════ -->
 <div class="screen with-nav" id="s-almost">
   <div class="al-hdr">
@@ -1277,12 +1250,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <div class="al-item"><div class="al-av" style="background:rgba(140,90,180,0.16);">P</div><div style="flex:1;"><div class="al-name">Parker, 30</div><div class="al-sub">Was at The Anchor · same night</div><div class="al-timer">⏱ 3 hrs left</div></div><div class="al-btn" onclick="showToastMsg('Connection sent to Parker ✦')">Connect</div></div>
   </div>
   <div style="text-align:center;margin-top:18px;padding:0 28px;font-size:13px;color:var(--ash);line-height:1.7;">You were already in the same room.<br>These disappear in 24 hours.</div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
-  </div>
 </div>
 
 <!-- ═══════════ FAVILLA NIGHTS ═══════════ -->
@@ -1316,12 +1283,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <div class="fn-up"><div class="fn-up-icon">🍷</div><div style="flex:1;"><div class="fn-up-name">Ember Lounge</div><div class="fn-up-date">Friday 4 April · Wine &amp; low-key vibes</div></div><button class="fn-nbtn" id="fn-ember" onclick="toggleNotify('fn-ember')">Notify me</button></div>
     <div class="fn-up"><div class="fn-up-icon">🎵</div><div style="flex:1;"><div class="fn-up-name">Blue Note</div><div class="fn-up-date">Friday 11 April · Live music night</div></div><button class="fn-nbtn" id="fn-blue" onclick="toggleNotify('fn-blue')">Notify me</button></div>
     <div class="fn-up"><div class="fn-up-icon">🌆</div><div style="flex:1;"><div class="fn-up-name">Rooftop 22</div><div class="fn-up-date">Friday 18 April · Rooftop season opener</div></div><button class="fn-nbtn" id="fn-roof" onclick="toggleNotify('fn-roof')">Notify me</button></div>
-  </div>
-  <div class="nav">
-    <div class="ni" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-    <div class="ni" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-    <div class="ni" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
-    <div class="ni" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
   </div>
 </div>
 
@@ -1359,6 +1320,7 @@ function goBack(){
 function navTo(id){
   navStack.length=0;
   _show(id);
+  if(id==='s-matches')loadMatchesList();
 }
 function goHome(){
   navStack.length=0;
@@ -1370,12 +1332,39 @@ function _show(id){
   const el=document.getElementById(id);
   if(el)el.classList.add('active');
   const shell=document.querySelector('.shell');
-  const darkScreens=['s-splash','s-login','s-signup','s-onboard','s-spark','s-match','s-chat','s-confirmed','s-findthem','s-heatmap','s-matches','s-almost','s-nights','s-met'];
   const blindScreens=['s-blind'];
   const warmScreens=['s-venue'];
   if(blindScreens.includes(id)){shell.style.background='var(--vl-bg)';}
   else if(warmScreens.includes(id)){shell.style.background='var(--wm-bg)';}
   else{shell.style.background='var(--sl-bg)';}
+
+  /* Master nav — hide on auth/onboard, show on all app screens */
+  const nav=document.getElementById('master-nav');
+  const noNav=['s-splash','s-login','s-signup','s-onboard'];
+  if(nav){
+    nav.style.display=noNav.includes(id)?'none':'flex';
+    /* Colour scheme per mode */
+    if(id==='s-blind'){
+      nav.style.background='var(--vl-hdr)';
+      nav.style.borderTopColor='rgba(155,95,224,0.15)';
+      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='var(--vc-dim)');
+    } else if(id==='s-venue'){
+      nav.style.background='var(--wm-hdr)';
+      nav.style.borderTopColor='rgba(255,255,255,0.06)';
+      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='#7A6858');
+    } else {
+      nav.style.background='var(--sl-hdr)';
+      nav.style.borderTopColor='rgba(255,90,50,0.12)';
+      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='');
+    }
+    /* Active tab */
+    const tabMap={'s-spark':'nav-spark','s-blind':'nav-blind','s-heatmap':'nav-map','s-venue':'nav-map','s-matches':'nav-matches'};
+    document.querySelectorAll('#master-nav .ni').forEach(n=>n.classList.remove('on'));
+    const activeTab=tabMap[id];
+    if(activeTab)document.getElementById(activeTab)?.classList.add('on');
+  }
+  /* Stop Find Them orientation listener when leaving that screen */
+  if(id!=='s-findthem'&&typeof stopFindThem==='function')stopFindThem();
 }
 
 /* ── PANELS ──────────────────────────── */
@@ -1390,7 +1379,21 @@ function openPP(){
   document.getElementById('profile-panel').classList.add('open');
 }
 function closePP(e){if(!e||e.target===document.getElementById('profile-panel'))document.getElementById('profile-panel').classList.remove('open');}
-function closePanelGo(id){document.getElementById('profile-panel').classList.remove('open');goTo(id,'s-spark');}
+function closePanelGo(id){
+  document.getElementById('profile-panel').classList.remove('open');
+  if(id==='s-onboard'&&currentProfile){
+    setTimeout(()=>{
+      const n=document.getElementById('ob-name');if(n)n.value=currentProfile.name||'';
+      const a=document.getElementById('ob-age');if(a)a.value=currentProfile.age||'';
+      const p1=document.getElementById('p1');if(p1)p1.value=currentProfile.prompt_1_a||'';
+      const p2=document.getElementById('p2');if(p2)p2.value=currentProfile.prompt_2_a||'';
+      const p3=document.getElementById('p3');if(p3)p3.value=currentProfile.prompt_3_a||'';
+      const ib=document.getElementById('ob-icebreaker');
+      if(ib){ib.value=currentProfile.icebreaker||'';updateIcebreakerCount(ib);}
+    },100);
+  }
+  goTo(id,'s-spark');
+}
 let statusAvail=true;
 function toggleStatus(){
   statusAvail=!statusAvail;
@@ -1405,7 +1408,10 @@ function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))docu
 
 /* ── BOOT ────────────────────────────── */
 window.addEventListener('DOMContentLoaded',async()=>{
+  const safetyTimer=setTimeout(()=>{try{hideLoading();}catch(e){}try{_show('s-splash');}catch(e){}},4000);
+  try{
   const{data:{session}}=await sb.auth.getSession();
+  clearTimeout(safetyTimer);
   if(session){
     currentUser=session.user;
     const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
@@ -1426,6 +1432,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
     hideLoading();
     _show('s-splash');
   }
+  }catch(err){console.error('Boot error:',err);clearTimeout(safetyTimer);hideLoading();_show('s-splash');}
 });
 function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
 function setInitial(name){
@@ -1694,13 +1701,134 @@ async function getRegularVenues(userId){
   return new Set(Object.keys(counts).filter(function(v){return counts[v]>=REGULAR_THRESHOLD;}));
 }
 
-function sendMsg(){
-  const inp=document.getElementById('ch-input');
-  const txt=inp.value.trim();if(!txt)return;
+/* ── REAL CHAT ───────────────────── */
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function openChat(matchId, otherProfile){
+  /* If no matchId, find the most recent match */
+  if(!matchId){
+    const{data:m}=await sb.from('matches')
+      .select('id,user_id_1,user_id_2')
+      .or(`user_id_1.eq.${currentUser.id},user_id_2.eq.${currentUser.id}`)
+      .order('created_at',{ascending:false}).limit(1).maybeSingle();
+    if(m){
+      matchId=m.id;
+      if(!otherProfile){
+        const otherId=m.user_id_1===currentUser.id?m.user_id_2:m.user_id_1;
+        otherProfile=await fetchProfileById(otherId);
+      }
+    }
+  }
+  currentMatchId=matchId;
+  currentMatchProfile=otherProfile;
+  const name=otherProfile?.name||'Match';
+  const el=document.getElementById('ch-av'); if(el)el.textContent=name.charAt(0).toUpperCase();
+  const nm=document.getElementById('ch-name'); if(nm)nm.textContent=name;
+  const inp=document.getElementById('ch-input'); if(inp)inp.placeholder='Message '+name+'...';
+  /* Icebreaker card */
+  const iceCard=document.getElementById('ice-card');
+  const iceText=document.getElementById('ice-text');
+  if(iceCard&&iceText&&currentProfile?.prompt_1_a&&otherProfile?.prompt_1_a){
+    iceText.innerHTML='You both answered the prompt. They said: <span>"'+escapeHtml(otherProfile.prompt_1_a)+'"</span>';
+    iceCard.style.display='block';
+  }else if(iceCard){iceCard.style.display='none';}
+  _show('s-chat');
+  dateCardShown=false;
+  if(matchId){await loadMessages(matchId);subscribeMsgs(matchId);}
+  else{
+    const msgs=document.getElementById('chat-msgs');
+    if(msgs)msgs.innerHTML='<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Say something. You\'re both here.</div>';
+  }
+}
+
+async function loadMessages(matchId){
   const msgs=document.getElementById('chat-msgs');
-  const m=document.createElement('div');m.className='msg me';
-  m.innerHTML='<div class="bub">'+txt+'</div><div class="msg-t">Just now</div>';
-  msgs.appendChild(m);inp.value='';msgs.scrollTop=msgs.scrollHeight;
+  if(!msgs)return;
+  msgs.innerHTML='<div style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Loading...</div>';
+  const{data,error}=await sb.from('messages')
+    .select('id,sender_id,content,created_at')
+    .eq('match_id',matchId)
+    .order('created_at',{ascending:true});
+  if(error){msgs.innerHTML='<div style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Could not load messages.</div>';return;}
+  msgs.innerHTML='';
+  if(!data||data.length===0){msgs.innerHTML='<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Say something. You\'re both here.</div>';return;}
+  data.forEach(m=>appendMessage(m));
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function appendMessage(msg){
+  const msgs=document.getElementById('chat-msgs');
+  if(!msgs)return;
+  /* Remove empty state */
+  const empty=msgs.querySelector('div:not(.msg):not(.date-card):not(.nudge)');
+  if(empty)empty.remove();
+  const isMe=msg.sender_id===currentUser.id;
+  const time=new Date(msg.created_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  const div=document.createElement('div');
+  div.className='msg '+(isMe?'me':'them');
+  div.innerHTML='<div class="bub">'+escapeHtml(msg.content)+'</div><div class="msg-t">'+time+'</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('ch-input');
+  const txt=inp?inp.value.trim():'';
+  if(!txt||!currentMatchId||!currentUser)return;
+  inp.value='';
+  appendMessage({id:'temp-'+Date.now(),sender_id:currentUser.id,content:txt,created_at:new Date().toISOString()});
+  const{error}=await sb.from('messages').insert({match_id:currentMatchId,sender_id:currentUser.id,content:txt});
+  if(error){showToastMsg('Message failed — try again.');console.error('[CHAT]',error);}
+  if(navigator.vibrate)navigator.vibrate(10);
+}
+
+function subscribeMsgs(matchId){
+  if(msgSub){sb.removeChannel(msgSub);msgSub=null;}
+  msgSub=sb.channel('msgs-'+matchId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'match_id=eq.'+matchId},
+      payload=>{if(payload.new.sender_id!==currentUser.id)appendMessage(payload.new);})
+    .subscribe();
+}
+
+/* ── MATCHES LIST ────────────────── */
+async function loadMatchesList(){
+  const list=document.getElementById('mx-list');
+  const count=document.getElementById('mx-count');
+  if(!list||!currentUser)return;
+  list.innerHTML='<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Loading...</div>';
+  const{data:matchRows,error}=await sb.from('matches')
+    .select('id,user_id_1,user_id_2,created_at')
+    .or(`user_id_1.eq.${currentUser.id},user_id_2.eq.${currentUser.id}`)
+    .order('created_at',{ascending:false});
+  if(error){list.innerHTML='<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Could not load matches.</div>';return;}
+  if(!matchRows||matchRows.length===0){
+    if(count)count.textContent='';
+    list.innerHTML='<div style="text-align:center;padding:40px 36px;"><div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;color:var(--cr);margin-bottom:10px;">No matches yet.</div><div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there.<br>Go check in.</div><button onclick="navTo(\'s-spark\')" style="margin-top:18px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:\'Space Grotesk\',sans-serif;cursor:pointer;font-weight:600;">Open Spark &#8594;</button></div>';
+    return;
+  }
+  if(count)count.textContent=matchRows.length+' conversation'+(matchRows.length===1?'':'s');
+  const items=await Promise.all(matchRows.map(async match=>{
+    const otherId=match.user_id_1===currentUser.id?match.user_id_2:match.user_id_1;
+    const[{data:profile},{data:lastMsgs}]=await Promise.all([
+      sb.from('profiles').select('name,age,photo_url').eq('id',otherId).single(),
+      sb.from('messages').select('content,created_at,sender_id').eq('match_id',match.id).order('created_at',{ascending:false}).limit(1),
+    ]);
+    const lastMsg=lastMsgs?.[0];
+    const timeStr=lastMsg?new Date(lastMsg.created_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):new Date(match.created_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+    const preview=lastMsg?(lastMsg.sender_id===currentUser.id?'You: ':'')+lastMsg.content:'Say something ✦';
+    return{match,profile,timeStr,preview};
+  }));
+  list.innerHTML='';
+  items.forEach(({match,profile,timeStr,preview},i)=>{
+    const name=profile?.name||'Someone';
+    const row=document.createElement('div');
+    row.className='mx-item'+(i===0?' first':'');
+    row.innerHTML=`<div class="mx-avw"><div class="mx-av" style="background:rgba(255,90,50,0.18);">${name.charAt(0).toUpperCase()}</div><div class="mx-badge bsp" style="font-size:9px;">&#x1F525;</div></div><div style="flex:1;"><div class="mx-name">${name}${profile?.age?', '+profile.age:''}</div><div class="mx-prev">${escapeHtml(preview.substring(0,50))}${preview.length>50?'...':''}</div></div><div style="font-size:11px;color:var(--ash);">${timeStr}</div>`;
+    row.onclick=()=>openChat(match.id,profile);
+    list.appendChild(row);
+  });
 }
 
 let blindIdx=1;
@@ -1732,12 +1860,15 @@ function mapView(view,btn){
 /* ── PRESENCE & CHECK-IN ──────────── */
 const VENUE_ID   = 'anchor-and-vine';
 const VENUE_NAME = 'The Anchor & Vine';
-let currentCheckInId = null;
-let presenceSub      = null;
-let likesSub         = null;
-let matchesSub       = null;
-let presenceCache    = [];
-let activeSheetUser  = null; // profile data of person currently in sheet
+let currentCheckInId    = null;
+let presenceSub         = null;
+let likesSub            = null;
+let matchesSub          = null;
+let msgSub              = null;
+let presenceCache       = [];
+let activeSheetUser     = null;
+let currentMatchId      = null;
+let currentMatchProfile = null;
 
 const POSITIONS = [
   {left:'50%',top:'50%'},{left:'22%',top:'22%'},{left:'78%',top:'22%'},
@@ -1961,126 +2092,68 @@ async function doSpark() {
 }
 
 async function createMatch(otherUserId, otherProfile) {
-  /* Prevent duplicate — check first */
   const {data: existing} = await sb.from('matches')
     .select('id')
     .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${currentUser.id})`)
     .maybeSingle();
-  if (existing) return; /* already matched */
-
-  await sb.from('matches').insert({
+  if (existing) return;
+  const {data: insertData, error} = await sb.from('matches').insert({
     user_id_1: currentUser.id, user_id_2: otherUserId, venue_id: VENUE_ID,
-  });
-  showMatchOverlay(otherProfile);
-}
-
-/* ── MATCH OVERLAY ───────────────── */
-function showMatchOverlay(otherProfile) {
-  if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
-  /* You avatar */
-  const youAv = document.getElementById('mo-av-you');
-  youAv.textContent = currentProfile?.name?.charAt(0).toUpperCase() || 'Y';
-  /* Them avatar */
-  const themAv = document.getElementById('mo-av-them');
-  if (otherProfile?.photo_url) {
-    themAv.innerHTML = `<img src="${otherProfile.photo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-  } else {
-    themAv.textContent = otherProfile?.name?.charAt(0).toUpperCase() || '?';
-  }
-  document.getElementById('mo-name').textContent =
-    'You and ' + (otherProfile?.name || 'someone') + ' both said yes.';
-  document.getElementById('mo-loc').textContent =
-    'Both at ' + VENUE_NAME + ' · right now';
-  document.getElementById('match-overlay').classList.add('show');
-}
-
-function dismissMatchGoChat() {
-  document.getElementById('match-overlay').classList.remove('show');
-  goTo('s-chat', 's-spark');
-}
-function dismissMatchGoFind(){
-  document.getElementById('match-overlay').classList.remove('show');
-  var name=(currentMatchProfile&&currentMatchProfile.name)||'them';
-  goTo('s-findthem','s-spark');
-  setTimeout(function(){initFindThem(name);},100);
-}
-
-/* ── SEE ALL DRAWER ──────────────── */
-function renderDrawerList(users) {
-  const list = document.getElementById('drawer-list');
-  const title = document.getElementById('drawer-title');
-  list.innerHTML = '';
-  title.textContent = users.length + ' people here right now';
-  if (users.length === 0) {
-    list.innerHTML = '<div style="padding:24px 20px;text-align:center;color:var(--ash);font-size:13px;">No one checked in yet.</div>';
-    return;
-  }
-  users.forEach(row => {
-    const p = row.profiles; if (!p) return;
-    const initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
-    const snippet = p.prompt_1_a ? '"' + p.prompt_1_a.substring(0, 60) + (p.prompt_1_a.length > 60 ? '…' : '') + '"' : '';
-    const row_ = document.createElement('div');
-    row_.className = 'drawer-row';
-    row_.innerHTML = `
-      <div class="drawer-av">${p.photo_url ? `<img src="${p.photo_url}">` : initial}</div>
-      <div style="flex:1;">
-        <div class="drawer-name">${p.name}${p.age ? ', ' + p.age : ''}</div>
-        ${snippet ? `<div class="drawer-snippet">${snippet}</div>` : ''}
-      </div>
-      <div class="drawer-online"></div>
-    `;
-    row_.onclick = () => { closeDrawer(); openProfileSheet(row); };
-    list.appendChild(row_);
-  });
-}
-
-function openDrawer() { document.getElementById('drawer-overlay').classList.add('open'); }
-function closeDrawer() { document.getElementById('drawer-overlay').classList.remove('open'); }
-function closeDrawerOutside(e) {
-  if (e.target === document.getElementById('drawer-overlay')) closeDrawer();
-}
-
-/* ── REALTIME SUBSCRIPTIONS ──────── */
-function subscribePresence() {
-  if (presenceSub) { sb.removeChannel(presenceSub); }
-  presenceSub = sb.channel('presence-' + VENUE_ID)
-    .on('postgres_changes', {event:'*', schema:'public', table:'check_ins',
-      filter:'venue_id=eq.' + VENUE_ID}, () => loadPresence())
-    .subscribe();
+  }).select().single();
+  if (error) { console.error('[MATCH] insert error:', error); return; }
+  showMatchOverlay(otherProfile, insertData.id);
 }
 
 function subscribeLikes() {
-  if (likesSub) { sb.removeChannel(likesSub); }
-  likesSub = sb.channel('likes-' + currentUser.id)
+  if (likesSub) sb.removeChannel(likesSub);
+  likesSub = sb.channel('likes-for-' + currentUser.id)
     .on('postgres_changes', {event:'INSERT', schema:'public', table:'likes',
       filter:'liked_user_id=eq.' + currentUser.id},
       async (payload) => {
-        /* Someone liked us — check if we liked them back */
         const likerId = payload.new.user_id;
         const {data: weAlsoLiked} = await sb.from('likes')
           .select('id').eq('user_id', currentUser.id)
           .eq('liked_user_id', likerId).maybeSingle();
-        if (weAlsoLiked) {
-          /* Find their profile to show in match overlay */
-          const them = presenceCache.find(r => r.user_id === likerId);
-          await createMatch(likerId, them?.profiles);
-        }
+        if (!weAlsoLiked) return;
+        let prof = presenceCache.find(r => r.user_id === likerId)?.profiles;
+        if (!prof) prof = await fetchProfileById(likerId);
+        await createMatch(likerId, prof);
       })
-    .subscribe();
+    .subscribe(s => console.log('[REALTIME] likes:', s));
 }
 
 function subscribeMatches() {
-  if (matchesSub) { sb.removeChannel(matchesSub); }
-  matchesSub = sb.channel('matches-' + currentUser.id)
+  if (matchesSub) sb.removeChannel(matchesSub);
+  matchesSub = sb.channel('matches-for-' + currentUser.id)
     .on('postgres_changes', {event:'INSERT', schema:'public', table:'matches',
-      filter:`user_id_2=eq.${currentUser.id}`},
+      filter:'user_id_1=eq.' + currentUser.id},
       async (payload) => {
-        /* We are user_id_2 meaning we were liked first, they confirmed */
-        const otherId = payload.new.user_id_1;
-        const them = presenceCache.find(r => r.user_id === otherId);
-        if (them) showMatchOverlay(them.profiles);
+        const otherId = payload.new.user_id_2;
+        const matchId = payload.new.id;
+        if (!document.getElementById('match-overlay').classList.contains('show')) {
+          let prof = presenceCache.find(r => r.user_id === otherId)?.profiles;
+          if (!prof) prof = await fetchProfileById(otherId);
+          showMatchOverlay(prof, matchId);
+        }
       })
-    .subscribe();
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'matches',
+      filter:'user_id_2=eq.' + currentUser.id},
+      async (payload) => {
+        const otherId = payload.new.user_id_1;
+        const matchId = payload.new.id;
+        let prof = presenceCache.find(r => r.user_id === otherId)?.profiles;
+        if (!prof) prof = await fetchProfileById(otherId);
+        showMatchOverlay(prof, matchId);
+      })
+    .subscribe(s => console.log('[REALTIME] matches:', s));
+}
+
+function subscribePresence() {
+  if (presenceSub) sb.removeChannel(presenceSub);
+  presenceSub = sb.channel('presence-' + VENUE_ID)
+    .on('postgres_changes', {event:'*', schema:'public', table:'check_ins',
+      filter:'venue_id=eq.' + VENUE_ID}, () => setTimeout(loadPresence, 400))
+    .subscribe(s => { if(s==='SUBSCRIBED') loadPresence(); });
 }
 
 window.addEventListener('beforeunload', async () => {
