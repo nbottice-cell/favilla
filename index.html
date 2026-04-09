@@ -957,7 +957,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 <!-- ═══════════ MATCH REVEAL ═══════════ -->
 <div class="screen" id="s-match">
   <div class="m-eye">Mutual. Confirmed.</div>
-  <div class="m-hl">You and Sofia<br>both said yes.</div>
+  <div class="m-hl">You and <span id="sm-name">someone</span><br>both said yes.</div>
   <div class="m-sub">No ambiguity. No wondering.<br>She's in the same room right now.</div>
   <div class="m-avs"><div class="m-av" style="background:rgba(255,90,50,0.18);">Y</div><div class="m-gem">✦</div><div class="m-av" style="background:rgba(255,90,50,0.14);">S</div></div>
   <div class="m-loc">Both at The Anchor &amp; Vine · right now</div>
@@ -969,26 +969,22 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 <div class="screen" id="s-chat">
   <div class="ch-hdr">
     <button class="bk-btn" onclick="goBack()">←</button>
-    <div class="ch-av">S</div>
-    <div style="flex:1;"><div class="ch-name">Sofia</div><div class="ch-status">✦ Spark match · The Anchor &amp; Vine</div></div>
+    <div class="ch-av" id="ch-av">?</div>
+    <div style="flex:1;">
+      <div class="ch-name" id="ch-name">Match</div>
+      <div class="ch-status">✦ Spark match · <span id="ch-venue">The Anchor &amp; Vine</span></div>
+    </div>
     <div style="font-size:20px;color:var(--ash);cursor:pointer;" onclick="goTo('s-findthem','s-chat');setTimeout(function(){initFindThem(currentMatchProfile&&currentMatchProfile.name);},100);">📍</div>
   </div>
   <div class="ch-ctx">You're both here tonight · <span>Still nearby</span></div>
-  <div class="ice-card">
+  <div class="ice-card" id="ice-card" style="display:none;">
     <div class="ice-lbl">✦ Something to start with</div>
-    <div class="ice-text">You both answered the spontaneous question. She quit her job on a Friday. <span>You booked a flight on a Tuesday.</span> Go.</div>
+    <div class="ice-text" id="ice-text"></div>
   </div>
-  <div class="msgs" id="chat-msgs">
-    <div class="msg them"><div class="bub">okay so I was NOT expecting a match tonight — hi 😅</div><div class="msg-t">10:48 pm</div></div>
-    <div class="msg me"><div class="bub">haha same. that animation got me. are you still here?</div><div class="msg-t">10:49 pm</div></div>
-    <div class="msg them"><div class="bub">yes! near the bar, dark green jacket. don't make it weird lol</div><div class="msg-t">10:50 pm</div></div>
-    <div class="msg me"><div class="bub">too late, already rehearsing my opener</div><div class="msg-t">10:51 pm</div></div>
-    <div class="msg them"><div class="bub">go for it. I'll pretend to be surprised.</div><div class="msg-t">10:52 pm</div></div>
-  </div>
-  <div class="nudge"><div style="font-size:16px;color:var(--gold);">✦</div><div class="nudge-t">You're both still at <span>The Anchor &amp; Vine</span> — the conversation's already started. Go finish it in person.</div></div>
+  <div class="msgs" id="chat-msgs"></div>
   <div class="ch-input-row">
     <button class="plan-btn" onclick="showDateCard()">📅 Plan a date</button>
-    <input class="ch-input" id="ch-input" placeholder="Message Sofia…" onkeydown="if(event.key==='Enter')sendMsg()">
+    <input class="ch-input" id="ch-input" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendMsg()">
     <div class="ch-send" onclick="sendMsg()">↑</div>
   </div>
 </div>
@@ -997,12 +993,12 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 <div class="screen" id="s-confirmed">
   <div class="cf-icon">🔥</div>
   <div class="cf-eye">It's official</div>
-  <div class="cf-hl">Sunday.<br>You and Sofia.</div>
+  <div class="cf-hl">Sunday.<br>You and <span id="cf-name">your match</span>.</div>
   <div class="cf-sub">Both confirmed. No backing out now.<br>(You've got this.)</div>
   <div class="cf-card">
     <div class="cf-row">📅 <strong>Sunday, 2:00 pm</strong></div>
     <div class="cf-row">📍 Brûlerie Coffee Co. · 0.7 mi away</div>
-    <div class="cf-row">👤 Sofia confirmed · <span style="color:var(--fl-lt);">You confirmed</span></div>
+    <div class="cf-row">👤 <span id="cf-name2">Match</span> confirmed · <span style="color:var(--fl-lt);">You confirmed</span></div>
   </div>
   <button class="cf-btn" onclick="showToastMsg('Added to calendar ✓')">Add to calendar →</button>
   <button class="cf-btn2" onclick="goTo('s-met','s-confirmed')">We actually met ✦</button>
@@ -1594,7 +1590,7 @@ async function saveProfile(){
 /* ── DEMO INTERACTIONS ───────────────── */
 let toastTimer;
 function showToast(){
-  showToastMsg("Mutual. Sofia also liked you — and she's still here.");
+  showToastMsg("Mutual ✦ — you're both still here.");
   setTimeout(()=>goTo('s-match','s-spark'),2400);
 }
 
@@ -1733,9 +1729,20 @@ async function openChat(matchId, otherProfile){
   currentMatchId=matchId;
   currentMatchProfile=otherProfile;
   const name=otherProfile?.name||'Match';
-  const el=document.getElementById('ch-av'); if(el)el.textContent=name.charAt(0).toUpperCase();
+
+  /* Avatar — photo if available, else initial */
+  const avEl=document.getElementById('ch-av');
+  if(avEl){
+    if(otherProfile?.photo_url){
+      avEl.innerHTML='<img src="'+otherProfile.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      avEl.innerHTML='';
+      avEl.textContent=name.charAt(0).toUpperCase();
+    }
+  }
   const nm=document.getElementById('ch-name'); if(nm)nm.textContent=name;
-  const inp=document.getElementById('ch-input'); if(inp)inp.placeholder='Message '+name+'...';
+  const venueEl=document.getElementById('ch-venue'); if(venueEl)venueEl.textContent=VENUE_NAME;
+  const inp=document.getElementById('ch-input'); if(inp)inp.placeholder='Message '+name+'…';
   /* Icebreaker card */
   const iceCard=document.getElementById('ice-card');
   const iceText=document.getElementById('ice-text');
@@ -1743,6 +1750,13 @@ async function openChat(matchId, otherProfile){
     iceText.innerHTML='You both answered the prompt. They said: <span>"'+escapeHtml(otherProfile.prompt_1_a)+'"</span>';
     iceCard.style.display='block';
   }else if(iceCard){iceCard.style.display='none';}
+  /* Update confirmed screen with real name */
+  const cfName=document.getElementById('cf-name');
+  const cfName2=document.getElementById('cf-name2');
+  const smName=document.getElementById('sm-name');
+  if(cfName)cfName.textContent=name;
+  if(cfName2)cfName2.textContent=name;
+  if(smName)smName.textContent=name;
   _show('s-chat');
   dateCardShown=false;
   if(matchId){await loadMessages(matchId);subscribeMsgs(matchId);}
