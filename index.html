@@ -2060,25 +2060,31 @@ function closeSheetOutside(e) {
 async function doSpark() {
   if (!currentUser || !activeSheetUser) return;
   const btn = document.getElementById('sheet-spark-btn');
-  btn.disabled = true; btn.textContent = 'Sparking…';
+  btn.disabled = true; btn.textContent = 'Flickering…';
 
   const likedId = activeSheetUser.user_id;
 
-  /* Write the like */
-  const {error} = await sb.from('likes').upsert({
+  /* Delete any existing like first to avoid constraint issues */
+  await sb.from('likes')
+    .delete()
+    .eq('user_id', currentUser.id)
+    .eq('liked_user_id', likedId);
+
+  /* Insert fresh like */
+  const {error} = await sb.from('likes').insert({
     user_id: currentUser.id, liked_user_id: likedId, venue_id: VENUE_ID,
-  }, {onConflict: 'user_id,liked_user_id'});
+  });
 
   if (error) {
-    showToastMsg('Something went wrong — try again.');
+    showToastMsg('Error: ' + (error.message || error.code || 'unknown'));
     btn.disabled = false; btn.innerHTML = '✦ Spark';
     return;
   }
 
   closeSheet();
-  showToastMsg('Spark sent ✦ — if it\'s mutual you\'ll both know instantly.');
+  showToastMsg('Flickering ✦ — if it\'s mutual you\'ll both know instantly.');
 
-  /* Check if they already liked us (mutual) */
+  /* Check if they already liked us back */
   const {data: mutual} = await sb.from('likes')
     .select('id')
     .eq('user_id', likedId)
@@ -2086,7 +2092,6 @@ async function doSpark() {
     .maybeSingle();
 
   if (mutual) {
-    /* It's mutual — write the match */
     await createMatch(likedId, activeSheetUser.profiles);
   }
 }
