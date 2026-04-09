@@ -2219,10 +2219,39 @@ function subscribeMatches() {
 
 
 
+
+/* ── MATCH OVERLAY ── */
+function showMatchOverlay(otherProfile, matchId) {
+  if (navigator.vibrate) navigator.vibrate([30,20,30]);
+  currentMatchId      = matchId || currentMatchId;
+  currentMatchProfile = otherProfile;
+
+  const youAv = document.getElementById('mo-av-you');
+  if (youAv) youAv.textContent = (currentProfile&&currentProfile.name) ? currentProfile.name.charAt(0).toUpperCase() : 'Y';
+
+  const themAv = document.getElementById('mo-av-them');
+  if (themAv) {
+    if (otherProfile && otherProfile.photo_url) {
+      themAv.innerHTML = '<img src="'+otherProfile.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      themAv.textContent = (otherProfile&&otherProfile.name) ? otherProfile.name.charAt(0).toUpperCase() : '?';
+    }
+  }
+
+  const moName = document.getElementById('mo-name');
+  if (moName) moName.textContent = 'You and ' + ((otherProfile&&otherProfile.name)||'someone') + ' both said yes.';
+
+  const moLoc = document.getElementById('mo-loc');
+  if (moLoc) moLoc.textContent = 'Both at ' + VENUE_NAME + ' right now';
+
+  const overlay = document.getElementById('match-overlay');
+  if (overlay) overlay.classList.add('show');
+
+  dbg('Match overlay shown!');
+}
+
 function testMatchOverlay(){
-  var fakeProfile = {name: 'Test Match', age: 28, photo_url: null};
-  showMatchOverlay(fakeProfile, 'test-id-123');
-  dbg('Test overlay fired');
+  showMatchOverlay({name:'Test Match', age:28, photo_url:null}, 'test-id-123');
 }
 
 function dismissMatchGoChat(){
