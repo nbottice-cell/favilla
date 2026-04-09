@@ -1989,6 +1989,20 @@ function updateVenueSub(count) {
 function openProfileSheet(row,isRegular){
   var p=row.profiles;if(!p)return;
   activeSheetUser=row;
+
+  /* Check if this person already sparked us (pending match) */
+  if(currentUser){
+    sb.from('likes').select('id')
+      .eq('user_id', row.user_id)
+      .eq('liked_user_id', currentUser.id)
+      .maybeSingle()
+      .then(function(res){
+        if(res.data){
+          var sparkBtn=document.getElementById('sheet-spark-btn');
+          if(sparkBtn) sparkBtn.innerHTML='&#x2746; Spark back';
+        }
+      });
+  }
   var hero=document.getElementById('sheet-hero');
   var heroInitial=document.getElementById('sheet-hero-initial');
   var existingImg=hero.querySelector('img');
@@ -2061,37 +2075,62 @@ async function doSpark() {
   btn.disabled = true; btn.textContent = 'Flickering…';
 
   const likedId = activeSheetUser.user_id;
+  const likedProfile = activeSheetUser.profiles;
 
-  /* Delete any existing like first to avoid constraint issues */
-  await sb.from('likes')
-    .delete()
+  /* Delete any existing like first, then insert fresh */
+  await sb.from('likes').delete()
     .eq('user_id', currentUser.id)
     .eq('liked_user_id', likedId);
 
-  /* Insert fresh like */
   const {error} = await sb.from('likes').insert({
     user_id: currentUser.id, liked_user_id: likedId, venue_id: VENUE_ID,
   });
 
   if (error) {
     showToastMsg('Error: ' + (error.message || error.code || 'unknown'));
-    btn.disabled = false; btn.innerHTML = '✦ Spark';
+    btn.disabled = false; btn.innerHTML = '&#x2746; Spark';
     return;
   }
 
   closeSheet();
-  showToastMsg('Flickering ✦ — if it\'s mutual you\'ll both know instantly.');
+  showToastMsg('Flickering &#x2746; — if it\'s mutual you\'ll both know instantly.');
 
-  /* Check if they already liked us back */
+  /* Check immediately for mutual */
   const {data: mutual} = await sb.from('likes')
-    .select('id')
-    .eq('user_id', likedId)
-    .eq('liked_user_id', currentUser.id)
-    .maybeSingle();
+    .select('id').eq('user_id', likedId)
+    .eq('liked_user_id', currentUser.id).maybeSingle();
 
   if (mutual) {
-    await createMatch(likedId, activeSheetUser.profiles);
+    await createMatch(likedId, likedProfile);
+    return;
   }
+
+  /* Polling fallback — check every 4s for up to 5 minutes */
+  let polls = 0;
+  const maxPolls = 75;
+  const pollTimer = setInterval(async () => {
+    polls++;
+    if (polls > maxPolls) { clearInterval(pollTimer); return; }
+
+    /* Check if they've liked us back since we sparked */
+    const {data: nowMutual} = await sb.from('likes')
+      .select('id').eq('user_id', likedId)
+      .eq('liked_user_id', currentUser.id).maybeSingle();
+
+    if (nowMutual) {
+      clearInterval(pollTimer);
+      /* Check no match row exists yet */
+      const {data: existing} = await sb.from('matches')
+        .select('id')
+        .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${likedId}),and(user_id_1.eq.${likedId},user_id_2.eq.${currentUser.id})`)
+        .maybeSingle();
+      if (!existing) {
+        await createMatch(likedId, likedProfile);
+      } else {
+        showMatchOverlay(likedProfile, existing.id);
+      }
+    }
+  }, 4000);
 }
 
 async function createMatch(otherUserId, otherProfile) {
