@@ -1595,6 +1595,15 @@ function showToast(){
   showToastMsg("Mutual. Sofia also liked you — and she's still here.");
   setTimeout(()=>goTo('s-match','s-spark'),2400);
 }
+
+/* ── DEBUG — remove before launch ── */
+var _dbgStep = 0;
+function dbg(msg){
+  _dbgStep++;
+  showToastMsg('[' + _dbgStep + '] ' + msg);
+  console.log('[DBG ' + _dbgStep + ']', msg);
+}
+
 function showToastMsg(msg){
   document.getElementById('toast-text').innerHTML=msg;
   const t=document.getElementById('toast');
@@ -2070,14 +2079,14 @@ function closeSheetOutside(e) {
 
 /* ── SPARK (LIKE) ────────────────── */
 async function doSpark() {
-  if (!currentUser || !activeSheetUser) return;
+  if (!currentUser || !activeSheetUser) { dbg('no user/sheet'); return; }
   const btn = document.getElementById('sheet-spark-btn');
   btn.disabled = true; btn.textContent = 'Flickering…';
 
   const likedId = activeSheetUser.user_id;
   const likedProfile = activeSheetUser.profiles;
+  dbg('Sparking ' + ((likedProfile&&likedProfile.name)||'?') + ' (' + likedId.substring(0,6) + ')');
 
-  /* Delete any existing like first, then insert fresh */
   await sb.from('likes').delete()
     .eq('user_id', currentUser.id)
     .eq('liked_user_id', likedId);
@@ -2087,13 +2096,13 @@ async function doSpark() {
   });
 
   if (error) {
-    showToastMsg('Error: ' + (error.message || error.code || 'unknown'));
+    dbg('INSERT ERR: ' + (error.message || error.code));
     btn.disabled = false; btn.innerHTML = '&#x2746; Spark';
     return;
   }
 
+  dbg('Like saved OK ✔');
   closeSheet();
-  showToastMsg('Flickering &#x2746; — if it\'s mutual you\'ll both know instantly.');
 
   /* Check immediately for mutual */
   const {data: mutual} = await sb.from('likes')
@@ -2101,32 +2110,34 @@ async function doSpark() {
     .eq('liked_user_id', currentUser.id).maybeSingle();
 
   if (mutual) {
+    dbg('Mutual right away! Matching...');
     await createMatch(likedId, likedProfile);
     return;
   }
 
-  /* Polling fallback — check every 4s for up to 5 minutes */
+  dbg('Waiting... polling every 4s');
+
+  /* Polling fallback */
   let polls = 0;
-  const maxPolls = 75;
   const pollTimer = setInterval(async () => {
     polls++;
-    if (polls > maxPolls) { clearInterval(pollTimer); return; }
+    if (polls > 75) { clearInterval(pollTimer); dbg('Poll gave up'); return; }
 
-    /* Check if they've liked us back since we sparked */
     const {data: nowMutual} = await sb.from('likes')
       .select('id').eq('user_id', likedId)
       .eq('liked_user_id', currentUser.id).maybeSingle();
 
     if (nowMutual) {
       clearInterval(pollTimer);
-      /* Check no match row exists yet */
+      dbg('Mutual on poll #' + polls);
       const {data: existing} = await sb.from('matches')
         .select('id')
-        .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${likedId}),and(user_id_1.eq.${likedId},user_id_2.eq.${currentUser.id})`)
+        .or('and(user_id_1.eq.' + currentUser.id + ',user_id_2.eq.' + likedId + '),and(user_id_1.eq.' + likedId + ',user_id_2.eq.' + currentUser.id + ')')
         .maybeSingle();
       if (!existing) {
         await createMatch(likedId, likedProfile);
       } else {
+        dbg('Match row exists, showing overlay');
         showMatchOverlay(likedProfile, existing.id);
       }
     }
@@ -2134,11 +2145,12 @@ async function doSpark() {
 }
 
 async function createMatch(otherUserId, otherProfile) {
+  dbg('createMatch called for '+((otherProfile&&otherProfile.name)||otherUserId.substring(0,8)));
   const {data: existing} = await sb.from('matches')
     .select('id')
     .or(`and(user_id_1.eq.${currentUser.id},user_id_2.eq.${otherUserId}),and(user_id_1.eq.${otherUserId},user_id_2.eq.${currentUser.id})`)
     .maybeSingle();
-  if (existing) return;
+  if (existing) { dbg('Match already exists, showing overlay'); showMatchOverlay(otherProfile, existing.id); return; }
   const {data: insertData, error} = await sb.from('matches').insert({
     user_id_1: currentUser.id, user_id_2: otherUserId, venue_id: VENUE_ID,
   }).select().single();
@@ -2161,7 +2173,7 @@ function subscribeLikes() {
         if (!prof) prof = await fetchProfileById(likerId);
         await createMatch(likerId, prof);
       })
-    .subscribe(s => console.log('[REALTIME] likes:', s));
+    .subscribe(s => { console.log('[REALTIME] likes:', s); dbg('Likes sub: '+s); });
 }
 
 function subscribeMatches() {
@@ -2187,7 +2199,7 @@ function subscribeMatches() {
         if (!prof) prof = await fetchProfileById(otherId);
         showMatchOverlay(prof, matchId);
       })
-    .subscribe(s => console.log('[REALTIME] matches:', s));
+    .subscribe(s => { console.log('[REALTIME] matches:', s); dbg('Matches sub: '+s); });
 }
 
 
