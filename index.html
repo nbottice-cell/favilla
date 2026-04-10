@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#13151A">
 <title>Favilla</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -30,7 +31,14 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .notch{width:120px;height:34px;background:var(--sl-bg);border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:100;}
 .sbar{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:space-between;padding:0 28px;z-index:99;font-size:12px;color:var(--ash);}
 @media(max-width:499px){.notch,.sbar{display:none;}}
-.screen{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity 0.3s ease;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:88px;}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:88px;will-change:transform,opacity;}
+.screen.active{opacity:1;pointer-events:all;}
+.screen.slide-up{transform:translateY(24px);}
+.screen.slide-down{transform:translateY(-24px);}
+@media(prefers-reduced-motion:reduce){
+  .screen,.sheet-overlay,.profile-panel,.match-overlay,.delete-overlay,.notif-tray,.drawer-overlay{transition:none!important;animation:none!important;}
+  *{transition-duration:0.01ms!important;animation-duration:0.01ms!important;}
+}
 .screen::-webkit-scrollbar{display:none;}
 .screen.active{opacity:1;pointer-events:all;}
 @media(max-width:499px){.screen{padding-top:env(safe-area-inset-top,44px);}}
@@ -256,7 +264,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .m-skip{font-size:13px;color:var(--ash);cursor:pointer;animation:fadeUp 0.6s 0.6s ease forwards;opacity:0;background:none;border:none;font-family:'Space Grotesk',sans-serif;padding:8px;}
 
 /* CHAT */
-#s-chat{background:var(--sl-bg);padding-top:50px;display:flex;flex-direction:column;}
+#s-chat{background:var(--sl-bg);padding-top:0;display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .ch-hdr{background:var(--sl-hdr);padding:14px 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,90,50,0.12);flex-shrink:0;}
 .bk-btn{font-size:20px;color:var(--ash);cursor:pointer;padding:4px 8px 4px 0;min-width:44px;min-height:44px;display:flex;align-items:center;background:none;border:none;font-family:'Space Grotesk',sans-serif;flex-shrink:0;}
 .ch-av{width:40px;height:40px;border-radius:50%;background:rgba(255,90,50,0.18);border:1px solid rgba(255,90,50,0.35);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);font-weight:600;}
@@ -268,7 +276,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .ice-lbl{font-size:10px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
 .ice-text{font-size:12px;color:var(--cr-dim);line-height:1.55;}
 .ice-text span{color:var(--cr);}
-.msgs{flex:1;padding:12px 18px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+.msgs{flex:1;padding:12px 18px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;min-height:0;}
 .msg{display:flex;flex-direction:column;max-width:80%;}
 .msg.them{align-self:flex-start;}
 .msg.me{align-self:flex-end;align-items:flex-end;}
@@ -279,9 +287,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .nudge{margin:0 18px 8px;background:rgba(212,146,26,0.07);border:0.5px solid rgba(212,146,26,0.2);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .nudge-t{font-size:12px;color:var(--ash);line-height:1.5;}
 .nudge-t span{color:var(--gold);}
-.ch-input-row{display:flex;align-items:center;gap:10px;padding:10px 18px;padding-bottom:max(14px,env(safe-area-inset-bottom,14px));border-top:0.5px solid rgba(255,255,255,0.05);flex-shrink:0;}
+.ch-input-row{display:flex;align-items:center;gap:10px;padding:10px 18px;padding-bottom:max(14px,env(safe-area-inset-bottom,14px));border-top:0.5px solid rgba(255,255,255,0.05);flex-shrink:0;position:sticky;bottom:0;background:var(--sl-bg);z-index:10;}
 .plan-btn{padding:9px 14px;border-radius:22px;font-size:12px;font-family:'Space Grotesk',sans-serif;font-weight:600;flex-shrink:0;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);color:var(--fl-lt);cursor:pointer;white-space:nowrap;}
-.ch-input{flex:1;background:var(--sl-card);border:0.5px solid rgba(255,255,255,0.09);border-radius:22px;padding:11px 16px;font-size:14px;color:var(--cr-dim);font-family:'Space Grotesk',sans-serif;outline:none;}
+.ch-input{flex:1;background:var(--sl-card);border:0.5px solid rgba(255,255,255,0.09);border-radius:22px;padding:11px 16px;font-size:16px;color:var(--cr-dim);font-family:'Space Grotesk',sans-serif;outline:none;}
 .ch-send{width:38px;height:38px;background:var(--fl);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;cursor:pointer;flex-shrink:0;}
 .date-card{margin:6px 18px;border:0.5px solid rgba(255,90,50,0.28);border-radius:16px;overflow:hidden;flex-shrink:0;}
 .dc-top{background:rgba(255,90,50,0.09);padding:12px 16px 10px;border-bottom:0.5px solid rgba(255,90,50,0.17);}
@@ -395,6 +403,126 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .regular-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(212,146,26,0.12);border:0.5px solid rgba(212,146,26,0.4);border-radius:10px;padding:2px 8px;font-size:10px;color:var(--gold);font-weight:600;margin-top:3px;}
 .pn-snippet{max-width:130px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--cr-dim);font-style:italic;line-height:1.4;margin-top:2px;cursor:pointer;}
 .pn-snippet-tap{font-family:'Space Grotesk',sans-serif;font-style:normal;font-size:9px;color:rgba(255,90,50,0.55);letter-spacing:0.5px;margin-top:3px;text-transform:uppercase;}
+
+
+/* ═══════════════════════════════════════════
+   EMBER MODE — Warm Amber
+═══════════════════════════════════════════ */
+:root{
+  --em-bg:#1A1510;--em-card:#231C14;--em-hdr:#1E1810;
+  --em-acc:#FF8C42;--em-glow:#FFB347;--em-text:#F0E6D6;--em-dim:#7A6858;
+}
+#s-ember{background:var(--em-bg);padding-top:0;display:flex;flex-direction:column;overflow:hidden;}
+.em-hdr{background:var(--em-hdr);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,140,66,0.15);flex-shrink:0;position:sticky;top:0;z-index:10;}
+.em-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--em-text);font-weight:600;letter-spacing:0.5px;}
+.em-title span{color:var(--em-glow);}
+.em-radius-wrap{display:flex;align-items:center;gap:8px;}
+.em-radius-lbl{font-size:11px;color:var(--em-dim);}
+.em-radius-val{font-size:12px;color:var(--em-glow);font-weight:600;min-width:40px;}
+.em-radius-slider{-webkit-appearance:none;width:90px;height:3px;border-radius:2px;background:rgba(255,179,71,0.2);outline:none;}
+.em-radius-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--em-glow);cursor:pointer;box-shadow:0 0 8px rgba(255,179,71,0.5);}
+.em-count{font-size:11px;color:var(--em-dim);text-align:center;padding:6px 20px 0;flex-shrink:0;}
+
+/* Card deck */
+.em-deck{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:12px 20px 0;}
+.em-card{position:absolute;width:100%;max-width:340px;background:var(--em-card);border-radius:24px;border:0.5px solid rgba(255,140,66,0.15);overflow:hidden;cursor:grab;user-select:none;touch-action:none;box-shadow:0 8px 40px rgba(0,0,0,0.4);}
+.em-card:active{cursor:grabbing;}
+.em-card-photo{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:rgba(255,140,66,0.06);}
+.em-card-photo-initial{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:96px;color:var(--em-acc);background:rgba(255,140,66,0.06);}
+.em-card-info{padding:16px 18px 12px;}
+.em-card-name{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--em-text);font-weight:600;line-height:1.1;}
+.em-card-meta{font-size:12px;color:var(--em-dim);margin-top:3px;display:flex;align-items:center;gap:8px;}
+.em-card-dist{display:flex;align-items:center;gap:3px;color:var(--em-glow);font-size:11px;font-weight:600;}
+.em-card-prompt{margin-top:12px;background:rgba(255,140,66,0.06);border:0.5px solid rgba(255,140,66,0.15);border-radius:12px;padding:10px 13px;}
+.em-card-pq{font-size:10px;color:var(--em-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.em-card-pa{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--em-text);font-style:italic;line-height:1.5;}
+
+/* Like/pass indicator overlays */
+.em-like-ind{position:absolute;top:24px;left:20px;background:rgba(255,179,71,0.9);border:2px solid #FFB347;border-radius:8px;padding:6px 14px;font-size:18px;font-weight:800;color:#1A1510;opacity:0;transform:rotate(-12deg);pointer-events:none;}
+.em-pass-ind{position:absolute;top:24px;right:20px;background:rgba(80,80,100,0.9);border:2px solid #555;border-radius:8px;padding:6px 14px;font-size:18px;font-weight:800;color:#ccc;opacity:0;transform:rotate(12deg);pointer-events:none;}
+
+/* Action buttons */
+.em-actions{display:flex;justify-content:center;align-items:center;gap:20px;padding:16px 20px;padding-bottom:max(20px,env(safe-area-inset-bottom,20px));flex-shrink:0;}
+.em-btn-pass{width:56px;height:56px;border-radius:50%;background:var(--em-card);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;color:#888;box-shadow:0 4px 16px rgba(0,0,0,0.3);touch-action:manipulation;}
+.em-btn-like{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;box-shadow:0 6px 24px rgba(255,140,66,0.4);touch-action:manipulation;}
+.em-btn-info{width:48px;height:48px;border-radius:50%;background:var(--em-card);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--em-dim);box-shadow:0 4px 16px rgba(0,0,0,0.3);touch-action:manipulation;}
+.em-empty{text-align:center;padding:48px 32px;}
+.em-empty-icon{font-size:48px;margin-bottom:16px;}
+.em-empty-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--em-text);margin-bottom:10px;}
+.em-empty-sub{font-size:13px;color:var(--em-dim);line-height:1.8;}
+
+/* Ember match overlay */
+.ember-match-overlay{position:absolute;inset:0;background:rgba(26,21,16,0.97);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;}
+.ember-match-overlay.show{opacity:1;pointer-events:all;}
+@keyframes emberPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,179,71,0.4);}50%{box-shadow:0 0 0 20px rgba(255,179,71,0);}}
+.em-mo-eyebrow{font-size:11px;color:var(--em-glow);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;}
+.em-mo-avs{display:flex;align-items:center;gap:16px;margin-bottom:24px;}
+.em-mo-av{width:72px;height:72px;border-radius:50%;border:2px solid var(--em-glow);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--em-text);animation:emberPulse 2s ease-in-out infinite;}
+.em-mo-gem{font-size:28px;color:var(--em-glow);}
+.em-mo-name{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--em-text);font-weight:600;margin-bottom:8px;line-height:1.2;}
+.em-mo-sub{font-size:13px;color:var(--em-dim);line-height:1.8;margin-bottom:28px;}
+.em-mo-chat{width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1A1510;cursor:pointer;font-weight:700;margin-bottom:10px;}
+.em-mo-spot{width:100%;background:rgba(255,179,71,0.1);border:0.5px solid rgba(255,179,71,0.35);border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--em-glow);cursor:pointer;font-weight:600;}
+
+/* Mutual Spot screen */
+#s-spot{background:var(--em-bg);padding-top:0;display:flex;flex-direction:column;}
+.spot-hdr{background:var(--em-hdr);padding:14px 18px 12px;display:flex;align-items:center;gap:14px;border-bottom:0.5px solid rgba(255,140,66,0.15);flex-shrink:0;}
+.spot-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--em-text);font-weight:600;}
+.spot-sub{font-size:12px;color:var(--em-dim);margin-top:2px;}
+.vibe-section{padding:20px 20px 0;}
+.vibe-lbl{font-size:11px;color:var(--em-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+.vibe-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.vibe-opt{background:var(--em-card);border:0.5px solid rgba(255,140,66,0.15);border-radius:14px;padding:13px 14px;cursor:pointer;text-align:center;transition:all 0.15s;}
+.vibe-opt.sel{background:rgba(255,140,66,0.12);border-color:rgba(255,140,66,0.5);}
+.vibe-opt-icon{font-size:22px;margin-bottom:5px;}
+.vibe-opt-lbl{font-size:12px;color:var(--em-dim);}
+.vibe-opt.sel .vibe-opt-lbl{color:var(--em-glow);}
+.spot-ask-btn{width:calc(100% - 40px);margin:0 20px;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1A1510;cursor:pointer;font-weight:700;}
+.spot-ask-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.spot-results{padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.spot-venue-card{background:var(--em-card);border:0.5px solid rgba(255,140,66,0.15);border-radius:16px;padding:14px 16px;cursor:pointer;}
+.spot-venue-card.featured{border-color:rgba(255,179,71,0.45);background:rgba(255,140,66,0.06);}
+.spot-venue-name{font-size:15px;color:var(--em-text);font-weight:600;margin-bottom:4px;}
+.spot-venue-meta{font-size:12px;color:var(--em-dim);margin-bottom:8px;}
+.spot-venue-reason{font-size:12px;color:var(--em-glow);font-style:italic;line-height:1.5;}
+.spot-venue-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.spot-venue-tag{font-size:10px;color:var(--em-dim);background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:2px 8px;}
+.spot-suggest-btn{margin-top:10px;width:100%;background:rgba(255,179,71,0.1);border:0.5px solid rgba(255,179,71,0.3);border-radius:20px;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--em-glow);cursor:pointer;font-weight:600;}
+.spot-ai-thinking{text-align:center;padding:32px 20px;color:var(--em-dim);font-size:13px;}
+@keyframes emDot{0%,80%,100%{opacity:0.2;}40%{opacity:1;}}
+.spot-ai-dots span{animation:emDot 1.4s ease-in-out infinite;display:inline-block;font-size:20px;color:var(--em-glow);}
+.spot-ai-dots span:nth-child(2){animation-delay:0.2s;}
+.spot-ai-dots span:nth-child(3){animation-delay:0.4s;}
+
+/* Milestone overlay */
+.milestone-overlay{position:absolute;inset:0;background:rgba(26,21,16,0.97);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;}
+.milestone-overlay.show{opacity:1;pointer-events:all;}
+.ms-icon{font-size:64px;margin-bottom:16px;}
+.ms-title{font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--em-glow);font-weight:600;margin-bottom:10px;}
+.ms-sub{font-size:14px;color:var(--em-dim);line-height:1.8;margin-bottom:8px;}
+.ms-venue{font-size:13px;color:var(--em-text);margin-bottom:28px;}
+.ms-share{width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1A1510;cursor:pointer;font-weight:700;margin-bottom:10px;}
+.ms-close{width:100%;background:transparent;border:0.5px solid rgba(255,255,255,0.1);border-radius:28px;padding:14px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--em-dim);cursor:pointer;}
+
+/* Nav — 5 tabs need slightly smaller labels */
+.nav{padding:8px 4px;padding-bottom:max(20px,env(safe-area-inset-bottom,20px));}
+.ni{min-width:48px;}
+.ni-lbl{font-size:9px;}
+
+/* Venues tab */
+#s-venues{background:var(--sl-bg);padding-top:0;}
+.venues-hdr{background:var(--sl-hdr);padding:16px 20px 14px;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:10;}
+.venues-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);font-weight:600;}
+.venues-feed{padding:12px 0;}
+.venue-post{margin:0 16px 16px;background:var(--sl-card);border-radius:16px;border:0.5px solid rgba(255,255,255,0.06);overflow:hidden;}
+.venue-post-banner{height:100px;background:linear-gradient(135deg,rgba(255,90,50,0.3),rgba(212,146,26,0.2));display:flex;align-items:flex-end;padding:10px 14px;}
+.venue-post-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cr);font-weight:600;}
+.venue-post-body{padding:12px 14px 14px;}
+.venue-post-evt{font-size:13px;color:var(--cr);font-weight:600;margin-bottom:4px;}
+.venue-post-desc{font-size:12px;color:var(--ash);line-height:1.7;margin-bottom:10px;}
+.venue-post-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.venue-post-tag{font-size:10px;color:var(--ash);background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:2px 8px;}
+.venue-post-cta{width:100%;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.3);border-radius:20px;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--fl-lt);cursor:pointer;font-weight:600;}
 
 /* BLIND */
 #s-blind{background:var(--vl-bg);padding-top:0;}
@@ -661,9 +789,10 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 
 <!-- MASTER NAV — single instance, outside all screens, never scrolls -->
 <div class="nav" id="master-nav" style="display:none;">
-  <div class="ni" id="nav-spark" onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
-  <div class="ni" id="nav-blind" onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
-  <div class="ni" id="nav-map" onclick="navTo('s-heatmap')"><div class="ni-dot"></div><div class="ni-lbl">Map</div></div>
+  <div class="ni" id="nav-spark"   onclick="navTo('s-spark')"><div class="ni-dot"></div><div class="ni-lbl">Spark</div></div>
+  <div class="ni" id="nav-ember"   onclick="navTo('s-ember')"><div class="ni-dot"></div><div class="ni-lbl">Ember</div></div>
+  <div class="ni" id="nav-venues"  onclick="navTo('s-venues')"><div class="ni-dot"></div><div class="ni-lbl">Venues</div></div>
+  <div class="ni" id="nav-blind"   onclick="navTo('s-blind')"><div class="ni-dot"></div><div class="ni-lbl">Blind</div></div>
   <div class="ni" id="nav-matches" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
 </div>
 
@@ -984,7 +1113,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="msgs" id="chat-msgs"></div>
   <div class="ch-input-row">
     <button class="plan-btn" onclick="showDateCard()">📅 Plan a date</button>
-    <input class="ch-input" id="ch-input" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendMsg()">
+    <input class="ch-input" id="ch-input" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendMsg()" onfocus="scrollMsgsToBottom()" oninput="scrollMsgsToBottom()">
     <div class="ch-send" onclick="sendMsg()">↑</div>
   </div>
 </div>
@@ -1066,6 +1195,148 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   </div>
   <div class="ft-drop-btn" onclick="showToastMsg('Hint sent')">Drop a hint &#8594;</div>
 </div>
+
+<!-- ═══════════ EMBER MODE ═══════════ -->
+<div class="screen with-nav" id="s-ember">
+  <div class="em-hdr">
+    <div class="em-title">Em<span>ber</span></div>
+    <div class="em-radius-wrap">
+      <div class="em-radius-lbl">Radius</div>
+      <input class="em-radius-slider" type="range" min="2" max="50" value="10" id="em-radius" oninput="updateEmberRadius(this.value)">
+      <div class="em-radius-val" id="em-radius-val">10 mi</div>
+    </div>
+  </div>
+  <div class="em-count" id="em-count"></div>
+  <div class="em-deck" id="em-deck">
+    <!-- Cards injected by JS -->
+    <div class="em-empty" id="em-empty" style="display:none;">
+      <div class="em-empty-icon">🔥</div>
+      <div class="em-empty-title">All caught up</div>
+      <div class="em-empty-sub">No more profiles nearby.<br>Try widening your radius<br>or check back later.</div>
+    </div>
+  </div>
+  <div class="em-actions">
+    <div class="em-btn-pass" onclick="emberPass()" title="Pass">✕</div>
+    <div class="em-btn-like" onclick="emberLike()" title="Like">🔥</div>
+    <div class="em-btn-info" onclick="emberInfo()" title="More info">⋯</div>
+  </div>
+</div>
+
+<!-- ═══════════ EMBER MATCH OVERLAY ═══════════ -->
+<div class="ember-match-overlay" id="ember-match-overlay">
+  <div class="em-mo-eyebrow">Ember lit</div>
+  <div class="em-mo-avs">
+    <div class="em-mo-av" id="em-mo-av-you"></div>
+    <div class="em-mo-gem">🔥</div>
+    <div class="em-mo-av" id="em-mo-av-them"></div>
+  </div>
+  <div class="em-mo-name" id="em-mo-name">You both said yes.</div>
+  <div class="em-mo-sub" id="em-mo-sub">The conversation starts here.<br>Where it goes is up to you.</div>
+  <button class="em-mo-chat" onclick="dismissEmberGoChat()">Start chatting →</button>
+  <button class="em-mo-spot" onclick="dismissEmberGoSpot()">🗺 Find a spot to meet</button>
+</div>
+
+<!-- ═══════════ MUTUAL SPOT ═══════════ -->
+<div class="screen" id="s-spot">
+  <div class="spot-hdr">
+    <button class="bk-btn" onclick="goBack()">←</button>
+    <div>
+      <div class="spot-title">Find a Spot</div>
+      <div class="spot-sub" id="spot-sub">Pick a vibe for your meetup</div>
+    </div>
+  </div>
+  <div class="vibe-section">
+    <div class="vibe-lbl">What's the energy?</div>
+    <div class="vibe-grid">
+      <div class="vibe-opt" onclick="selectVibe(this,'low-key')" data-vibe="low-key"><div class="vibe-opt-icon">🍷</div><div class="vibe-opt-lbl">Low-key &amp; intimate</div></div>
+      <div class="vibe-opt" onclick="selectVibe(this,'lively')" data-vibe="lively"><div class="vibe-opt-icon">🎵</div><div class="vibe-opt-lbl">Lively, something happening</div></div>
+      <div class="vibe-opt" onclick="selectVibe(this,'casual')" data-vibe="casual"><div class="vibe-opt-icon">☕</div><div class="vibe-opt-lbl">Casual, no pressure</div></div>
+      <div class="vibe-opt" onclick="selectVibe(this,'food')" data-vibe="food"><div class="vibe-opt-icon">🍕</div><div class="vibe-opt-lbl">Keep it easy — just food</div></div>
+      <div class="vibe-opt" onclick="selectVibe(this,'surprise')" data-vibe="surprise" style="grid-column:1/-1;"><div class="vibe-opt-icon">🎯</div><div class="vibe-opt-lbl">Surprise us</div></div>
+    </div>
+    <button class="spot-ask-btn" id="spot-ask-btn" onclick="askAIForSpot()" disabled>Find spots for us →</button>
+  </div>
+  <div id="spot-results" style="display:none;">
+    <div class="spot-ai-thinking" id="spot-thinking" style="display:none;">
+      <div style="margin-bottom:10px;font-size:13px;color:var(--em-dim);">Finding the perfect spot</div>
+      <div class="spot-ai-dots"><span>●</span><span>●</span><span>●</span></div>
+    </div>
+    <div class="spot-results" id="spot-venue-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════ MILESTONE OVERLAY ═══════════ -->
+<div class="milestone-overlay" id="milestone-overlay">
+  <div class="ms-icon" id="ms-icon">🔥</div>
+  <div class="ms-title" id="ms-title">First Flame</div>
+  <div class="ms-sub" id="ms-sub">You met in person for the first time.</div>
+  <div class="ms-venue" id="ms-venue"></div>
+  <button class="ms-share" onclick="shareMilestone()">Share your story →</button>
+  <button class="ms-close" onclick="closeMilestone()">Continue</button>
+</div>
+
+<!-- ═══════════ VENUES TAB ═══════════ -->
+<div class="screen with-nav" id="s-venues">
+  <div class="venues-hdr">
+    <div class="venues-title">Venues</div>
+    <div style="font-size:12px;color:var(--ash);margin-top:2px;">Partner spots &amp; events near you</div>
+  </div>
+  <div class="venues-feed" id="venues-feed">
+    <!-- Anchor & Vine -->
+    <div class="venue-post">
+      <div class="venue-post-banner" style="background:linear-gradient(135deg,rgba(255,90,50,0.35),rgba(212,146,26,0.25));">
+        <div>
+          <div style="font-size:9px;color:rgba(255,179,71,0.9);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Featured Partner</div>
+          <div class="venue-post-name">The Anchor &amp; Vine</div>
+        </div>
+      </div>
+      <div class="venue-post-body">
+        <div class="venue-post-evt">🎟 Favilla Friday — This Week</div>
+        <div class="venue-post-desc">Every Friday 8–11pm, The Anchor &amp; Vine becomes Favilla's home base. Check in to appear in the live room, meet your Spark matches in person, and get 2-for-1 on cocktails when you show your Favilla profile.</div>
+        <div class="venue-post-tags">
+          <div class="venue-post-tag">Low-key</div>
+          <div class="venue-post-tag">Good conversation</div>
+          <div class="venue-post-tag">Late night</div>
+          <div class="venue-post-tag">Favilla Night</div>
+        </div>
+        <button class="venue-post-cta" onclick="checkInFromVenue('anchor-and-vine','The Anchor &amp; Vine')">Check in here tonight →</button>
+      </div>
+    </div>
+    <!-- Rooftop 22 -->
+    <div class="venue-post">
+      <div class="venue-post-banner" style="background:linear-gradient(135deg,rgba(60,100,200,0.3),rgba(100,60,200,0.2));">
+        <div class="venue-post-name">Rooftop 22</div>
+      </div>
+      <div class="venue-post-body">
+        <div class="venue-post-evt">🌙 Saturday Sunset Sessions</div>
+        <div class="venue-post-desc">Rooftop views, craft cocktails, and a crowd that actually talks to each other. A favourite for Ember date meetups — several Favilla first dates have happened here.</div>
+        <div class="venue-post-tags">
+          <div class="venue-post-tag">Views</div>
+          <div class="venue-post-tag">Date night</div>
+          <div class="venue-post-tag">Outdoor</div>
+        </div>
+        <button class="venue-post-cta" onclick="showToastMsg('Opening Rooftop 22 — coming soon')">View venue →</button>
+      </div>
+    </div>
+    <!-- Blue Note -->
+    <div class="venue-post">
+      <div class="venue-post-banner" style="background:linear-gradient(135deg,rgba(30,60,120,0.4),rgba(60,30,90,0.3));">
+        <div class="venue-post-name">Blue Note</div>
+      </div>
+      <div class="venue-post-body">
+        <div class="venue-post-evt">🎷 Live Jazz Every Thursday</div>
+        <div class="venue-post-desc">Intimate live music in a room that makes conversation feel effortless. Perfect low-key first Ember meetup. Show your Favilla match and get priority seating.</div>
+        <div class="venue-post-tags">
+          <div class="venue-post-tag">Live music</div>
+          <div class="venue-post-tag">Intimate</div>
+          <div class="venue-post-tag">Low-key</div>
+        </div>
+        <button class="venue-post-cta" onclick="showToastMsg('Opening Blue Note — coming soon')">View venue →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ BLIND ═══════════ -->
 <div class="screen with-nav" id="s-blind">
   <div class="bl-hdr">
@@ -1308,60 +1579,122 @@ const navStack=[];
 /* ── NAV ─────────────────────────────── */
 function goTo(id,from){
   if(from)navStack.push(from);
-  _show(id);
+  _show(id,'forward');
 }
 function goBack(){
-  if(navStack.length>0){_show(navStack.pop());}else{goHome();}
+  if(navStack.length>0){_show(navStack.pop(),'back');}else{goHome();}
 }
 function navTo(id){
   navStack.length=0;
-  _show(id);
-  if(id==='s-matches')loadMatchesList();
+  _show(id,'forward');
+  if(id==='s-matches') loadMatchesList();
+  if(id==='s-ember')   bootEmber();
 }
 function goHome(){
   navStack.length=0;
   dateCardShown=false;
-  _show(currentUser?(currentProfile?'s-spark':'s-onboard'):'s-splash');
+  _show(currentUser?(currentProfile?'s-spark':'s-onboard'):'s-splash','back');
 }
-function _show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id);
-  if(el)el.classList.add('active');
-  const shell=document.querySelector('.shell');
-  const blindScreens=['s-blind'];
-  const warmScreens=['s-venue'];
-  if(blindScreens.includes(id)){shell.style.background='var(--vl-bg)';}
-  else if(warmScreens.includes(id)){shell.style.background='var(--wm-bg)';}
-  else{shell.style.background='var(--sl-bg)';}
+/* ── SCREEN TRANSITION ENGINE ───────────────────────────────── */
+const _screenHistory = [];
+let _transitioning = false;
+const _noNav = ['s-splash','s-login','s-signup','s-onboard','s-chat','s-findthem','s-match','s-confirmed','s-met','s-spot'];
+const _tabMap = {'s-spark':'nav-spark','s-ember':'nav-ember','s-venues':'nav-venues','s-heatmap':'nav-venues','s-venue':'nav-venues','s-blind':'nav-blind','s-matches':'nav-matches'};
 
-  /* Master nav — hide on auth/onboard, show on all app screens */
-  const nav=document.getElementById('master-nav');
-  const noNav=['s-splash','s-login','s-signup','s-onboard','s-chat','s-findthem','s-match','s-confirmed','s-met'];
-  if(nav){
-    nav.style.display=noNav.includes(id)?'none':'flex';
-    /* Colour scheme per mode */
-    if(id==='s-blind'){
-      nav.style.background='var(--vl-hdr)';
-      nav.style.borderTopColor='rgba(155,95,224,0.15)';
-      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='var(--vc-dim)');
-    } else if(id==='s-venue'){
-      nav.style.background='var(--wm-hdr)';
-      nav.style.borderTopColor='rgba(255,255,255,0.06)';
-      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='#7A6858');
-    } else {
-      nav.style.background='var(--sl-hdr)';
-      nav.style.borderTopColor='rgba(255,90,50,0.12)';
-      document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='');
-    }
-    /* Active tab */
-    const tabMap={'s-spark':'nav-spark','s-blind':'nav-blind','s-heatmap':'nav-map','s-venue':'nav-map','s-matches':'nav-matches'};
-    document.querySelectorAll('#master-nav .ni').forEach(n=>n.classList.remove('on'));
-    const activeTab=tabMap[id];
-    if(activeTab)document.getElementById(activeTab)?.classList.add('on');
+/* Detect reduced motion once */
+const _reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function _updateNav(id){
+  const nav = document.getElementById('master-nav');
+  if(!nav) return;
+  nav.style.display = _noNav.includes(id) ? 'none' : 'flex';
+  if(id==='s-blind'){
+    nav.style.background='var(--vl-hdr)';nav.style.borderTopColor='rgba(155,95,224,0.15)';
+    document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='var(--vc-dim)');
+  } else if(id==='s-venue'){
+    nav.style.background='var(--wm-hdr)';nav.style.borderTopColor='rgba(255,255,255,0.06)';
+    document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='#7A6858');
+  } else {
+    nav.style.background='var(--sl-hdr)';nav.style.borderTopColor='rgba(255,90,50,0.12)';
+    document.querySelectorAll('#master-nav .ni-lbl').forEach(l=>l.style.color='');
   }
-  /* Stop Find Them orientation listener when leaving that screen */
-  if(id!=='s-findthem'&&typeof stopFindThem==='function')stopFindThem();
+  document.querySelectorAll('#master-nav .ni').forEach(n=>n.classList.remove('on'));
+  const activeTab=_tabMap[id];
+  if(activeTab) document.getElementById(activeTab)?.classList.add('on');
 }
+
+function _updateShell(id){
+  const shell = document.querySelector('.shell');
+  if(!shell) return;
+  if(id==='s-blind') shell.style.background='var(--vl-bg)';
+  else if(id==='s-venue') shell.style.background='var(--wm-bg)';
+  else shell.style.background='var(--sl-bg)';
+}
+
+function _show(id, direction='forward', pushHistory=true){
+  if(_transitioning) return;
+  const incoming = document.getElementById(id);
+  if(!incoming) return;
+
+  const current = document.querySelector('.screen.active');
+
+  _updateShell(id);
+  _updateNav(id);
+  if(id!=='s-findthem' && typeof stopFindThem==='function') stopFindThem();
+
+  /* Push browser history — wrapped for iframe safety */
+  if(pushHistory){
+    try{ history.pushState({screen:id}, '', '#'+id); }catch(e){ /* iframe/srcdoc — skip */ }
+  }
+
+  /* Instant swap if reduced motion or no current screen */
+  if(_reducedMotion || !current || current === incoming){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    incoming.style.opacity='1';
+    incoming.style.transform='none';
+    incoming.classList.add('active');
+    return;
+  }
+
+  _transitioning = true;
+
+  /* Choose animation based on direction */
+  const yIn  = direction==='back' ? -28 : 28;
+  const yOut = direction==='back' ?  28 : -28;
+
+  /* Set incoming start state */
+  gsap.set(incoming, {opacity:0, y:yIn, immediateRender:true});
+  incoming.classList.add('active');
+
+  /* Animate out current, animate in incoming */
+  const tl = gsap.timeline({
+    onComplete: ()=>{
+      document.querySelectorAll('.screen').forEach(s=>{
+        if(s!==incoming){
+          s.classList.remove('active');
+          gsap.set(s,{opacity:0,y:0,clearProps:'transform'});
+        }
+      });
+      gsap.set(incoming,{clearProps:'transform'});
+      _transitioning=false;
+    }
+  });
+
+  tl.to(current,   {opacity:0, y:yOut, duration:0.18, ease:'power2.in'}, 0)
+    .to(incoming,  {opacity:1, y:0,    duration:0.22, ease:'power2.out'}, 0.08);
+}
+
+/* Browser back/forward button support */
+window.addEventListener('popstate', function(e){
+  const screen = e.state && e.state.screen;
+  if(screen){
+    /* Determine direction */
+    const idx = _screenHistory.indexOf(screen);
+    _show(screen, 'back', false);
+  } else {
+    _show('s-splash', 'back', false);
+  }
+});
 
 /* ── PANELS ──────────────────────────── */
 function openPP(){
@@ -1781,6 +2114,7 @@ async function loadMessages(matchId){
   msgs.scrollTop=msgs.scrollHeight;
 }
 
+
 function appendMessage(msg){
   const msgs=document.getElementById('chat-msgs');
   if(!msgs)return;
@@ -1796,6 +2130,346 @@ function appendMessage(msg){
   msgs.scrollTop=msgs.scrollHeight;
 }
 
+
+
+/* ═══════════════════════════════════════════════════
+   EMBER MODE — Card Feed + Matching + Mutual Spot
+═══════════════════════════════════════════════════ */
+
+/* ── State ── */
+let emberRadius    = 10;
+let emberQueue     = [];   /* profiles to show */
+let emberIdx       = 0;
+let emberMatchId   = null;
+let emberMatchProf = null;
+let selectedVibe   = null;
+let currentCard    = null;
+let isDragging     = false;
+let dragStartY     = 0;
+let dragCurrentY   = 0;
+
+/* Hardcoded venue list for Mutual Spot (Option A) */
+const SPOT_VENUES = [
+  {name:'The Anchor & Vine', vibe:['low-key','surprise'], tags:['Cocktail bar','Good conversation','Late night'], distance:'0.0 mi', note:'Your home base — already a Favilla partner.'},
+  {name:'Rooftop 22',        vibe:['lively','surprise'],  tags:['Rooftop','Date night','Outdoor'],              distance:'0.3 mi', note:'Views make everything better.'},
+  {name:'Blue Note',         vibe:['low-key','casual'],   tags:['Live jazz','Intimate'],                       distance:'0.9 mi', note:'Music that fills the silence.'},
+  {name:'Café Lucid',        vibe:['casual','food'],      tags:['Coffee','Relaxed','Daytime'],                 distance:'0.6 mi', note:'No pressure, great coffee.'},
+  {name:'The Garden Room',   vibe:['food','low-key'],     tags:['Restaurant','Cozy','Candlelit'],              distance:'1.1 mi', note:'Perfect for a proper first meal.'},
+  {name:'The Loft',          vibe:['lively','surprise'],  tags:['Bar','Dancing','High energy'],                distance:'0.8 mi', note:'When you want the night to go long.'},
+];
+
+/* ── Boot Ember when tab is opened ── */
+async function bootEmber(){
+  if(!currentUser||!currentProfile) return;
+  emberIdx=0;
+  emberQueue=[];
+  document.getElementById('em-empty').style.display='none';
+  await loadEmberProfiles();
+  renderEmberCard();
+}
+
+async function loadEmberProfiles(){
+  /* Load profiles excluding self, people already liked, and existing matches */
+  const{data:liked}=await sb.from('ember_likes').select('liked_user_id').eq('user_id',currentUser.id);
+  const likedIds=(liked||[]).map(r=>r.liked_user_id);
+
+  let q=sb.from('profiles').select('id,name,age,photo_url,icebreaker,prompt_1_q,prompt_1_a,intention,gender,interested_in').neq('id',currentUser.id);
+  const{data:profiles}=await q;
+  if(!profiles)return;
+
+  /* Filter out already-liked */
+  emberQueue=profiles.filter(p=>!likedIds.includes(p.id));
+  const countEl=document.getElementById('em-count');
+  if(countEl) countEl.textContent=emberQueue.length>0?emberQueue.length+' people within '+emberRadius+' mi':'';
+}
+
+function updateEmberRadius(val){
+  emberRadius=parseInt(val);
+  document.getElementById('em-radius-val').textContent=val+' mi';
+  const countEl=document.getElementById('em-count');
+  if(countEl&&emberQueue.length>0) countEl.textContent=emberQueue.length+' people within '+val+' mi';
+}
+
+/* ── Render current card ── */
+function renderEmberCard(){
+  const deck=document.getElementById('em-deck');
+  /* Remove existing card */
+  const old=deck.querySelector('.em-card');
+  if(old) old.remove();
+
+  if(emberIdx>=emberQueue.length){
+    document.getElementById('em-empty').style.display='block';
+    return;
+  }
+
+  const p=emberQueue[emberIdx];
+  const card=document.createElement('div');
+  card.className='em-card';
+  card.id='em-current-card';
+
+  const photoHTML=p.photo_url
+    ?'<img class="em-card-photo" src="'+p.photo_url+'" loading="lazy">'
+    :'<div class="em-card-photo-initial">'+(p.name?p.name.charAt(0).toUpperCase():'?')+'</div>';
+
+  const promptHTML=p.prompt_1_q&&p.prompt_1_a
+    ?'<div class="em-card-prompt"><div class="em-card-pq">'+escapeHtml(p.prompt_1_q)+'</div><div class="em-card-pa">"'+escapeHtml(p.prompt_1_a)+'"</div></div>':'' ;
+
+  card.innerHTML=
+    photoHTML+
+    '<div class="em-like-ind" id="em-like-ind">🔥 Yes</div>'+
+    '<div class="em-pass-ind" id="em-pass-ind">✕ Pass</div>'+
+    '<div class="em-card-info">'+
+      '<div class="em-card-name">'+(p.name||'Someone')+(p.age?', '+p.age:'')+'</div>'+
+      '<div class="em-card-meta"><div class="em-card-dist">◎ ~'+emberRadius+' mi</div>'+(p.intention?'· '+p.intention:'')+'</div>'+
+      promptHTML+
+    '</div>';
+
+  deck.appendChild(card);
+  currentCard=card;
+  attachCardGestures(card);
+
+  /* Animate card entering from right */
+  if(!_reducedMotion){
+    gsap.fromTo(card,{x:340,opacity:0,rotate:4},{x:0,opacity:1,rotate:0,duration:0.32,ease:'power2.out'});
+  }
+}
+
+/* ── Touch/drag gesture handling ── */
+function attachCardGestures(card){
+  let startY=0, currentY=0, startX=0, moving=false;
+
+  function onStart(e){
+    const pt=e.touches?e.touches[0]:e;
+    startY=pt.clientY; startX=pt.clientX; moving=false;
+    isDragging=true;
+  }
+  function onMove(e){
+    if(!isDragging)return;
+    e.preventDefault();
+    const pt=e.touches?e.touches[0]:e;
+    currentY=pt.clientY-startY;
+    const progress=Math.abs(currentY)/120;
+    const likeInd=document.getElementById('em-like-ind');
+    const passInd=document.getElementById('em-pass-ind');
+    if(currentY<-20){
+      /* Moving up = like */
+      if(likeInd)likeInd.style.opacity=Math.min(progress,1);
+      if(passInd)passInd.style.opacity=0;
+      if(!_reducedMotion) gsap.to(card,{y:currentY,rotate:currentY*0.03,duration:0,ease:'none'});
+    } else if(currentY>20){
+      /* Moving down = pass */
+      if(passInd)passInd.style.opacity=Math.min(progress,1);
+      if(likeInd)likeInd.style.opacity=0;
+      if(!_reducedMotion) gsap.to(card,{y:currentY,rotate:currentY*0.03,duration:0,ease:'none'});
+    } else {
+      if(likeInd)likeInd.style.opacity=0;
+      if(passInd)passInd.style.opacity=0;
+      if(!_reducedMotion) gsap.to(card,{y:0,rotate:0,duration:0.1});
+    }
+    moving=true;
+  }
+  function onEnd(){
+    isDragging=false;
+    if(currentY<-60){ emberLike(); }
+    else if(currentY>60){ emberPass(); }
+    else { if(!_reducedMotion) gsap.to(card,{y:0,rotate:0,duration:0.3,ease:'back.out(1.5)'}); }
+    currentY=0;
+  }
+
+  card.addEventListener('touchstart',onStart,{passive:true});
+  card.addEventListener('touchmove',onMove,{passive:false});
+  card.addEventListener('touchend',onEnd);
+  card.addEventListener('mousedown',onStart);
+  card.addEventListener('mousemove',onMove);
+  card.addEventListener('mouseup',onEnd);
+}
+
+/* ── Like / Pass actions ── */
+async function emberLike(){
+  if(emberIdx>=emberQueue.length)return;
+  const p=emberQueue[emberIdx];
+  const card=document.getElementById('em-current-card');
+
+  /* Animate out upward */
+  if(card&&!_reducedMotion){
+    await gsap.to(card,{y:-500,opacity:0,rotate:-8,duration:0.35,ease:'power2.in'}).then();
+  }
+
+  /* Write like to DB */
+  await sb.from('ember_likes').delete().eq('user_id',currentUser.id).eq('liked_user_id',p.id);
+  await sb.from('ember_likes').insert({user_id:currentUser.id,liked_user_id:p.id});
+
+  /* Check mutual */
+  const{data:mutual}=await sb.from('ember_likes').select('id').eq('user_id',p.id).eq('liked_user_id',currentUser.id).maybeSingle();
+  if(mutual){ await createEmberMatch(p.id,p); return; }
+
+  emberIdx++;
+  renderEmberCard();
+}
+
+function emberPass(){
+  if(emberIdx>=emberQueue.length)return;
+  const card=document.getElementById('em-current-card');
+  if(card&&!_reducedMotion){
+    gsap.to(card,{y:500,opacity:0,rotate:8,duration:0.35,ease:'power2.in',onComplete:()=>{emberIdx++;renderEmberCard();}});
+  } else { emberIdx++; renderEmberCard(); }
+}
+
+function emberInfo(){
+  if(emberIdx>=emberQueue.length)return;
+  const p=emberQueue[emberIdx];
+  /* Reuse existing profile sheet */
+  openProfileSheet({user_id:p.id,profiles:p},false);
+}
+
+/* ── Ember Match ── */
+async function createEmberMatch(otherUserId,otherProfile){
+  const{data:existing}=await sb.from('matches')
+    .select('id')
+    .or('and(user_id_1.eq.'+currentUser.id+',user_id_2.eq.'+otherUserId+'),and(user_id_1.eq.'+otherUserId+',user_id_2.eq.'+currentUser.id+')')
+    .maybeSingle();
+  if(existing){ showEmberMatchOverlay(otherProfile,existing.id); return; }
+  const{data:row,error}=await sb.from('matches').insert({user_id_1:currentUser.id,user_id_2:otherUserId,venue_id:'ember'}).select().single();
+  if(error){console.error('[EMBER MATCH]',error);return;}
+  showEmberMatchOverlay(otherProfile,row.id);
+}
+
+function showEmberMatchOverlay(profile,matchId){
+  emberMatchId=matchId; emberMatchProf=profile;
+  const youAv=document.getElementById('em-mo-av-you');
+  const themAv=document.getElementById('em-mo-av-them');
+  if(youAv) youAv.textContent=currentProfile?.name?.charAt(0).toUpperCase()||'Y';
+  if(themAv){
+    if(profile?.photo_url) themAv.innerHTML='<img src="'+profile.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else themAv.textContent=profile?.name?.charAt(0).toUpperCase()||'?';
+  }
+  const nm=document.getElementById('em-mo-name');
+  if(nm) nm.textContent='You and '+(profile?.name||'someone')+' both said yes.';
+  document.getElementById('ember-match-overlay').classList.add('show');
+  if(navigator.vibrate) navigator.vibrate([30,20,30]);
+  emberIdx++;
+}
+
+function dismissEmberGoChat(){
+  document.getElementById('ember-match-overlay').classList.remove('show');
+  openChat(emberMatchId,emberMatchProf);
+}
+function dismissEmberGoSpot(){
+  document.getElementById('ember-match-overlay').classList.remove('show');
+  selectedVibe=null;
+  document.querySelectorAll('.vibe-opt').forEach(o=>o.classList.remove('sel'));
+  document.getElementById('spot-ask-btn').disabled=true;
+  document.getElementById('spot-results').style.display='none';
+  const sub=document.getElementById('spot-sub');
+  if(sub) sub.textContent=(emberMatchProf?.name||'your match')+' will see your suggestion';
+  _show('s-spot','forward');
+}
+
+/* ── Mutual Spot — Vibe + AI ── */
+function selectVibe(el,vibe){
+  document.querySelectorAll('.vibe-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel'); selectedVibe=vibe;
+  document.getElementById('spot-ask-btn').disabled=false;
+}
+
+async function askAIForSpot(){
+  const btn=document.getElementById('spot-ask-btn');
+  btn.disabled=true; btn.textContent='Finding spots…';
+  document.getElementById('spot-results').style.display='block';
+  document.getElementById('spot-thinking').style.display='block';
+  document.getElementById('spot-venue-list').innerHTML='';
+
+  /* Filter venues by vibe */
+  const vibeVenues=SPOT_VENUES.filter(v=>v.vibe.includes(selectedVibe)||selectedVibe==='surprise');
+
+  /* Call Claude API for personalised recommendations */
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        messages:[{role:'user',content:'Two people just matched on a dating app. They want a "'+selectedVibe+'" vibe. Here are the available venues: '+vibeVenues.map(v=>v.name+' ('+v.tags.join(', ')+')').join('; ')+'. Pick the top 3 and write one short, warm sentence (max 12 words) for each explaining why it fits their vibe. Respond ONLY with JSON array: [{"name":"...","reason":"..."}]'}]
+      })
+    });
+    const data=await resp.json();
+    const text=data.content[0].text;
+    const clean=text.replace(/```json|```/g,'').trim();
+    const recs=JSON.parse(clean);
+    document.getElementById('spot-thinking').style.display='none';
+    renderSpotResults(recs,vibeVenues);
+  } catch(err){
+    /* Fallback — show top 3 without AI reason */
+    document.getElementById('spot-thinking').style.display='none';
+    renderSpotResults(vibeVenues.slice(0,3).map(v=>({name:v.name,reason:v.note})),vibeVenues);
+  }
+
+  btn.disabled=false; btn.textContent='Find spots for us →';
+}
+
+function renderSpotResults(recs,venueData){
+  const list=document.getElementById('spot-venue-list');
+  list.innerHTML='';
+  recs.slice(0,3).forEach((rec,i)=>{
+    const venue=venueData.find(v=>v.name===rec.name)||venueData[i]||venueData[0];
+    const card=document.createElement('div');
+    card.className='spot-venue-card'+(i===0?' featured':'');
+    card.innerHTML=
+      '<div class="spot-venue-name">'+venue.name+'</div>'+
+      '<div class="spot-venue-meta">'+venue.distance+' away</div>'+
+      '<div class="spot-venue-reason">"'+rec.reason+'"</div>'+
+      '<div class="spot-venue-tags">'+venue.tags.map(t=>'<div class="spot-venue-tag">'+t+'</div>').join('')+'</div>'+
+      '<button class="spot-suggest-btn" onclick="suggestSpot(this.dataset.venue)" data-venue="'+venue.name+'">Suggest this to '+(emberMatchProf?.name||'your match')+' →</button>';
+    list.appendChild(card);
+  });
+}
+
+async function suggestSpot(venueName){
+  if(!emberMatchId||!currentUser)return;
+  await sb.from('messages').insert({
+    match_id:emberMatchId,
+    sender_id:currentUser.id,
+    content:'📍 How about '+venueName+'? I think it fits our vibe.',
+    message_type:'spot_proposal'
+  });
+  showToastMsg('Spot suggested ✦ — heading to chat');
+  setTimeout(()=>{openChat(emberMatchId,emberMatchProf);},600);
+}
+
+/* ── Milestones ── */
+function checkMilestone(userId1,userId2,venueName,sharedCheckins){
+  const milestones=[
+    {count:1, icon:'🔥', title:'First Flame',    sub:'Your first time in the same room.'},
+    {count:3, icon:'✦',  title:'Still Burning',  sub:'Three times at the same place. Not a coincidence.'},
+    {count:5, icon:'🕯️', title:'Regular',        sub:'You have made this place yours.'},
+  ];
+  const ms=milestones.find(m=>m.count===sharedCheckins);
+  if(!ms)return;
+  document.getElementById('ms-icon').textContent=ms.icon;
+  document.getElementById('ms-title').textContent=ms.title;
+  document.getElementById('ms-sub').textContent=ms.sub;
+  document.getElementById('ms-venue').textContent='at '+venueName;
+  document.getElementById('milestone-overlay').classList.add('show');
+  if(navigator.vibrate)navigator.vibrate([40,20,40,20,40]);
+}
+function closeMilestone(){ document.getElementById('milestone-overlay').classList.remove('show'); }
+function shareMilestone(){ showToastMsg('Share card coming soon ✦'); }
+
+/* ── Venue tab check-in shortcut ── */
+function checkInFromVenue(venueId,venueName){
+  showToastMsg('Checking in to '+venueName+'…');
+  navTo('s-spark');
+  setTimeout(()=>checkIn('ci-anchor'),400);
+}
+
+/* ── Boot when switching to Ember tab ── */
+const _origNavTo=navTo;
+
+function scrollMsgsToBottom(){
+  var msgs = document.getElementById('chat-msgs');
+  if(msgs) msgs.scrollTop = msgs.scrollHeight;
+}
 async function sendMsg(){
   const inp=document.getElementById('ch-input');
   const txt=inp?inp.value.trim():'';
@@ -2285,6 +2959,17 @@ function subscribePresence() {
     .on('postgres_changes', {event:'*', schema:'public', table:'check_ins',
       filter:'venue_id=eq.' + VENUE_ID}, () => setTimeout(loadPresence, 400))
     .subscribe(s => { if(s==='SUBSCRIBED') loadPresence(); });
+}
+
+
+/* ── iOS KEYBOARD SCROLL FIX ── */
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', function(){
+    var chatScreen = document.getElementById('s-chat');
+    if(chatScreen && chatScreen.classList.contains('active')){
+      scrollMsgsToBottom();
+    }
+  });
 }
 
 window.addEventListener('beforeunload', async () => {
