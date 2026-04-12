@@ -2321,6 +2321,16 @@ async function bootEmber(){
   emberIdx=0;
   emberQueue=[];
   document.getElementById('em-empty').style.display='none';
+
+  /* Reset swipe hints so they replay every visit */
+  const hints = document.querySelector('.em-hints');
+  if(hints){
+    hints.style.animation='none';
+    hints.style.opacity='0';
+    void hints.offsetWidth; /* force reflow */
+    hints.style.animation='';
+  }
+
   await loadEmberProfiles();
   /* If no real profiles, inject demo cards so the UI is testable */
   if(emberQueue.length===0) injectEmberDemoCards();
