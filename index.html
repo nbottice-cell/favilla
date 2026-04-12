@@ -2546,10 +2546,15 @@ function showEmberMatchOverlay(profile,matchId){
   emberIdx++;
 }
 
+/* Local store for demo matches (not in DB) */
+var pendingDemoMatches = [];
+
 function dismissEmberMaybeLater(){
-  /* Save match, close overlay, continue browsing */
   document.getElementById('ember-match-overlay').classList.remove('show');
-  /* Match row already exists in DB — nothing to save */
+  if(emberMatchId && emberMatchId.startsWith('demo-') && emberMatchProf){
+    var already=pendingDemoMatches.find(function(m){return m.id===emberMatchId;});
+    if(!already) pendingDemoMatches.push({id:emberMatchId,profile:emberMatchProf,createdAt:new Date().toISOString()});
+  }
   showToastMsg('Saved ❆ — find them in your Matches tab anytime.');
   renderEmberCard();
 }
@@ -2716,7 +2721,20 @@ async function loadMatchesList(){
     list.innerHTML='<div style="text-align:center;padding:40px 36px;"><div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;color:var(--cr);margin-bottom:10px;">No matches yet.</div><div style="font-size:13px;color:var(--ash);line-height:1.8;">The next one is out there.<br>Go check in.</div><button onclick="navTo(\'s-spark\')" style="margin-top:18px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.32);border-radius:24px;padding:12px 28px;color:var(--fl-lt);font-size:13px;font-family:\'Space Grotesk\',sans-serif;cursor:pointer;font-weight:600;">Open Spark &#8594;</button></div>';
     return;
   }
-  if(count)count.textContent=matchRows.length+' conversation'+(matchRows.length===1?'':'s');
+  const totalCount=(matchRows?matchRows.length:0)+pendingDemoMatches.length;
+  if(count)count.textContent=totalCount+' conversation'+(totalCount===1?'':'s');
+  list.innerHTML='';
+  /* Demo matches render first — amber tinted */
+  pendingDemoMatches.forEach(function(dm){
+    var p=dm.profile, nm=p.name||'Someone';
+    var row=document.createElement('div');
+    row.className='mx-item first';
+    row.style.borderColor='rgba(255,140,66,0.25)';
+    row.innerHTML='<div class="mx-avw"><div class="mx-av" style="background:rgba(255,140,66,0.18);color:#FF8C42;">'+nm.charAt(0).toUpperCase()+'</div><div class="mx-badge bsp" style="font-size:9px;background:rgba(255,140,66,0.15);border-color:rgba(255,140,66,0.35);">&#x1F525;</div></div><div style="flex:1;"><div class="mx-name">'+nm+(p.age?', '+p.age:'')+'</div><div class="mx-prev" style="color:rgba(255,140,66,0.7);">Ember match &#x2014; say something &#x2746;</div></div><div style="font-size:11px;color:var(--ash);">Now</div>';
+    row.onclick=function(){emberMatchId=dm.id;emberMatchProf=p;showEmberMatchOverlay(p,dm.id);};
+    list.appendChild(row);
+  });
+  if(!matchRows||matchRows.length===0)return;
   const items=await Promise.all(matchRows.map(async match=>{
     const otherId=match.user_id_1===currentUser.id?match.user_id_2:match.user_id_1;
     const[{data:profile},{data:lastMsgs}]=await Promise.all([
