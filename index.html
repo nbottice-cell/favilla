@@ -2730,30 +2730,29 @@ async function loadMatchesList(){
   const items=await Promise.all(matchRows.map(async match=>{
     const otherId=match.user_id_1===currentUser.id?match.user_id_2:match.user_id_1;
     const[{data:profile},{data:lastMsgs}]=await Promise.all([
-      sb.from('profiles').select('name,age,photo_url').eq('id',otherId).single(),
+      sb.from('profiles').select('name,age,photo_url').eq('id',otherId).maybeSingle(),
       sb.from('messages').select('content,created_at,sender_id').eq('match_id',match.id).order('created_at',{ascending:false}).limit(1),
     ]);
     const lastMsg=lastMsgs?.[0];
     const timeStr=lastMsg?new Date(lastMsg.created_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):new Date(match.created_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-    const preview=lastMsg?(lastMsg.sender_id===currentUser.id?'You: ':'')+lastMsg.content:'Say something ✦';
-    return{match,profile,timeStr,preview};
+    const preview=lastMsg?(lastMsg.sender_id===currentUser.id?'You: ':'')+lastMsg.content:'New match &#x2014; start a conversation';
+    return{match,profile,timeStr,preview,hasMessages:!!(lastMsg)};
   }));
-  list.innerHTML='';
-  items.forEach(({match,profile,timeStr,preview},i)=>{
+  /* Append real DB matches below demo matches — do NOT clear list again */
+  items.forEach(({match,profile,timeStr,preview,hasMessages},i)=>{
     const name=profile?.name||'Someone';
+    const age=profile?.age?', '+profile.age:'';
     const row=document.createElement('div');
-    row.className='mx-item'+(i===0?' first':'');
-    row.innerHTML=`<div class="mx-avw"><div class="mx-av" style="background:rgba(255,90,50,0.18);">${name.charAt(0).toUpperCase()}</div><div class="mx-badge bsp" style="font-size:9px;">&#x1F525;</div></div><div style="flex:1;"><div class="mx-name">${name}${profile?.age?', '+profile.age:''}</div><div class="mx-prev">${escapeHtml(preview.substring(0,50))}${preview.length>50?'...':''}</div></div><div style="font-size:11px;color:var(--ash);">${timeStr}</div>`;
-    row.onclick=async ()=>{
-      /* Check if any messages exist — if not, show Ember Lit overlay again */
-      const{data:msgs}=await sb.from('messages').select('id').eq('match_id',match.id).limit(1);
-      if(msgs&&msgs.length>0){
+    row.className='mx-item'+(pendingDemoMatches.length===0&&i===0?' first':'');
+    row.innerHTML=`<div class="mx-avw"><div class="mx-av" style="background:rgba(255,90,50,0.18);">${name.charAt(0).toUpperCase()}</div><div class="mx-badge bsp" style="font-size:9px;">&#x1F525;</div></div><div style="flex:1;"><div class="mx-name">${name}${age}</div><div class="mx-prev">${preview.substring(0,60)}${preview.length>60?'...':''}</div></div><div style="font-size:11px;color:var(--ash);">${timeStr}</div>`;
+    row.onclick=async()=>{
+      if(hasMessages){
         openChat(match.id,profile);
       } else {
-        /* No messages yet — show the Ember match overlay so they can decide */
+        /* No messages yet — show new match options overlay */
         emberMatchId=match.id;
         emberMatchProf=profile;
-        showEmberMatchOverlay(profile,match.id);
+        showNewMatchOptions(match.id,profile);
       }
     };
     list.appendChild(row);
@@ -3298,6 +3297,30 @@ function showMatchOverlay(otherProfile, matchId) {
 
 function testMatchOverlay(){
   showMatchOverlay({name:'Test Match', age:28, photo_url:null}, 'test-id-123');
+}
+
+
+/* ── NEW MATCH OPTIONS (no messages yet) ── */
+function showNewMatchOptions(matchId, profile){
+  var name = (profile&&profile.name)||'your match';
+  currentMatchId = matchId;
+  currentMatchProfile = profile;
+
+  /* Reuse Spark match overlay with correct content */
+  var moName = document.getElementById('mo-name');
+  var moLoc  = document.getElementById('mo-loc');
+  var youAv  = document.getElementById('mo-av-you');
+  var themAv = document.getElementById('mo-av-them');
+
+  if(youAv) youAv.textContent = (currentProfile&&currentProfile.name)?currentProfile.name.charAt(0).toUpperCase():'Y';
+  if(themAv){
+    if(profile&&profile.photo_url) themAv.innerHTML='<img src="'+profile.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    else themAv.textContent = name.charAt(0).toUpperCase();
+  }
+  if(moName) moName.textContent = 'You matched with '+name+'.';
+  if(moLoc)  moLoc.textContent  = 'Start the conversation.';
+
+  document.getElementById('match-overlay').classList.add('show');
 }
 
 function dismissMatchMaybeLater(){
