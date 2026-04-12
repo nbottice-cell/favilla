@@ -1993,13 +1993,19 @@ function startOrientationListener(){
   window.addEventListener('deviceorientation',handleOrientation,true);
 }
 function handleOrientation(e){
-  /* webkitCompassHeading is clockwise from magnetic north (iOS).
-     e.alpha is counter-clockwise from arbitrary zero — needs negating.
-     We negate so the arrow rotates opposite to phone heading,
-     meaning it always points toward the target location. */
-  var heading = e.webkitCompassHeading != null
-    ? -e.webkitCompassHeading          /* iOS — negate clockwise heading */
-    : -(e.alpha || 0);                 /* Android — negate alpha */
+  var heading;
+  if(e.webkitCompassHeading != null){
+    /* iOS — webkitCompassHeading is 0-360 clockwise from magnetic north.
+       The arrow SVG points up at 0deg. We want the arrow to point
+       in the same direction the phone is facing, so rotate by heading. */
+    heading = e.webkitCompassHeading;
+  } else if(e.alpha != null){
+    /* Android — alpha is counter-clockwise from arbitrary zero.
+       Convert to clockwise: negate and normalise to 0-360. */
+    heading = (360 - e.alpha) % 360;
+  } else {
+    return;
+  }
   rotateArrow(heading);
 }
 function rotateArrow(deg){var g=document.getElementById('ft-arrow-group');if(g)g.style.transform='rotate('+deg+'deg)';}
