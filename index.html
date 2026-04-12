@@ -145,12 +145,13 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 
 /* SPARK */
 #s-spark{background:var(--sl-bg);padding-top:0;}
-.sp-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:50;}
+.sp-hdr{background:var(--sl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.12);position:sticky;top:0;z-index:400;}
 .sp-logo{display:flex;align-items:center;gap:10px;}
 .sp-wm{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);letter-spacing:4px;text-transform:uppercase;font-weight:600;}
-.sp-right{display:flex;align-items:center;gap:10px;}
-.bell-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--fl-lt);}
-.pp-pill{width:32px;height:32px;border-radius:50%;background:rgba(255,90,50,0.18);border:1px solid rgba(255,90,50,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cr);cursor:pointer;font-weight:600;}
+.sp-right{display:flex;align-items:center;gap:8px;}
+.map-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--fl-lt);font-size:16px;-webkit-appearance:none;touch-action:manipulation;}
+.bell-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.25);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--fl-lt);-webkit-appearance:none;touch-action:manipulation;}
+.pp-pill{width:44px;height:44px;border-radius:50%;background:rgba(255,90,50,0.18);border:1px solid rgba(255,90,50,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cr);cursor:pointer;font-weight:600;-webkit-appearance:none;touch-action:manipulation;}
 .venue-bar{margin:14px 18px;background:rgba(255,90,50,0.08);border:0.5px solid rgba(255,90,50,0.32);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 @keyframes vp{0%{box-shadow:0 0 0 0 rgba(255,90,50,0.5);}70%{box-shadow:0 0 0 8px rgba(255,90,50,0);}100%{box-shadow:0 0 0 0 rgba(255,90,50,0);}}
 .v-pulse{width:9px;height:9px;border-radius:50%;background:var(--fl);flex-shrink:0;animation:vp 2.2s infinite;}
@@ -248,7 +249,8 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .mo-sub{font-size:13px;color:var(--ash);line-height:1.7;margin-bottom:28px;animation:fadeUp 0.4s 0.7s ease forwards;opacity:0;}
 .mo-loc{font-size:12px;color:var(--ash);margin-bottom:28px;animation:fadeUp 0.4s 0.65s ease forwards;opacity:0;}
 .mo-chat{width:100%;background:var(--fl);color:#fff;border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;animation:fadeUp 0.4s 0.8s ease forwards;opacity:0;}
-.mo-find{width:100%;background:transparent;border:0.5px solid rgba(255,184,64,0.4);border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:#FFB840;cursor:pointer;animation:fadeUp 0.4s 0.9s ease forwards;opacity:0;}
+.mo-find{width:100%;background:transparent;border:0.5px solid rgba(255,184,64,0.4);border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:#FFB840;cursor:pointer;animation:fadeUp 0.4s 0.9s ease forwards;opacity:0;margin-bottom:10px;}
+.mo-later{width:100%;background:transparent;border:none;padding:12px;font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--ash);cursor:pointer;animation:fadeUp 0.4s 1.0s ease forwards;opacity:0;}
 
 /* MATCH REVEAL */
 #s-match{background:#0D0F14;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 36px 48px;text-align:center;}
@@ -525,6 +527,33 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .venue-post-tag{font-size:10px;color:var(--ash);background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:2px 8px;}
 .venue-post-cta{width:100%;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.3);border-radius:20px;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--fl-lt);cursor:pointer;font-weight:600;}
 
+
+/* MAP SHEET */
+.map-sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
+.map-sheet-overlay.open{opacity:1;pointer-events:all;}
+.map-sheet{width:100%;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,90,50,0.2);height:80%;display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);}
+.map-sheet-overlay.open .map-sheet{transform:translateY(0);}
+.map-sheet-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);margin:14px auto 0;flex-shrink:0;cursor:pointer;}
+.map-sheet-hdr{padding:12px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(255,90,50,0.1);flex-shrink:0;}
+.map-sheet-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cr);font-weight:600;}
+.map-sheet-sub{font-size:11px;color:var(--ash);margin-top:2px;}
+.map-close-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.06);border:none;color:var(--ash);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;}
+.map-venue-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0;}
+.map-venue-row{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+.map-venue-row:last-child{border-bottom:none;}
+.map-venue-heat{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.map-venue-info{flex:1;}
+.map-venue-name{font-size:14px;color:var(--cr);font-weight:600;margin-bottom:2px;}
+.map-venue-meta{font-size:11px;color:var(--ash);}
+.map-venue-count{text-align:right;}
+.map-venue-num{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--fl-lt);line-height:1;}
+.map-venue-lbl{font-size:9px;color:var(--ash);letter-spacing:0.5px;}
+.map-heat-bar{margin:0 20px 14px;background:rgba(255,255,255,0.04);border-radius:8px;padding:12px 14px;border:0.5px solid rgba(255,90,50,0.12);}
+.map-heat-lbl{font-size:10px;color:var(--ash);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.map-heat-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.map-heat-bar-fill{height:6px;border-radius:3px;transition:width 0.6s ease;}
+.map-heat-venue{font-size:11px;color:var(--cr-dim);min-width:100px;}
+
 /* BLIND */
 #s-blind{background:var(--vl-bg);padding-top:0;}
 .bl-hdr{background:var(--vl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(155,95,224,0.14);}
@@ -797,6 +826,74 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="ni" id="nav-matches" onclick="navTo('s-matches')"><div class="ni-dot"></div><div class="ni-lbl">Matches</div></div>
 </div>
 
+
+<!-- MAP SHEET -->
+<div class="map-sheet-overlay" id="map-sheet-overlay" onclick="closeMapSheet(event)">
+  <div class="map-sheet">
+    <div class="map-sheet-handle" onclick="closeMapSheet()"></div>
+    <div class="map-sheet-hdr">
+      <div>
+        <div class="map-sheet-title">Where the action is</div>
+        <div class="map-sheet-sub">Live crowd levels right now</div>
+      </div>
+      <button class="map-close-btn" onclick="closeMapSheet()">✕</button>
+    </div>
+    <div class="map-venue-list">
+      <div class="map-heat-bar">
+        <div class="map-heat-lbl">Crowd heat</div>
+        <div class="map-heat-row">
+          <div class="map-heat-venue">The Anchor &amp; Vine</div>
+          <div class="map-heat-bar-fill" style="width:85%;background:linear-gradient(90deg,#FF5A32,#FF8C42);flex:1;"></div>
+          <div style="font-size:11px;color:var(--fl-lt);min-width:28px;text-align:right;">32</div>
+        </div>
+        <div class="map-heat-row">
+          <div class="map-heat-venue">Rooftop 22</div>
+          <div class="map-heat-bar-fill" style="width:55%;background:linear-gradient(90deg,#FFB347,#FF8C42);flex:1;"></div>
+          <div style="font-size:11px;color:#FFB347;min-width:28px;text-align:right;">18</div>
+        </div>
+        <div class="map-heat-row">
+          <div class="map-heat-venue">Blue Note</div>
+          <div class="map-heat-bar-fill" style="width:15%;background:rgba(255,90,50,0.4);flex:1;"></div>
+          <div style="font-size:11px;color:var(--ash);min-width:28px;text-align:right;">4</div>
+        </div>
+      </div>
+      <div class="map-venue-row" onclick="closeMapSheet();doCheckInVenue()">
+        <div class="map-venue-heat" style="background:rgba(255,90,50,0.15);">🔥</div>
+        <div class="map-venue-info">
+          <div class="map-venue-name">The Anchor &amp; Vine</div>
+          <div class="map-venue-meta">0.0 mi · Favilla Night · You're here</div>
+        </div>
+        <div class="map-venue-count">
+          <div class="map-venue-num" style="color:var(--fl-lt);">32</div>
+          <div class="map-venue-lbl">here</div>
+        </div>
+      </div>
+      <div class="map-venue-row" onclick="closeMapSheet();showToastMsg('Rooftop 22 — check in coming soon')">
+        <div class="map-venue-heat" style="background:rgba(255,179,71,0.12);">🌙</div>
+        <div class="map-venue-info">
+          <div class="map-venue-name">Rooftop 22</div>
+          <div class="map-venue-meta">0.3 mi · Bar &amp; cocktails</div>
+        </div>
+        <div class="map-venue-count">
+          <div class="map-venue-num" style="color:#FFB347;">18</div>
+          <div class="map-venue-lbl">here</div>
+        </div>
+      </div>
+      <div class="map-venue-row" onclick="closeMapSheet();showToastMsg('Blue Note — check in coming soon')">
+        <div class="map-venue-heat" style="background:rgba(60,80,160,0.15);">🎷</div>
+        <div class="map-venue-info">
+          <div class="map-venue-name">Blue Note</div>
+          <div class="map-venue-meta">0.9 mi · Live music</div>
+        </div>
+        <div class="map-venue-count">
+          <div class="map-venue-num" style="color:var(--ash);">4</div>
+          <div class="map-venue-lbl">here</div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:16px 20px;font-size:12px;color:var(--ash);">More venues coming soon ✦</div>
+    </div>
+  </div>
+</div>
 <!-- PROFILE PANEL -->
 <div class="profile-panel" id="profile-panel" onclick="closePP(event)">
   <div class="pp-sheet">
@@ -977,8 +1074,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
       <div class="sp-wm">Favilla</div>
     </div>
     <div class="sp-right">
-      <div class="bell-btn" onclick="openNT()">🔔</div>
-      <div class="pp-pill" id="user-initial" onclick="openPP()">?</div>
+      <button class="map-btn" onclick="showMapSheet()" aria-label="View map">🗺</button>
+      <button class="bell-btn" onclick="openNT()" aria-label="Notifications">🔔</button>
+      <button class="pp-pill" id="user-initial" onclick="openPP()" aria-label="Profile">?</button>
     </div>
   </div>
   <div class="venue-bar" id="venue-bar" onclick="doCheckInVenue()"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></div>
@@ -1082,6 +1180,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="mo-loc" id="mo-loc"></div>
   <button class="mo-chat" onclick="dismissMatchGoChat()">Open chat →</button>
   <button class="mo-find" onclick="dismissMatchGoFind()">🎯 Find Them instead</button>
+  <button class="mo-later" onclick="dismissMatchMaybeLater()">Maybe later — I’ll find them in Matches</button>
 </div>
 
 <!-- ═══════════ MATCH REVEAL ═══════════ -->
@@ -1737,6 +1836,16 @@ function toggleStatus(){
   else{p.textContent='Invisible';d.style.background='#666';}
   showToastMsg(statusAvail?'You\'re now visible to nearby matches.':'You\'re now invisible to other users.');
 }
+
+function showMapSheet(){
+  document.getElementById('map-sheet-overlay').classList.add('open');
+}
+function closeMapSheet(e){
+  if(!e || e.target===document.getElementById('map-sheet-overlay')){
+    document.getElementById('map-sheet-overlay').classList.remove('open');
+  }
+}
+
 function openNT(){document.getElementById('notif-tray').classList.add('open');}
 function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))document.getElementById('notif-tray').classList.remove('open');}
 
@@ -3017,6 +3126,10 @@ function testMatchOverlay(){
   showMatchOverlay({name:'Test Match', age:28, photo_url:null}, 'test-id-123');
 }
 
+function dismissMatchMaybeLater(){
+  document.getElementById('match-overlay').classList.remove('show');
+  showToastMsg('Saved \u2746 \u2014 find them in your Matches tab anytime.');
+}
 function dismissMatchGoChat(){
   document.getElementById('match-overlay').classList.remove('show');
   openChat(currentMatchId, currentMatchProfile);
