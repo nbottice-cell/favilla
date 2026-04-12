@@ -453,6 +453,14 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .em-empty-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--em-text);margin-bottom:10px;}
 .em-empty-sub{font-size:13px;color:var(--em-dim);line-height:1.8;}
 
+
+/* Ember swipe hints */
+.em-hints{position:absolute;left:10px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:28px;pointer-events:none;z-index:3;opacity:0;animation:emHintFade 4s ease-in-out 1.2s forwards;}
+@keyframes emHintFade{0%{opacity:0;}15%{opacity:1;}75%{opacity:1;}100%{opacity:0;}}
+.em-hint{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.em-hint-arrow{font-size:14px;color:var(--em-glow);}
+.em-hint-lbl{font-size:9px;color:var(--em-dim);letter-spacing:1px;text-transform:uppercase;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);}
+
 /* Ember match overlay */
 .ember-match-overlay{position:absolute;inset:0;background:rgba(26,21,16,0.97);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;}
 .ember-match-overlay.show{opacity:1;pointer-events:all;}
@@ -1311,6 +1319,11 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   </div>
   <div class="em-count" id="em-count"></div>
   <div class="em-deck" id="em-deck">
+    <!-- Swipe hints -->
+    <div class="em-hints">
+      <div class="em-hint"><div class="em-hint-arrow">↑</div><div class="em-hint-lbl">Like</div></div>
+      <div class="em-hint"><div class="em-hint-arrow">↓</div><div class="em-hint-lbl">Pass</div></div>
+    </div>
     <!-- Cards injected by JS -->
     <div class="em-empty" id="em-empty" style="display:none;">
       <div class="em-empty-icon">🔥</div>
