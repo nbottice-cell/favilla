@@ -1199,7 +1199,10 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 <!-- ═══════════ EMBER MODE ═══════════ -->
 <div class="screen with-nav" id="s-ember">
   <div class="em-hdr">
-    <div class="em-title">Em<span>ber</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="bk-btn" onclick="navTo('s-spark')" style="position:relative;top:0;left:0;">&#8592;</button>
+      <div class="em-title">Em<span>ber</span></div>
+    </div>
     <div class="em-radius-wrap">
       <div class="em-radius-lbl">Radius</div>
       <input class="em-radius-slider" type="range" min="2" max="50" value="10" id="em-radius" oninput="updateEmberRadius(this.value)">
@@ -1989,7 +1992,16 @@ function startOrientationListener(){
   if(note)note.textContent='Arrow follows your heading';
   window.addEventListener('deviceorientation',handleOrientation,true);
 }
-function handleOrientation(e){rotateArrow(e.alpha||0);}
+function handleOrientation(e){
+  /* webkitCompassHeading is clockwise from magnetic north (iOS).
+     e.alpha is counter-clockwise from arbitrary zero — needs negating.
+     We negate so the arrow rotates opposite to phone heading,
+     meaning it always points toward the target location. */
+  var heading = e.webkitCompassHeading != null
+    ? -e.webkitCompassHeading          /* iOS — negate clockwise heading */
+    : -(e.alpha || 0);                 /* Android — negate alpha */
+  rotateArrow(heading);
+}
 function rotateArrow(deg){var g=document.getElementById('ft-arrow-group');if(g)g.style.transform='rotate('+deg+'deg)';}
 function startSimulatedArrow(){
   var note=document.getElementById('ft-orient-note');
@@ -2165,7 +2177,25 @@ async function bootEmber(){
   emberQueue=[];
   document.getElementById('em-empty').style.display='none';
   await loadEmberProfiles();
+  /* If no real profiles, inject demo cards so the UI is testable */
+  if(emberQueue.length===0) injectEmberDemoCards();
   renderEmberCard();
+}
+
+/* Demo cards — 6 accounts, 3 of which auto-trigger the match overlay */
+const EMBER_DEMO = [
+  {id:'demo-1', name:'Maya',    age:26, photo_url:null, prompt_1_q:'A hill I will die on',           prompt_1_a:'Breakfast should be available at any hour.',          intention:'Keeping it light',  _autoMatch:true},
+  {id:'demo-2', name:'Jordan',  age:29, photo_url:null, prompt_1_q:'The most spontaneous thing I have done', prompt_1_a:'Drove to the coast at 2am to hear the ocean.',  intention:'Something real',    _autoMatch:false},
+  {id:'demo-3', name:'Priya',   age:27, photo_url:null, prompt_1_q:'I could talk about this forever', prompt_1_a:'Why maps are the most beautiful thing humans make.',  intention:'Still figuring it out', _autoMatch:true},
+  {id:'demo-4', name:'Alex',    age:31, photo_url:null, prompt_1_q:'My love language',                prompt_1_a:'Recommending a film and then dissecting it after.',   intention:'Something real',    _autoMatch:false},
+  {id:'demo-5', name:'Simone',  age:25, photo_url:null, prompt_1_q:'A green flag I look for',         prompt_1_a:'They remember small things you mentioned once.',      intention:'Keeping it light',  _autoMatch:true},
+  {id:'demo-6', name:'Rafi',    age:30, photo_url:null, prompt_1_q:'Best meal I ever had',            prompt_1_a:'A sandwich at a market in Lisbon at 7am. Perfect.',   intention:'Still figuring it out', _autoMatch:false},
+];
+
+function injectEmberDemoCards(){
+  emberQueue = EMBER_DEMO.map(d=>({...d}));
+  const countEl=document.getElementById('em-count');
+  if(countEl) countEl.textContent=emberQueue.length+' people within '+emberRadius+' mi';
 }
 
 async function loadEmberProfiles(){
@@ -2295,11 +2325,21 @@ async function emberLike(){
     await gsap.to(card,{y:-500,opacity:0,rotate:-8,duration:0.35,ease:'power2.in'}).then();
   }
 
-  /* Write like to DB */
+  /* Demo card — auto-match if flagged */
+  if(p.id&&p.id.startsWith('demo-')){
+    if(p._autoMatch){
+      showEmberMatchOverlay(p, 'demo-match-'+p.id);
+    } else {
+      emberIdx++;
+      renderEmberCard();
+    }
+    return;
+  }
+
+  /* Real DB card */
   await sb.from('ember_likes').delete().eq('user_id',currentUser.id).eq('liked_user_id',p.id);
   await sb.from('ember_likes').insert({user_id:currentUser.id,liked_user_id:p.id});
 
-  /* Check mutual */
   const{data:mutual}=await sb.from('ember_likes').select('id').eq('user_id',p.id).eq('liked_user_id',currentUser.id).maybeSingle();
   if(mutual){ await createEmberMatch(p.id,p); return; }
 
@@ -2310,9 +2350,10 @@ async function emberLike(){
 function emberPass(){
   if(emberIdx>=emberQueue.length)return;
   const card=document.getElementById('em-current-card');
+  const advance=()=>{emberIdx++;renderEmberCard();};
   if(card&&!_reducedMotion){
-    gsap.to(card,{y:500,opacity:0,rotate:8,duration:0.35,ease:'power2.in',onComplete:()=>{emberIdx++;renderEmberCard();}});
-  } else { emberIdx++; renderEmberCard(); }
+    gsap.to(card,{y:500,opacity:0,rotate:8,duration:0.35,ease:'power2.in',onComplete:advance});
+  } else { advance(); }
 }
 
 function emberInfo(){
@@ -2352,7 +2393,14 @@ function showEmberMatchOverlay(profile,matchId){
 
 function dismissEmberGoChat(){
   document.getElementById('ember-match-overlay').classList.remove('show');
-  openChat(emberMatchId,emberMatchProf);
+  if(emberMatchId && emberMatchId.startsWith('demo-')){
+    /* Demo match — open chat with fake profile, no real matchId */
+    openChat(null, emberMatchProf);
+  } else {
+    openChat(emberMatchId, emberMatchProf);
+  }
+  emberIdx++;
+  renderEmberCard();
 }
 function dismissEmberGoSpot(){
   document.getElementById('ember-match-overlay').classList.remove('show');
