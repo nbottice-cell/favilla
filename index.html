@@ -1456,11 +1456,23 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
         <div class="cp-dot" id="cp-dot-3"></div>
         <div class="cp-dot" id="cp-dot-4"></div>
       </div>
+      <!-- Slot machine window -->
       <div class="cp-roulette" id="cp-roulette">
         <div class="cp-spin-lbl" id="cp-spin-lbl">Question spinning&#x2026;</div>
-        <div class="cp-blur-tape" id="cp-blur-tape"></div>
+        <!-- Center target line -->
+        <div style="position:absolute;left:12px;right:12px;top:50%;height:1px;background:rgba(255,179,71,0.3);pointer-events:none;z-index:3;margin-top:-10px;"></div>
+        <div style="position:absolute;left:12px;right:12px;top:50%;height:1px;background:rgba(255,179,71,0.3);pointer-events:none;z-index:3;margin-top:10px;"></div>
+        <!-- Scrolling tape -->
+        <div style="position:absolute;inset:0;overflow:hidden;border-radius:20px;">
+          <div id="cp-blur-tape" class="cp-blur-tape"></div>
+        </div>
+        <!-- Landed question (shown after spin) -->
         <div class="cp-question" id="cp-question"></div>
       </div>
+      <!-- Spin button (shown before spinning) -->
+      <button class="cp-submit" id="cp-spin-btn" onclick="cpDoSpin()" style="margin-top:0;margin-bottom:16px;">
+        &#x21BB; Spin for question
+      </button>
       <div class="cp-answer-wrap" id="cp-answer-wrap" style="display:none;">
         <div class="cp-answer-lbl">Your answer</div>
         <textarea class="cp-answer-input" id="cp-answer-input" placeholder="Type your answer&#x2026;" rows="3" oninput="cpCheckSubmit()"></textarea>
@@ -1483,14 +1495,14 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="cp-result-overlay" id="cp-result-overlay">
     <div class="cp-result-eyebrow">Results are in</div>
     <div class="cp-score-ring" id="cp-score-ring">
-      <div class="cp-score-num" id="cp-score-num">0</div>
+      <div class="cp-score-num" id="cp-score-num">&#x2026;</div>
       <div class="cp-score-denom">out of 5</div>
     </div>
-    <div class="cp-result-title" id="cp-result-title">Finding out&#x2026;</div>
+    <div class="cp-result-title" id="cp-result-title">Calculating&#x2026;</div>
     <div class="cp-result-sub" id="cp-result-sub"></div>
     <div class="cp-answers-preview" id="cp-answers-preview"></div>
     <div class="cp-tally-lbl" id="cp-tally-lbl"></div>
-    <button class="cp-result-chat" id="cp-result-chat" onclick="cpStartChat()">Start chatting &#x2192;</button>
+    <button class="cp-result-chat" id="cp-result-chat" onclick="cpStartChat()" style="display:none;">Start chatting &#x2192;</button>
     <button class="cp-result-anyway" id="cp-result-anyway" onclick="cpStartChat()" style="display:none;">Chat anyway &#x2014; differences make it interesting</button>
     <button class="cp-result-pass" id="cp-result-pass" onclick="cpPass()" style="display:none;">Keep browsing instead</button>
   </div>
@@ -2844,6 +2856,15 @@ const _origNavTo=navTo;
    COMPATIBILITY CHECK + AI SCORE
 ═══════════════════════════════════════════════════ */
 
+
+/* State */
+var cpMatchId      = null;
+var cpMatchProfile = null;
+var cpQuestions    = [];
+var cpAnswers      = [];
+var cpCurrentQ     = 0;
+var cpSpinning     = false;
+
 const CP_QUESTIONS = [
   "Jimmies or sprinkles?",
   "Pineapple on pizza -- where do you stand?",
@@ -2877,56 +2898,38 @@ const CP_QUESTIONS = [
   "What is the last song you listened to on purpose?"
 ];
 
-/* State */
-var cpMatchId      = null;
-var cpMatchProfile = null;
-var cpQuestions    = [];
-var cpAnswers      = [];
-var cpCurrentQ     = 0;
-var cpAlignments   = [];
-var cpSpinTimer    = null;
-var aiScoreEnabled = true;
-var currentAIScore = null;
-
-/* ── Entry points ── */
+/* Entry points */
 function dismissEmberGoCompat(){
   document.getElementById('ember-match-overlay').classList.remove('show');
   cpMatchId      = emberMatchId;
   cpMatchProfile = emberMatchProf;
   openCompatCheck();
 }
-
 function openCompatCheckFromChat(){
   cpMatchId      = currentMatchId;
   cpMatchProfile = currentMatchProfile;
   openCompatCheck();
 }
-
 function openCompatCheck(){
-  /* Pick 5 random questions */
   var pool = CP_QUESTIONS.slice();
   cpQuestions = [];
   for(var i=0;i<5;i++){
-    var idx = Math.floor(Math.random()*pool.length);
+    var idx=Math.floor(Math.random()*pool.length);
     cpQuestions.push(pool.splice(idx,1)[0]);
   }
-  cpAnswers    = [];
-  cpAlignments = [];
-  cpCurrentQ   = 0;
+  cpAnswers=[]; cpCurrentQ=0; cpSpinning=false;
 
-  var theirName = (cpMatchProfile&&cpMatchProfile.name)||'them';
-  var subEl = document.getElementById('cp-sub');
-  if(subEl) subEl.textContent = 'You and '+theirName+' answer independently';
-  var wnEl = document.getElementById('cp-their-name');
-  if(wnEl) wnEl.textContent = theirName;
+  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
+  var subEl=document.getElementById('cp-sub');
+  if(subEl) subEl.textContent='You and '+name+' answer independently';
+  var wnEl=document.getElementById('cp-their-name');
+  if(wnEl) wnEl.textContent=name;
 
-  /* Reset dots */
   for(var d=0;d<5;d++){
-    var dot = document.getElementById('cp-dot-'+d);
-    if(dot){ dot.classList.remove('done','active'); if(d===0) dot.classList.add('active'); }
+    var dot=document.getElementById('cp-dot-'+d);
+    if(dot){dot.classList.remove('done','active'); if(d===0)dot.classList.add('active');}
   }
 
-  /* Reset phases */
   document.getElementById('cp-question-phase').style.display='flex';
   document.getElementById('cp-waiting-phase').style.display='none';
   document.getElementById('cp-result-overlay').classList.remove('show');
@@ -2934,107 +2937,113 @@ function openCompatCheck(){
   document.getElementById('cp-answer-input').value='';
   document.getElementById('cp-submit').disabled=true;
 
+  /* Show spin button, hide answer */
+  var spinBtn=document.getElementById('cp-spin-btn');
+  if(spinBtn){spinBtn.style.display='block';}
+
+  /* Reset roulette to idle state */
+  var spinLbl=document.getElementById('cp-spin-lbl');
+  if(spinLbl) spinLbl.textContent='Question '+(cpCurrentQ+1)+' of 5';
+  var question=document.getElementById('cp-question');
+  if(question){question.classList.remove('visible');question.textContent='';}
+  var tape=document.getElementById('cp-blur-tape');
+  if(tape){tape.innerHTML='';tape.style.transform='none';}
+
   _show('s-compat','forward');
-  setTimeout(function(){ cpSpinQuestion(0); }, 300);
 }
 
-/* ── Roulette spin ── */
+/* ── Spin button pressed ── */
+function cpDoSpin(){
+  if(cpSpinning)return;
+  cpSpinning=true;
+  var spinBtn=document.getElementById('cp-spin-btn');
+  if(spinBtn){spinBtn.disabled=true;}
+  cpSpinQuestion(cpCurrentQ);
+}
+
+/* ── Proper slot machine spin ── */
 function cpSpinQuestion(qIdx){
-  var roulette  = document.getElementById('cp-roulette');
   var question  = document.getElementById('cp-question');
   var blurTape  = document.getElementById('cp-blur-tape');
   var spinLbl   = document.getElementById('cp-spin-lbl');
   var ansWrap   = document.getElementById('cp-answer-wrap');
   var inp       = document.getElementById('cp-answer-input');
+  var roulette  = document.getElementById('cp-roulette');
 
   question.classList.remove('visible');
   question.textContent='';
   ansWrap.style.display='none';
   inp.value='';
   document.getElementById('cp-submit').disabled=true;
-  spinLbl.textContent='Question '+(qIdx+1)+' of 5';
+  spinLbl.textContent='Spinning...';
 
-  /* Build a tall slot-machine tape — 12 random questions + the real one at the end */
+  /* Build tall tape: 20 random + target question lands at end */
   blurTape.innerHTML='';
-  blurTape.style.display='flex';
-  blurTape.style.flexDirection='column';
-  blurTape.style.gap='18px';
-  blurTape.style.transform='translateY(0)';
-
+  var ITEM_H=52; /* px per slot item */
   var pool2=CP_QUESTIONS.filter(function(q){return q!==cpQuestions[qIdx];});
-  var tapeItems=[];
-  for(var b=0;b<12;b++){
-    var bi=document.createElement('div');
-    bi.className='cp-blur-item';
-    bi.textContent=pool2[Math.floor(Math.random()*pool2.length)];
-    blurTape.appendChild(bi);
-    tapeItems.push(bi);
-  }
-  /* Final item is the real question — slightly different style */
-  var finalItem=document.createElement('div');
-  finalItem.className='cp-blur-item';
-  finalItem.style.filter='blur(0px)';
-  finalItem.style.opacity='0.9';
-  finalItem.style.fontSize='18px';
-  finalItem.textContent=cpQuestions[qIdx];
-  blurTape.appendChild(finalItem);
 
-  var itemHeight=42; /* px per item including gap */
-  var totalItems=tapeItems.length+1;
-  var finalY=-(totalItems-1)*itemHeight; /* scroll so last item is centred */
-
-  if(!_reducedMotion){
-    /* Phase 1: fast spin (items blur past) */
-    gsap.to(blurTape,{
-      y: finalY * 0.6,
-      duration: 1.2,
-      ease: 'power1.in',
-      onUpdate: function(){
-        /* Progressively blur items as they scroll past */
-        var progress=this.progress();
-        tapeItems.forEach(function(item,i){
-          item.style.filter='blur('+(2+progress*3)+'px)';
-          item.style.opacity=Math.max(0.1,0.4-progress*0.3);
-        });
-      },
-      onComplete: function(){
-        /* Phase 2: slow down and snap to final question */
-        gsap.to(blurTape,{
-          y: finalY,
-          duration: 0.9,
-          ease: 'power3.out',
-          onUpdate: function(){
-            var p=this.progress();
-            finalItem.style.filter='blur('+(2*(1-p))+'px)';
-            finalItem.style.opacity=0.4+(p*0.6);
-          },
-          onComplete: function(){
-            /* Land with a satisfying bounce */
-            blurTape.style.display='none';
-            question.textContent=cpQuestions[qIdx];
-            question.classList.add('visible');
-            gsap.fromTo(roulette,
-              {scale:0.96,borderColor:'rgba(255,140,66,0.5)'},
-              {scale:1,borderColor:'rgba(255,140,66,0.2)',duration:0.4,ease:'back.out(2.5)'}
-            );
-            gsap.fromTo(question,
-              {y:10,opacity:0},
-              {y:0,opacity:1,duration:0.35,ease:'power2.out'}
-            );
-            setTimeout(function(){
-              ansWrap.style.display='block';
-              /* Don't auto-focus — let user scroll first, avoids keyboard jump */
-            }, 250);
-          }
-        });
-      }
-    });
-  } else {
-    blurTape.style.display='none';
-    question.textContent=cpQuestions[qIdx];
-    question.classList.add('visible');
-    ansWrap.style.display='block';
+  /* Each item div */
+  function makeItem(text,highlight){
+    var d=document.createElement('div');
+    d.style.cssText='font-family:Cormorant Garamond,serif;font-size:17px;'
+      +'color:'+(highlight?'#FFB347':'rgba(255,179,71,0.45)')+';'
+      +'text-align:center;padding:0 16px;line-height:1.4;'
+      +'height:'+ITEM_H+'px;display:flex;align-items:center;justify-content:center;'
+      +'width:100%;flex-shrink:0;';
+    d.textContent=text;
+    return d;
   }
+
+  var COUNT=22;
+  for(var b=0;b<COUNT;b++){
+    blurTape.appendChild(makeItem(pool2[Math.floor(Math.random()*pool2.length)],false));
+  }
+  /* Final winning item */
+  var winner=makeItem(cpQuestions[qIdx],true);
+  winner.style.fontSize='20px';
+  winner.style.fontStyle='italic';
+  blurTape.appendChild(winner);
+
+  /* Set tape starting position just below view */
+  var totalItems=COUNT+1;
+  var tapeH=totalItems*ITEM_H;
+  gsap.set(blurTape,{y:ITEM_H*2});
+
+  /* Phase 1 — fast spin */
+  var fastDist=tapeH*0.65;
+  gsap.to(blurTape,{
+    y:-fastDist,
+    duration:1.8,
+    ease:'power2.in',
+    onComplete:function(){
+      /* Phase 2 — slow down to winner */
+      var remainDist=tapeH-fastDist+ITEM_H; /* land winner at centre */
+      gsap.to(blurTape,{
+        y:-(tapeH-ITEM_H/2),
+        duration:2.4,
+        ease:'power4.out',
+        onComplete:function(){
+          /* Winner locked in */
+          spinLbl.textContent='Question '+(qIdx+1)+' of 5';
+          /* Flash the roulette border */
+          gsap.fromTo(roulette,
+            {borderColor:'rgba(255,179,71,0.8)'},
+            {borderColor:'rgba(255,140,66,0.2)',duration:0.8,ease:'power2.out'}
+          );
+          /* Show question text cleanly */
+          question.textContent=cpQuestions[qIdx];
+          question.classList.add('visible');
+          cpSpinning=false;
+          /* Show answer area after brief pause */
+          setTimeout(function(){
+            ansWrap.style.display='block';
+            var spinBtn=document.getElementById('cp-spin-btn');
+            if(spinBtn)spinBtn.style.display='none';
+          },400);
+        }
+      });
+    }
+  });
 }
 
 /* ── Answer submission ── */
@@ -3048,140 +3057,148 @@ function cpSubmitAnswer(){
   if(!val)return;
   cpAnswers.push(val);
 
-  /* Update dot */
   var dot=document.getElementById('cp-dot-'+cpCurrentQ);
   if(dot){dot.classList.remove('active');dot.classList.add('done');}
   cpCurrentQ++;
 
   if(cpCurrentQ<5){
-    /* Activate next dot */
     var nextDot=document.getElementById('cp-dot-'+cpCurrentQ);
     if(nextDot)nextDot.classList.add('active');
     document.getElementById('cp-answer-wrap').style.display='none';
-    setTimeout(function(){cpSpinQuestion(cpCurrentQ);},200);
+    document.getElementById('cp-answer-input').blur(); /* dismiss keyboard */
+
+    /* Update spin button for next question */
+    var spinBtn=document.getElementById('cp-spin-btn');
+    var spinLbl2=document.getElementById('cp-spin-lbl');
+    if(spinBtn){spinBtn.style.display='block';spinBtn.disabled=false;}
+    if(spinLbl2)spinLbl2.textContent='Question '+(cpCurrentQ+1)+' of 5';
+    var q2=document.getElementById('cp-question');
+    if(q2){q2.classList.remove('visible');q2.textContent='';}
+    var tape2=document.getElementById('cp-blur-tape');
+    if(tape2){tape2.innerHTML='';gsap.set(tape2,{y:0});}
+    cpSpinning=false;
   } else {
-    /* All 5 answered — show waiting, then simulate their answers coming in */
+    /* All 5 done */
+    document.getElementById('cp-answer-input').blur();
     document.getElementById('cp-question-phase').style.display='none';
     document.getElementById('cp-waiting-phase').style.display='block';
-    var btnLbl=document.getElementById('cp-submit-lbl');
-    if(btnLbl)btnLbl.textContent='Next question \u2192';
-    /* Simulate partner answers after 2.5s (real: would wait for DB) */
-    setTimeout(function(){cpRevealResults();}, 2500);
+    /* Simulate partner + AI scoring after 2.5s */
+    setTimeout(function(){cpRevealResults();},2500);
   }
 }
 
-/* ── Demo partner answers (until real two-device flow is built) ── */
-var CP_DEMO_ANSWERS = [
-  ["Sprinkles -- jimmies sounds made up","I see both sides honestly","Avocado toast, sorry","Italian, no contest","Yes, obviously","Breakfast, always"],
-  ["Jimmies all day","Hard no on pineapple","Truffle everything","Japanese","No, it is a sausage","Dinner, it is the main event"],
-  ["Neither, just ice cream","Yes and I will not apologize","Macarons","Mexican","It depends on the bread","Lunch, most underrated"],
-  ["Sprinkles","Pineapple is fine if you want it","Cronuts","Thai","No, a sandwich needs two pieces of bread","Brunch counts as breakfast"],
-  ["Jimmies","No pineapple ever","Acai bowls","Vietnamese","It is its own category","Second breakfast"]
+/* ── Demo partner answers ── */
+var CP_DEMO_ANSWERS=[
+  ["Sprinkles -- jimmies is a regional conspiracy","Hard no on pineapple","Cronuts, way too hyped","Italian, always","No it is a sausage in a bun","Breakfast, by a mile"],
+  ["Jimmies all the way","Pineapple is fine if you want it","Avocado toast, sorry","Japanese","Yes obviously","Dinner is the main event"],
+  ["Neither, just plain","I see both sides","Macarons","Mexican","It depends on the bread","Lunch, wildly underrated"],
+  ["Sprinkles","No pineapple ever","Truffle on everything","Vietnamese","It is its own category","Brunch counts as breakfast"],
+  ["Does it matter? Both?","Pineapple belongs on pizza","Acai bowls","Thai","No, a sandwich has two pieces of bread","Second breakfast is real"]
 ];
 
 function cpRevealResults(){
   var demoSet=CP_DEMO_ANSWERS[Math.floor(Math.random()*CP_DEMO_ANSWERS.length)];
-  var theirAnswers=cpQuestions.map(function(q,i){return demoSet[i]||'I would have to think about it';});
-  cpShowResults(theirAnswers);
+  /* Use first 5 answers from demo set, matching question count */
+  var theirAnswers=cpQuestions.map(function(q,i){return demoSet[i]||'I would have to think about that one';});
+  cpScoreWithAI(theirAnswers);
+}
+
+/* ── AI scoring (Option B) ── */
+async function cpScoreWithAI(theirAnswers){
+  /* Show loading state */
+  document.getElementById('cp-waiting-phase').style.display='block';
+  var waitMsg=document.querySelector('.cp-waiting-msg');
+  if(waitMsg) waitMsg.innerHTML='<div style="font-size:28px;margin-bottom:14px;">&#x2728;</div><div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--em-text);margin-bottom:10px;">Reading your answers</div><div class="cp-waiting-dots"><span>&#x25CF;</span><span>&#x25CF;</span><span>&#x25CF;</span></div>';
+
+  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
+  var pairsText=cpQuestions.map(function(q,i){
+    return 'Q: '+q+'\nMe: '+cpAnswers[i]+'\nThem: '+theirAnswers[i];
+  }).join('\n\n');
+
+  var score=null;
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        messages:[{role:'user',content:'Two people on a dating app answered the same 5 questions. Score their compatibility 0-5 based on shared values, personality alignment, and conversational energy -- not just literal answer matching. Return ONLY valid JSON: {"score":number,"title":"short celebratory or honest phrase max 5 words","summary":"one warm honest sentence about what their answers reveal together","q_scores":[0 or 1 for each question]}. Answers:\n\n'+pairsText}]
+      })
+    });
+    var data=await resp.json();
+    var text=data.content[0].text.replace(/```json|```/g,'').trim();
+    score=JSON.parse(text);
+  }catch(err){
+    console.error('[CP SCORE]',err);
+    /* Fallback scoring */
+    var aligned=Math.floor(Math.random()*3)+2;
+    score={score:aligned,title:aligned>=3?'Strong connection':'Different takes',summary:'Your answers show distinct personalities with some interesting common ground.',q_scores:cpQuestions.map(function(_,i){return i<aligned?1:0;})};
+  }
+  cpShowResults(theirAnswers,score);
 }
 
 /* ── Results reveal ── */
-function cpShowResults(theirAnswers){
-  cpAlignments=[];
-  var preview=document.getElementById('cp-answers-preview');
-  preview.innerHTML='';
+function cpShowResults(theirAnswers,aiScore){
+  document.getElementById('cp-waiting-phase').style.display='none';
+  document.getElementById('cp-question-phase').style.display='none';
 
+  var score=aiScore.score||0;
+  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
+
+  /* Score ring */
+  document.getElementById('cp-score-num').textContent=score;
+  var ring=document.getElementById('cp-score-ring');
+  if(score>=3){ring.style.borderColor='var(--em-glow)';ring.style.boxShadow='0 0 28px rgba(255,179,71,0.35)';}
+  else{ring.style.borderColor='rgba(255,255,255,0.2)';ring.style.boxShadow='none';}
+
+  document.getElementById('cp-result-title').textContent=aiScore.title||'Results in';
+  document.getElementById('cp-result-sub').textContent=aiScore.summary||'You both answered. See how you compare.';
+
+  /* Show answers side by side */
+  var preview=document.getElementById('cp-answers-preview');
+  preview.innerHTML='<div style="display:flex;gap:6px;margin-bottom:8px;"><div style="flex:1;font-size:10px;color:var(--em-glow);letter-spacing:1px;text-align:center;">YOU</div><div style="flex:1;font-size:10px;color:var(--em-dim);letter-spacing:1px;text-align:center;">'+name.toUpperCase()+'</div></div>';
   cpQuestions.forEach(function(q,i){
-    var myA=cpAnswers[i]||'';
-    var theirA=theirAnswers[i]||'';
+    var aligned=aiScore.q_scores&&aiScore.q_scores[i]===1;
     var row=document.createElement('div');
     row.className='cp-ans-row';
+    row.style.borderLeft=aligned?'2px solid rgba(255,179,71,0.5)':'2px solid transparent';
+    row.style.paddingLeft='8px';
     row.innerHTML=
-      '<div class="cp-ans-q">'+q+'</div>'+
+      '<div class="cp-ans-q">'+(aligned?'&#x2746; ':'')+q+'</div>'+
       '<div class="cp-ans-both">'+
-        '<div class="cp-ans-me">'+escapeHtml(myA)+'</div>'+
-        '<div class="cp-ans-them">'+escapeHtml(theirA)+'</div>'+
-      '</div>'+
-      '<div class="cp-align-tap">'+
-        '<button class="cp-align-btn yes" onclick="cpTapAlign('+i+',true,this)">We aligned \u2746</button>'+
-        '<button class="cp-align-btn no"  onclick="cpTapAlign('+i+',false,this)">Different takes</button>'+
+        '<div class="cp-ans-me">'+escapeHtml(cpAnswers[i]||'')+'</div>'+
+        '<div class="cp-ans-them">'+escapeHtml(theirAnswers[i]||'')+'</div>'+
       '</div>';
     preview.appendChild(row);
-    cpAlignments.push(null);
   });
 
-  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
-  document.getElementById('cp-result-eyebrow').textContent='Results are in';
-  document.getElementById('cp-score-num').textContent='?';
-  document.getElementById('cp-result-title').textContent='Tap each answer to score';
-  document.getElementById('cp-result-sub').textContent='You and '+name+' both answered. Mark where you aligned.';
-  document.getElementById('cp-tally-lbl').textContent='Tap each question to mark alignment';
-  document.getElementById('cp-result-chat').style.display='none';
-  document.getElementById('cp-result-anyway').style.display='none';
-  document.getElementById('cp-result-pass').style.display='none';
-
-  document.getElementById('cp-question-phase').style.display='none';
-  document.getElementById('cp-waiting-phase').style.display='none';
-  document.getElementById('cp-result-overlay').classList.add('show');
-}
-
-function cpTapAlign(idx,aligned,btn){
-  cpAlignments[idx]=aligned;
-  /* Update button states */
-  var row=btn.closest('.cp-align-tap');
-  row.querySelectorAll('.cp-align-btn').forEach(function(b){b.classList.remove('sel');});
-  btn.classList.add('sel');
-  cpUpdateScore();
-}
-
-function cpUpdateScore(){
-  var answered=cpAlignments.filter(function(a){return a!==null;}).length;
-  var aligned=cpAlignments.filter(function(a){return a===true;}).length;
-  var scoreEl=document.getElementById('cp-score-num');
-  var titleEl=document.getElementById('cp-result-title');
-  var subEl=document.getElementById('cp-result-sub');
   var tallyEl=document.getElementById('cp-tally-lbl');
+  if(tallyEl)tallyEl.textContent='You aligned on '+score+' out of 5';
+
   var chatBtn=document.getElementById('cp-result-chat');
   var anywayBtn=document.getElementById('cp-result-anyway');
   var passBtn=document.getElementById('cp-result-pass');
-  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
-
-  if(answered<5){
-    scoreEl.textContent=answered>0?aligned+'/'+answered:'?';
-    tallyEl.textContent=(5-answered)+' more to go';
-    chatBtn.style.display='none'; anywayBtn.style.display='none'; passBtn.style.display='none';
-    return;
+  if(score>=3){
+    if(chatBtn)chatBtn.style.display='block';
+    if(anywayBtn)anywayBtn.style.display='none';
+    if(passBtn)passBtn.style.display='none';
+  }else{
+    if(chatBtn)chatBtn.style.display='none';
+    if(anywayBtn)anywayBtn.style.display='block';
+    if(passBtn)passBtn.style.display='block';
   }
 
-  /* All 5 scored */
-  scoreEl.textContent=aligned;
-  var ring=document.getElementById('cp-score-ring');
-  if(aligned>=3){
-    ring.style.borderColor='var(--em-glow)';
-    ring.style.boxShadow='0 0 24px rgba(255,179,71,0.3)';
-    titleEl.textContent=aligned===5?'Perfect match \u2746':aligned===4?'Really strong \u2746':'Good chemistry \u2746';
-    subEl.textContent='You and '+name+' see a lot the same way. The conversation is going to be good.';
-    chatBtn.style.display='block'; chatBtn.textContent='Start chatting \u2192';
-    anywayBtn.style.display='none'; passBtn.style.display='none';
-  } else {
-    ring.style.borderColor='rgba(255,255,255,0.2)';
-    ring.style.boxShadow='none';
-    titleEl.textContent='Different takes';
-    subEl.textContent='You and '+name+' see some things differently. That can make for a great conversation too.';
-    chatBtn.style.display='none';
-    anywayBtn.style.display='block';
-    passBtn.style.display='block';
-  }
-  tallyEl.textContent='You aligned on '+aligned+' out of 5';
+  document.getElementById('cp-result-overlay').classList.add('show');
+  if(navigator.vibrate)navigator.vibrate([20,10,20]);
 }
 
 function cpStartChat(){
   document.getElementById('cp-result-overlay').classList.remove('show');
-  if(cpMatchId&&cpMatchProf){
-    openChat(cpMatchId,cpMatchProfile);
-  } else {
-    openChat(emberMatchId,emberMatchProf);
-  }
+  var mId=cpMatchId||emberMatchId;
+  var mProf=cpMatchProfile||emberMatchProf;
+  if(mId&&mProf){openChat(mId,mProf);}
+  else{navTo('s-matches');}
 }
 function cpPass(){
   document.getElementById('cp-result-overlay').classList.remove('show');
@@ -3938,30 +3955,30 @@ function subscribePresence() {
 
 /* ── iOS KEYBOARD SCROLL FIX ── */
 if(window.visualViewport){
+  var _lastVH = window.visualViewport.height;
   window.visualViewport.addEventListener('resize', function(){
-    var vv = window.visualViewport;
-    /* Chat screen — scroll messages to bottom */
+    var vv  = window.visualViewport;
+    var cur = vv.height;
+
+    /* Chat screen */
     var chatScreen = document.getElementById('s-chat');
     if(chatScreen && chatScreen.classList.contains('active')){
       scrollMsgsToBottom();
     }
-    /* Compat screen — push body down so roulette stays visible */
+
+    /* Compat screen — when keyboard DISMISSES, reset scroll to top */
     var compatScreen = document.getElementById('s-compat');
     if(compatScreen && compatScreen.classList.contains('active')){
-      var body = document.getElementById('cp-body');
-      if(body){
-        /* When keyboard opens, viewport height shrinks — offset the body */
-        var offset = window.innerHeight - vv.height;
-        if(offset > 50){
-          /* Keyboard is open — scroll answer input into view */
-          var ansWrap = document.getElementById('cp-answer-wrap');
-          if(ansWrap) ansWrap.scrollIntoView({behavior:'smooth',block:'nearest'});
-        } else {
-          /* Keyboard closed — reset scroll */
-          body.scrollTop = 0;
-        }
+      var keyboardOpen = cur < _lastVH - 100;
+      if(!keyboardOpen){
+        /* Keyboard just closed — scroll back to top so roulette is visible */
+        var body = document.getElementById('cp-body');
+        if(body) body.scrollTop = 0;
+        /* Also scroll the whole screen back */
+        compatScreen.scrollTop = 0;
       }
     }
+    _lastVH = cur;
   });
 }
 
