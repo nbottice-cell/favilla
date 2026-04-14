@@ -576,12 +576,12 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .cp-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,140,66,0.18);transition:all 0.3s;}
 .cp-dot.done{background:var(--em-glow);}
 .cp-dot.active{background:var(--em-acc);box-shadow:0 0 10px rgba(255,140,66,0.55);}
-.cp-roulette{width:100%;background:var(--em-card);border-radius:20px;border:0.5px solid rgba(255,140,66,0.2);padding:32px 24px 28px;margin-bottom:22px;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.cp-roulette{width:100%;background:var(--em-card);border-radius:20px;border:0.5px solid rgba(255,140,66,0.2);padding:28px 24px;margin-bottom:22px;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 78%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 78%,transparent 100%);}
 .cp-spin-lbl{font-size:9px;color:var(--em-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
-.cp-question{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--em-text);text-align:center;line-height:1.5;font-style:italic;width:100%;opacity:0;transform:translateY(6px);transition:opacity 0.35s,transform 0.35s;}
+.cp-question{font-family:'Cormorant Garamond',serif;font-size:23px;color:var(--em-text);text-align:center;line-height:1.5;font-style:italic;width:100%;opacity:0;transform:translateY(6px);transition:opacity 0.35s,transform 0.35s;}
 .cp-question.visible{opacity:1;transform:translateY(0);}
 .cp-blur-tape{position:absolute;inset:0;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;pointer-events:none;}
-.cp-blur-item{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--em-glow);opacity:0.35;filter:blur(2px);white-space:nowrap;overflow:hidden;max-width:90%;text-align:center;}
+.cp-blur-item{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--em-glow);opacity:0.35;filter:blur(2px);white-space:nowrap;overflow:hidden;max-width:90%;text-align:center;line-height:1.4;}
 .cp-answer-wrap{width:100%;}
 .cp-answer-lbl{font-size:10px;color:var(--em-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;text-align:center;}
 .cp-answer-input{width:100%;background:var(--em-card);border:0.5px solid rgba(255,140,66,0.3);border-radius:14px;padding:14px 16px;font-size:16px;color:var(--em-text);font-family:'Space Grotesk',sans-serif;outline:none;resize:none;min-height:88px;-webkit-appearance:none;}
@@ -2948,37 +2948,85 @@ function cpSpinQuestion(qIdx){
   var inp       = document.getElementById('cp-answer-input');
 
   question.classList.remove('visible');
+  question.textContent='';
   ansWrap.style.display='none';
   inp.value='';
   document.getElementById('cp-submit').disabled=true;
   spinLbl.textContent='Question '+(qIdx+1)+' of 5';
 
-  /* Build blur tape with random questions cycling */
+  /* Build a tall slot-machine tape — 12 random questions + the real one at the end */
   blurTape.innerHTML='';
   blurTape.style.display='flex';
-  var blurItems=[];
+  blurTape.style.flexDirection='column';
+  blurTape.style.gap='18px';
+  blurTape.style.transform='translateY(0)';
+
   var pool2=CP_QUESTIONS.filter(function(q){return q!==cpQuestions[qIdx];});
-  for(var b=0;b<5;b++){
+  var tapeItems=[];
+  for(var b=0;b<12;b++){
     var bi=document.createElement('div');
     bi.className='cp-blur-item';
     bi.textContent=pool2[Math.floor(Math.random()*pool2.length)];
     blurTape.appendChild(bi);
-    blurItems.push(bi);
+    tapeItems.push(bi);
   }
+  /* Final item is the real question — slightly different style */
+  var finalItem=document.createElement('div');
+  finalItem.className='cp-blur-item';
+  finalItem.style.filter='blur(0px)';
+  finalItem.style.opacity='0.9';
+  finalItem.style.fontSize='18px';
+  finalItem.textContent=cpQuestions[qIdx];
+  blurTape.appendChild(finalItem);
 
-  /* GSAP spin animation */
-  var totalDuration=1.4;
+  var itemHeight=42; /* px per item including gap */
+  var totalItems=tapeItems.length+1;
+  var finalY=-(totalItems-1)*itemHeight; /* scroll so last item is centred */
+
   if(!_reducedMotion){
-    gsap.fromTo(blurTape,{y:0},{y:-220,duration:totalDuration,ease:'power2.in',
-      onComplete:function(){
-        blurTape.style.display='none';
-        question.textContent=cpQuestions[qIdx];
-        question.classList.add('visible');
-        gsap.fromTo(roulette,{scale:0.97},{scale:1,duration:0.25,ease:'back.out(2)'});
-        setTimeout(function(){
-          ansWrap.style.display='block';
-          inp.focus();
-        }, 200);
+    /* Phase 1: fast spin (items blur past) */
+    gsap.to(blurTape,{
+      y: finalY * 0.6,
+      duration: 1.2,
+      ease: 'power1.in',
+      onUpdate: function(){
+        /* Progressively blur items as they scroll past */
+        var progress=this.progress();
+        tapeItems.forEach(function(item,i){
+          item.style.filter='blur('+(2+progress*3)+'px)';
+          item.style.opacity=Math.max(0.1,0.4-progress*0.3);
+        });
+      },
+      onComplete: function(){
+        /* Phase 2: slow down and snap to final question */
+        gsap.to(blurTape,{
+          y: finalY,
+          duration: 0.9,
+          ease: 'power3.out',
+          onUpdate: function(){
+            var p=this.progress();
+            finalItem.style.filter='blur('+(2*(1-p))+'px)';
+            finalItem.style.opacity=0.4+(p*0.6);
+          },
+          onComplete: function(){
+            /* Land with a satisfying bounce */
+            blurTape.style.display='none';
+            question.textContent=cpQuestions[qIdx];
+            question.classList.add('visible');
+            gsap.fromTo(roulette,
+              {scale:0.96,borderColor:'rgba(255,140,66,0.5)'},
+              {scale:1,borderColor:'rgba(255,140,66,0.2)',duration:0.4,ease:'back.out(2.5)'}
+            );
+            gsap.fromTo(question,
+              {y:10,opacity:0},
+              {y:0,opacity:1,duration:0.35,ease:'power2.out'}
+            );
+            setTimeout(function(){
+              ansWrap.style.display='block';
+              /* Don't auto-focus — let user scroll first, avoids keyboard jump */
+            }, 250);
+          }
+        });
       }
     });
   } else {
@@ -2986,7 +3034,6 @@ function cpSpinQuestion(qIdx){
     question.textContent=cpQuestions[qIdx];
     question.classList.add('visible');
     ansWrap.style.display='block';
-    inp.focus();
   }
 }
 
@@ -3892,12 +3939,41 @@ function subscribePresence() {
 /* ── iOS KEYBOARD SCROLL FIX ── */
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize', function(){
+    var vv = window.visualViewport;
+    /* Chat screen — scroll messages to bottom */
     var chatScreen = document.getElementById('s-chat');
     if(chatScreen && chatScreen.classList.contains('active')){
       scrollMsgsToBottom();
     }
+    /* Compat screen — push body down so roulette stays visible */
+    var compatScreen = document.getElementById('s-compat');
+    if(compatScreen && compatScreen.classList.contains('active')){
+      var body = document.getElementById('cp-body');
+      if(body){
+        /* When keyboard opens, viewport height shrinks — offset the body */
+        var offset = window.innerHeight - vv.height;
+        if(offset > 50){
+          /* Keyboard is open — scroll answer input into view */
+          var ansWrap = document.getElementById('cp-answer-wrap');
+          if(ansWrap) ansWrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+        } else {
+          /* Keyboard closed — reset scroll */
+          body.scrollTop = 0;
+        }
+      }
+    }
   });
 }
+
+/* Dismiss keyboard on compat screen when tapping outside textarea */
+document.addEventListener('touchstart', function(e){
+  var compatScreen = document.getElementById('s-compat');
+  if(!compatScreen || !compatScreen.classList.contains('active')) return;
+  var inp = document.getElementById('cp-answer-input');
+  if(inp && !inp.contains(e.target) && document.activeElement === inp){
+    inp.blur();
+  }
+}, {passive:true});
 
 window.addEventListener('beforeunload', async () => {
   if (currentCheckInId) {
