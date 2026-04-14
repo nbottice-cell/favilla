@@ -562,6 +562,88 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .map-heat-bar-fill{height:6px;border-radius:3px;transition:width 0.6s ease;}
 .map-heat-venue{font-size:11px;color:var(--cr-dim);min-width:100px;}
 
+
+/* ═══════════════════════════════════
+   COMPATIBILITY CHECK + AI SCORE
+═══════════════════════════════════ */
+#s-compat{background:var(--em-bg);padding-top:0;display:flex;flex-direction:column;overflow:hidden;}
+.cp-hdr{background:var(--em-hdr);padding:14px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,140,66,0.15);flex-shrink:0;}
+.cp-hdr-info{flex:1;}
+.cp-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--em-text);font-weight:600;}
+.cp-sub{font-size:11px;color:var(--em-dim);margin-top:2px;}
+.cp-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center;padding:28px 24px 16px;}
+.cp-dots{display:flex;gap:8px;margin-bottom:32px;}
+.cp-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,140,66,0.18);transition:all 0.3s;}
+.cp-dot.done{background:var(--em-glow);}
+.cp-dot.active{background:var(--em-acc);box-shadow:0 0 10px rgba(255,140,66,0.55);}
+.cp-roulette{width:100%;background:var(--em-card);border-radius:20px;border:0.5px solid rgba(255,140,66,0.2);padding:32px 24px 28px;margin-bottom:22px;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.cp-spin-lbl{font-size:9px;color:var(--em-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
+.cp-question{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--em-text);text-align:center;line-height:1.5;font-style:italic;width:100%;opacity:0;transform:translateY(6px);transition:opacity 0.35s,transform 0.35s;}
+.cp-question.visible{opacity:1;transform:translateY(0);}
+.cp-blur-tape{position:absolute;inset:0;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;pointer-events:none;}
+.cp-blur-item{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--em-glow);opacity:0.35;filter:blur(2px);white-space:nowrap;overflow:hidden;max-width:90%;text-align:center;}
+.cp-answer-wrap{width:100%;}
+.cp-answer-lbl{font-size:10px;color:var(--em-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;text-align:center;}
+.cp-answer-input{width:100%;background:var(--em-card);border:0.5px solid rgba(255,140,66,0.3);border-radius:14px;padding:14px 16px;font-size:16px;color:var(--em-text);font-family:'Space Grotesk',sans-serif;outline:none;resize:none;min-height:88px;-webkit-appearance:none;}
+.cp-answer-input:focus{border-color:rgba(255,140,66,0.6);}
+.cp-submit{width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1A1510;cursor:pointer;font-weight:700;margin-top:14px;touch-action:manipulation;}
+.cp-submit:disabled{opacity:0.35;cursor:not-allowed;}
+.cp-waiting-msg{text-align:center;padding:24px 16px;font-size:13px;color:var(--em-dim);line-height:1.8;}
+.cp-waiting-dots span{display:inline-block;animation:emDot 1.4s ease-in-out infinite;font-size:20px;color:var(--em-glow);}
+.cp-waiting-dots span:nth-child(2){animation-delay:0.2s;}
+.cp-waiting-dots span:nth-child(3){animation-delay:0.4s;}
+/* Score reveal */
+.cp-result-overlay{position:absolute;inset:0;background:rgba(26,21,16,0.97);z-index:650;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.cp-result-overlay.show{opacity:1;pointer-events:all;}
+.cp-result-eyebrow{font-size:10px;color:var(--em-glow);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;}
+.cp-score-ring{width:110px;height:110px;border-radius:50%;border:2px solid var(--em-glow);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;}
+.cp-score-num{font-family:'Cormorant Garamond',serif;font-size:48px;color:var(--em-text);line-height:1;font-weight:600;}
+.cp-score-denom{font-size:13px;color:var(--em-dim);}
+.cp-result-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--em-text);font-weight:600;margin-bottom:8px;line-height:1.2;}
+.cp-result-sub{font-size:13px;color:var(--em-dim);line-height:1.8;margin-bottom:20px;}
+.cp-answers-preview{width:100%;background:var(--em-card);border-radius:14px;padding:12px 14px;margin-bottom:20px;text-align:left;}
+.cp-ans-row{margin-bottom:10px;padding-bottom:10px;border-bottom:0.5px solid rgba(255,255,255,0.05);}
+.cp-ans-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.cp-ans-q{font-size:10px;color:var(--em-dim);letter-spacing:0.5px;margin-bottom:4px;}
+.cp-ans-both{display:flex;gap:6px;}
+.cp-ans-me{flex:1;font-size:12px;color:var(--em-text);background:rgba(255,140,66,0.08);border-radius:8px;padding:5px 8px;line-height:1.4;}
+.cp-ans-them{flex:1;font-size:12px;color:var(--em-text);background:rgba(255,255,255,0.04);border-radius:8px;padding:5px 8px;font-style:italic;line-height:1.4;}
+.cp-align-tap{display:flex;gap:8px;margin-top:6px;}
+.cp-align-btn{flex:1;padding:7px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;border:0.5px solid;font-family:'Space Grotesk',sans-serif;touch-action:manipulation;transition:all 0.15s;}
+.cp-align-btn.yes{background:rgba(255,179,71,0.08);border-color:rgba(255,179,71,0.3);color:var(--em-glow);}
+.cp-align-btn.no{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:var(--em-dim);}
+.cp-align-btn.yes.sel{background:rgba(255,179,71,0.25);border-color:var(--em-glow);}
+.cp-align-btn.no.sel{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25);}
+.cp-tally-lbl{font-size:11px;color:var(--em-dim);text-align:center;margin-bottom:12px;}
+.cp-result-chat{width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1A1510;cursor:pointer;font-weight:700;margin-bottom:10px;}
+.cp-result-anyway{width:100%;background:rgba(255,179,71,0.08);border:0.5px solid rgba(255,179,71,0.2);border-radius:28px;padding:14px;font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--em-dim);cursor:pointer;margin-bottom:8px;}
+.cp-result-pass{width:100%;background:transparent;border:none;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:rgba(122,104,88,0.5);cursor:pointer;}
+/* Chat compat badge */
+.ch-compat-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,140,66,0.1);border:0.5px solid rgba(255,140,66,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--em-glow);cursor:pointer;touch-action:manipulation;}
+/* AI score panel sheet */
+.ai-score-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
+.ai-score-overlay.open{opacity:1;pointer-events:all;}
+.ai-score-sheet{width:100%;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,140,66,0.2);padding:0 24px;padding-bottom:max(32px,env(safe-area-inset-bottom,32px));transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);}
+.ai-score-overlay.open .ai-score-sheet{transform:translateY(0);}
+.ai-score-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.1);margin:14px auto 20px;}
+.ai-score-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--em-text);font-weight:600;margin-bottom:4px;}
+.ai-score-sub{font-size:12px;color:var(--em-dim);margin-bottom:20px;line-height:1.6;}
+.ai-big-score{font-family:'Cormorant Garamond',serif;font-size:72px;color:var(--em-glow);font-weight:600;line-height:1;text-align:center;margin-bottom:4px;}
+.ai-score-max{font-size:13px;color:var(--em-dim);text-align:center;margin-bottom:20px;}
+.ai-factors{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.ai-factor-row{display:flex;align-items:center;justify-content:space-between;}
+.ai-factor-lbl{font-size:12px;color:var(--em-dim);}
+.ai-factor-bar-bg{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin:0 12px;overflow:hidden;}
+.ai-factor-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#FF8C42,#FFB347);transition:width 1s ease;}
+.ai-factor-val{font-size:11px;color:var(--em-glow);min-width:28px;text-align:right;}
+.ai-score-note{font-size:11px;color:rgba(122,104,88,0.5);text-align:center;line-height:1.6;margin-bottom:16px;}
+.ai-score-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:0.5px solid rgba(255,255,255,0.05);}
+.ai-toggle-lbl{font-size:13px;color:var(--em-dim);}
+.ai-toggle{width:44px;height:26px;border-radius:13px;background:rgba(255,140,66,0.3);border:none;position:relative;cursor:pointer;transition:background 0.2s;touch-action:manipulation;}
+.ai-toggle.on{background:var(--em-acc);}
+.ai-toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left 0.2s;}
+.ai-toggle.on .ai-toggle-knob{left:21px;}
+
 /* BLIND */
 #s-blind{background:var(--vl-bg);padding-top:0;}
 .bl-hdr{background:var(--vl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(155,95,224,0.14);}
@@ -1349,8 +1431,91 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   <div class="em-mo-name" id="em-mo-name">You both said yes.</div>
   <div class="em-mo-sub" id="em-mo-sub">The conversation starts here.<br>Where it goes is up to you.</div>
   <button class="em-mo-chat" onclick="dismissEmberGoChat()">Start chatting →</button>
+  <button class="em-mo-spot" style="background:rgba(255,179,71,0.06);border-color:rgba(255,179,71,0.25);margin-bottom:10px;" onclick="dismissEmberGoCompat()">&#x2728; See if you click first</button>
   <button class="em-mo-spot" onclick="dismissEmberGoSpot()">🗺 Find a spot to meet</button>
   <button class="em-mo-later" onclick="dismissEmberMaybeLater()">Maybe later — keep browsing</button>
+</div>
+
+
+<!-- ═══════════ COMPATIBILITY CHECK ═══════════ -->
+<div class="screen" id="s-compat">
+  <div class="cp-hdr">
+    <button class="bk-btn" onclick="goBack()">&#8592;</button>
+    <div class="cp-hdr-info">
+      <div class="cp-title">See if you click</div>
+      <div class="cp-sub" id="cp-sub">5 questions &mdash; answered independently</div>
+    </div>
+  </div>
+  <div class="cp-body" id="cp-body">
+    <!-- Question phase -->
+    <div id="cp-question-phase" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+      <div class="cp-dots" id="cp-dots">
+        <div class="cp-dot active" id="cp-dot-0"></div>
+        <div class="cp-dot" id="cp-dot-1"></div>
+        <div class="cp-dot" id="cp-dot-2"></div>
+        <div class="cp-dot" id="cp-dot-3"></div>
+        <div class="cp-dot" id="cp-dot-4"></div>
+      </div>
+      <div class="cp-roulette" id="cp-roulette">
+        <div class="cp-spin-lbl" id="cp-spin-lbl">Question spinning&#x2026;</div>
+        <div class="cp-blur-tape" id="cp-blur-tape"></div>
+        <div class="cp-question" id="cp-question"></div>
+      </div>
+      <div class="cp-answer-wrap" id="cp-answer-wrap" style="display:none;">
+        <div class="cp-answer-lbl">Your answer</div>
+        <textarea class="cp-answer-input" id="cp-answer-input" placeholder="Type your answer&#x2026;" rows="3" oninput="cpCheckSubmit()"></textarea>
+        <button class="cp-submit" id="cp-submit" onclick="cpSubmitAnswer()" disabled>
+          <span id="cp-submit-lbl">Next question &#x2192;</span>
+        </button>
+      </div>
+    </div>
+    <!-- Waiting phase -->
+    <div id="cp-waiting-phase" style="display:none;width:100%;">
+      <div class="cp-waiting-msg">
+        <div style="font-size:32px;margin-bottom:14px;">&#x1F525;</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--em-text);margin-bottom:10px;">Answers sent</div>
+        <div>Waiting for <span id="cp-their-name">them</span> to finish&#x2026;</div>
+        <div class="cp-waiting-dots" style="margin-top:16px;"><span>&#x25CF;</span><span>&#x25CF;</span><span>&#x25CF;</span></div>
+      </div>
+    </div>
+  </div>
+  <!-- Score result overlay — sits inside screen -->
+  <div class="cp-result-overlay" id="cp-result-overlay">
+    <div class="cp-result-eyebrow">Results are in</div>
+    <div class="cp-score-ring" id="cp-score-ring">
+      <div class="cp-score-num" id="cp-score-num">0</div>
+      <div class="cp-score-denom">out of 5</div>
+    </div>
+    <div class="cp-result-title" id="cp-result-title">Finding out&#x2026;</div>
+    <div class="cp-result-sub" id="cp-result-sub"></div>
+    <div class="cp-answers-preview" id="cp-answers-preview"></div>
+    <div class="cp-tally-lbl" id="cp-tally-lbl"></div>
+    <button class="cp-result-chat" id="cp-result-chat" onclick="cpStartChat()">Start chatting &#x2192;</button>
+    <button class="cp-result-anyway" id="cp-result-anyway" onclick="cpStartChat()" style="display:none;">Chat anyway &#x2014; differences make it interesting</button>
+    <button class="cp-result-pass" id="cp-result-pass" onclick="cpPass()" style="display:none;">Keep browsing instead</button>
+  </div>
+</div>
+
+<!-- AI SCORE PANEL -->
+<div class="ai-score-overlay" id="ai-score-overlay" onclick="closeAIScore(event)">
+  <div class="ai-score-sheet">
+    <div class="ai-score-handle"></div>
+    <div class="ai-score-title">Compatibility Score</div>
+    <div class="ai-score-sub" id="ai-score-sub">Based on your conversations, response patterns, and shared interests.</div>
+    <div class="ai-big-score" id="ai-big-score">&#x2014;</div>
+    <div class="ai-score-max">out of 100</div>
+    <div class="ai-factors" id="ai-factors">
+      <div class="ai-factor-row"><div class="ai-factor-lbl">Conversational energy</div><div class="ai-factor-bar-bg"><div class="ai-factor-fill" style="width:0%"></div></div><div class="ai-factor-val">&#x2014;</div></div>
+      <div class="ai-factor-row"><div class="ai-factor-lbl">Questions asked</div><div class="ai-factor-bar-bg"><div class="ai-factor-fill" style="width:0%"></div></div><div class="ai-factor-val">&#x2014;</div></div>
+      <div class="ai-factor-row"><div class="ai-factor-lbl">Response time</div><div class="ai-factor-bar-bg"><div class="ai-factor-fill" style="width:0%"></div></div><div class="ai-factor-val">&#x2014;</div></div>
+      <div class="ai-factor-row"><div class="ai-factor-lbl">Shared interests</div><div class="ai-factor-bar-bg"><div class="ai-factor-fill" style="width:0%"></div></div><div class="ai-factor-val">&#x2014;</div></div>
+    </div>
+    <div class="ai-score-note" id="ai-score-note">Updates every 10 messages. Score improves as you talk more.</div>
+    <div class="ai-score-toggle-row">
+      <div class="ai-toggle-lbl">AI Compatibility Insights</div>
+      <button class="ai-toggle on" id="ai-score-toggle" onclick="toggleAIScore()"><div class="ai-toggle-knob"></div></button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════ MUTUAL SPOT ═══════════ -->
@@ -2673,6 +2838,383 @@ function checkInFromVenue(venueId,venueName){
 
 /* ── Boot when switching to Ember tab ── */
 const _origNavTo=navTo;
+
+
+/* ═══════════════════════════════════════════════════
+   COMPATIBILITY CHECK + AI SCORE
+═══════════════════════════════════════════════════ */
+
+const CP_QUESTIONS = [
+  "Jimmies or sprinkles?",
+  "Pineapple on pizza -- where do you stand?",
+  "What is a food everyone loves that you find overrated?",
+  "You can only eat one cuisine for the rest of your life, what are you choosing?",
+  "Is a hot dog a sandwich?",
+  "What is the most underrated meal of the day?",
+  "You find $50 on the ground outside a busy restaurant -- what do you do?",
+  "It is 2am and you are wide awake -- what are you doing?",
+  "What is something you own that you would never let someone borrow?",
+  "A stranger compliments your outfit -- what is your first reaction?",
+  "You are at a party where you know nobody -- what is your first move?",
+  "What is the last thing you googled that you would be embarrassed to admit?",
+  "What is a hill you will absolutely die on that most people find ridiculous?",
+  "Do you think people can genuinely change?",
+  "What is something you were wrong about for way too long?",
+  "What is a small weird thing that genuinely makes your day better?",
+  "Is being early the same as being on time?",
+  "What is something you do differently from everyone you know?",
+  "What is the most spontaneous thing you have actually done?",
+  "What is a place you have been that felt like it was made for you?",
+  "Describe the best meal you have ever had in one sentence.",
+  "What is something you tried once and immediately knew was not for you?",
+  "What is a compliment you received that you still think about?",
+  "What is the last thing that made you laugh embarrassingly hard?",
+  "Text or call?",
+  "Museum on a rainy day or drive with no destination?",
+  "Cook together or go out -- on a third date?",
+  "Window seat or aisle?",
+  "Do you make your bed every morning?",
+  "What is the last song you listened to on purpose?"
+];
+
+/* State */
+var cpMatchId      = null;
+var cpMatchProfile = null;
+var cpQuestions    = [];
+var cpAnswers      = [];
+var cpCurrentQ     = 0;
+var cpAlignments   = [];
+var cpSpinTimer    = null;
+var aiScoreEnabled = true;
+var currentAIScore = null;
+
+/* ── Entry points ── */
+function dismissEmberGoCompat(){
+  document.getElementById('ember-match-overlay').classList.remove('show');
+  cpMatchId      = emberMatchId;
+  cpMatchProfile = emberMatchProf;
+  openCompatCheck();
+}
+
+function openCompatCheckFromChat(){
+  cpMatchId      = currentMatchId;
+  cpMatchProfile = currentMatchProfile;
+  openCompatCheck();
+}
+
+function openCompatCheck(){
+  /* Pick 5 random questions */
+  var pool = CP_QUESTIONS.slice();
+  cpQuestions = [];
+  for(var i=0;i<5;i++){
+    var idx = Math.floor(Math.random()*pool.length);
+    cpQuestions.push(pool.splice(idx,1)[0]);
+  }
+  cpAnswers    = [];
+  cpAlignments = [];
+  cpCurrentQ   = 0;
+
+  var theirName = (cpMatchProfile&&cpMatchProfile.name)||'them';
+  var subEl = document.getElementById('cp-sub');
+  if(subEl) subEl.textContent = 'You and '+theirName+' answer independently';
+  var wnEl = document.getElementById('cp-their-name');
+  if(wnEl) wnEl.textContent = theirName;
+
+  /* Reset dots */
+  for(var d=0;d<5;d++){
+    var dot = document.getElementById('cp-dot-'+d);
+    if(dot){ dot.classList.remove('done','active'); if(d===0) dot.classList.add('active'); }
+  }
+
+  /* Reset phases */
+  document.getElementById('cp-question-phase').style.display='flex';
+  document.getElementById('cp-waiting-phase').style.display='none';
+  document.getElementById('cp-result-overlay').classList.remove('show');
+  document.getElementById('cp-answer-wrap').style.display='none';
+  document.getElementById('cp-answer-input').value='';
+  document.getElementById('cp-submit').disabled=true;
+
+  _show('s-compat','forward');
+  setTimeout(function(){ cpSpinQuestion(0); }, 300);
+}
+
+/* ── Roulette spin ── */
+function cpSpinQuestion(qIdx){
+  var roulette  = document.getElementById('cp-roulette');
+  var question  = document.getElementById('cp-question');
+  var blurTape  = document.getElementById('cp-blur-tape');
+  var spinLbl   = document.getElementById('cp-spin-lbl');
+  var ansWrap   = document.getElementById('cp-answer-wrap');
+  var inp       = document.getElementById('cp-answer-input');
+
+  question.classList.remove('visible');
+  ansWrap.style.display='none';
+  inp.value='';
+  document.getElementById('cp-submit').disabled=true;
+  spinLbl.textContent='Question '+(qIdx+1)+' of 5';
+
+  /* Build blur tape with random questions cycling */
+  blurTape.innerHTML='';
+  blurTape.style.display='flex';
+  var blurItems=[];
+  var pool2=CP_QUESTIONS.filter(function(q){return q!==cpQuestions[qIdx];});
+  for(var b=0;b<5;b++){
+    var bi=document.createElement('div');
+    bi.className='cp-blur-item';
+    bi.textContent=pool2[Math.floor(Math.random()*pool2.length)];
+    blurTape.appendChild(bi);
+    blurItems.push(bi);
+  }
+
+  /* GSAP spin animation */
+  var totalDuration=1.4;
+  if(!_reducedMotion){
+    gsap.fromTo(blurTape,{y:0},{y:-220,duration:totalDuration,ease:'power2.in',
+      onComplete:function(){
+        blurTape.style.display='none';
+        question.textContent=cpQuestions[qIdx];
+        question.classList.add('visible');
+        gsap.fromTo(roulette,{scale:0.97},{scale:1,duration:0.25,ease:'back.out(2)'});
+        setTimeout(function(){
+          ansWrap.style.display='block';
+          inp.focus();
+        }, 200);
+      }
+    });
+  } else {
+    blurTape.style.display='none';
+    question.textContent=cpQuestions[qIdx];
+    question.classList.add('visible');
+    ansWrap.style.display='block';
+    inp.focus();
+  }
+}
+
+/* ── Answer submission ── */
+function cpCheckSubmit(){
+  var val=document.getElementById('cp-answer-input').value.trim();
+  document.getElementById('cp-submit').disabled=val.length<2;
+}
+
+function cpSubmitAnswer(){
+  var val=document.getElementById('cp-answer-input').value.trim();
+  if(!val)return;
+  cpAnswers.push(val);
+
+  /* Update dot */
+  var dot=document.getElementById('cp-dot-'+cpCurrentQ);
+  if(dot){dot.classList.remove('active');dot.classList.add('done');}
+  cpCurrentQ++;
+
+  if(cpCurrentQ<5){
+    /* Activate next dot */
+    var nextDot=document.getElementById('cp-dot-'+cpCurrentQ);
+    if(nextDot)nextDot.classList.add('active');
+    document.getElementById('cp-answer-wrap').style.display='none';
+    setTimeout(function(){cpSpinQuestion(cpCurrentQ);},200);
+  } else {
+    /* All 5 answered — show waiting, then simulate their answers coming in */
+    document.getElementById('cp-question-phase').style.display='none';
+    document.getElementById('cp-waiting-phase').style.display='block';
+    var btnLbl=document.getElementById('cp-submit-lbl');
+    if(btnLbl)btnLbl.textContent='Next question \u2192';
+    /* Simulate partner answers after 2.5s (real: would wait for DB) */
+    setTimeout(function(){cpRevealResults();}, 2500);
+  }
+}
+
+/* ── Demo partner answers (until real two-device flow is built) ── */
+var CP_DEMO_ANSWERS = [
+  ["Sprinkles -- jimmies sounds made up","I see both sides honestly","Avocado toast, sorry","Italian, no contest","Yes, obviously","Breakfast, always"],
+  ["Jimmies all day","Hard no on pineapple","Truffle everything","Japanese","No, it is a sausage","Dinner, it is the main event"],
+  ["Neither, just ice cream","Yes and I will not apologize","Macarons","Mexican","It depends on the bread","Lunch, most underrated"],
+  ["Sprinkles","Pineapple is fine if you want it","Cronuts","Thai","No, a sandwich needs two pieces of bread","Brunch counts as breakfast"],
+  ["Jimmies","No pineapple ever","Acai bowls","Vietnamese","It is its own category","Second breakfast"]
+];
+
+function cpRevealResults(){
+  var demoSet=CP_DEMO_ANSWERS[Math.floor(Math.random()*CP_DEMO_ANSWERS.length)];
+  var theirAnswers=cpQuestions.map(function(q,i){return demoSet[i]||'I would have to think about it';});
+  cpShowResults(theirAnswers);
+}
+
+/* ── Results reveal ── */
+function cpShowResults(theirAnswers){
+  cpAlignments=[];
+  var preview=document.getElementById('cp-answers-preview');
+  preview.innerHTML='';
+
+  cpQuestions.forEach(function(q,i){
+    var myA=cpAnswers[i]||'';
+    var theirA=theirAnswers[i]||'';
+    var row=document.createElement('div');
+    row.className='cp-ans-row';
+    row.innerHTML=
+      '<div class="cp-ans-q">'+q+'</div>'+
+      '<div class="cp-ans-both">'+
+        '<div class="cp-ans-me">'+escapeHtml(myA)+'</div>'+
+        '<div class="cp-ans-them">'+escapeHtml(theirA)+'</div>'+
+      '</div>'+
+      '<div class="cp-align-tap">'+
+        '<button class="cp-align-btn yes" onclick="cpTapAlign('+i+',true,this)">We aligned \u2746</button>'+
+        '<button class="cp-align-btn no"  onclick="cpTapAlign('+i+',false,this)">Different takes</button>'+
+      '</div>';
+    preview.appendChild(row);
+    cpAlignments.push(null);
+  });
+
+  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
+  document.getElementById('cp-result-eyebrow').textContent='Results are in';
+  document.getElementById('cp-score-num').textContent='?';
+  document.getElementById('cp-result-title').textContent='Tap each answer to score';
+  document.getElementById('cp-result-sub').textContent='You and '+name+' both answered. Mark where you aligned.';
+  document.getElementById('cp-tally-lbl').textContent='Tap each question to mark alignment';
+  document.getElementById('cp-result-chat').style.display='none';
+  document.getElementById('cp-result-anyway').style.display='none';
+  document.getElementById('cp-result-pass').style.display='none';
+
+  document.getElementById('cp-question-phase').style.display='none';
+  document.getElementById('cp-waiting-phase').style.display='none';
+  document.getElementById('cp-result-overlay').classList.add('show');
+}
+
+function cpTapAlign(idx,aligned,btn){
+  cpAlignments[idx]=aligned;
+  /* Update button states */
+  var row=btn.closest('.cp-align-tap');
+  row.querySelectorAll('.cp-align-btn').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');
+  cpUpdateScore();
+}
+
+function cpUpdateScore(){
+  var answered=cpAlignments.filter(function(a){return a!==null;}).length;
+  var aligned=cpAlignments.filter(function(a){return a===true;}).length;
+  var scoreEl=document.getElementById('cp-score-num');
+  var titleEl=document.getElementById('cp-result-title');
+  var subEl=document.getElementById('cp-result-sub');
+  var tallyEl=document.getElementById('cp-tally-lbl');
+  var chatBtn=document.getElementById('cp-result-chat');
+  var anywayBtn=document.getElementById('cp-result-anyway');
+  var passBtn=document.getElementById('cp-result-pass');
+  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
+
+  if(answered<5){
+    scoreEl.textContent=answered>0?aligned+'/'+answered:'?';
+    tallyEl.textContent=(5-answered)+' more to go';
+    chatBtn.style.display='none'; anywayBtn.style.display='none'; passBtn.style.display='none';
+    return;
+  }
+
+  /* All 5 scored */
+  scoreEl.textContent=aligned;
+  var ring=document.getElementById('cp-score-ring');
+  if(aligned>=3){
+    ring.style.borderColor='var(--em-glow)';
+    ring.style.boxShadow='0 0 24px rgba(255,179,71,0.3)';
+    titleEl.textContent=aligned===5?'Perfect match \u2746':aligned===4?'Really strong \u2746':'Good chemistry \u2746';
+    subEl.textContent='You and '+name+' see a lot the same way. The conversation is going to be good.';
+    chatBtn.style.display='block'; chatBtn.textContent='Start chatting \u2192';
+    anywayBtn.style.display='none'; passBtn.style.display='none';
+  } else {
+    ring.style.borderColor='rgba(255,255,255,0.2)';
+    ring.style.boxShadow='none';
+    titleEl.textContent='Different takes';
+    subEl.textContent='You and '+name+' see some things differently. That can make for a great conversation too.';
+    chatBtn.style.display='none';
+    anywayBtn.style.display='block';
+    passBtn.style.display='block';
+  }
+  tallyEl.textContent='You aligned on '+aligned+' out of 5';
+}
+
+function cpStartChat(){
+  document.getElementById('cp-result-overlay').classList.remove('show');
+  if(cpMatchId&&cpMatchProf){
+    openChat(cpMatchId,cpMatchProfile);
+  } else {
+    openChat(emberMatchId,emberMatchProf);
+  }
+}
+function cpPass(){
+  document.getElementById('cp-result-overlay').classList.remove('show');
+  navTo('s-ember');
+}
+
+/* ── AI SCORE ── */
+function openAIScore(){
+  document.getElementById('ai-score-overlay').classList.add('open');
+  if(currentAIScore) renderAIScore(currentAIScore);
+}
+function closeAIScore(e){
+  if(!e||e.target===document.getElementById('ai-score-overlay'))
+    document.getElementById('ai-score-overlay').classList.remove('open');
+}
+function toggleAIScore(){
+  aiScoreEnabled=!aiScoreEnabled;
+  var btn=document.getElementById('ai-score-toggle');
+  if(btn){btn.classList.toggle('on',aiScoreEnabled);}
+  showToastMsg(aiScoreEnabled?'AI Insights on \u2746':'AI Insights turned off');
+}
+
+async function computeAIScore(messages){
+  if(!aiScoreEnabled||!messages||messages.length<6)return;
+  var name=(currentMatchProfile&&currentMatchProfile.name)||'your match';
+  var transcript=messages.slice(-20).map(function(m){
+    return (m.sender_id===currentUser.id?'Me':'Them')+': '+m.content;
+  }).join('\n');
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:300,
+        messages:[{role:'user',content:'Analyse this dating app conversation and return ONLY a JSON object with these fields: {"overall":number 0-100,"energy":number 0-100,"questions":number 0-100,"response_time":number 0-100,"shared_interests":number 0-100,"summary":"one sentence, warm and honest"}. Conversation:\n'+transcript}]
+      })
+    });
+    var data=await resp.json();
+    var text=data.content[0].text.replace(/```json|```/g,'').trim();
+    var score=JSON.parse(text);
+    currentAIScore=score;
+    /* Update badge in chat header */
+    var badge=document.getElementById('ch-compat-badge');
+    var scoreEl=document.getElementById('ch-compat-score');
+    if(badge&&scoreEl){badge.style.display='inline-flex';scoreEl.textContent=score.overall;}
+    renderAIScore(score);
+  }catch(err){console.error('[AI SCORE]',err);}
+}
+
+function renderAIScore(score){
+  var bigEl=document.getElementById('ai-big-score');
+  if(bigEl)bigEl.textContent=score.overall;
+  var subEl=document.getElementById('ai-score-sub');
+  if(subEl&&score.summary)subEl.textContent=score.summary;
+  var fills=document.querySelectorAll('.ai-factor-fill');
+  var vals=document.querySelectorAll('.ai-factor-val');
+  var factors=[score.energy,score.questions,score.response_time,score.shared_interests];
+  factors.forEach(function(v,i){
+    if(fills[i])fills[i].style.width=v+'%';
+    if(vals[i])vals[i].textContent=v;
+  });
+}
+
+/* Hook into loadMessages to trigger AI score after loading */
+var _origLoadMessages=loadMessages;
+async function loadMessages(matchId){
+  await _origLoadMessages(matchId);
+  var msgs=document.querySelectorAll('.msg');
+  if(msgs.length>=10){
+    /* Build simple array for AI from DOM (real: use cached data) */
+    setTimeout(function(){
+      if(currentMatchId) computeAIScore(
+        Array.from(msgs).map(function(m){
+          return{sender_id:m.classList.contains('me')?currentUser.id:'other',content:m.querySelector('.bub')?.textContent||''};
+        })
+      );
+    },1000);
+  }
+}
 
 function scrollMsgsToBottom(){
   var msgs = document.getElementById('chat-msgs');
