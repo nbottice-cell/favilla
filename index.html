@@ -563,64 +563,94 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .map-heat-venue{font-size:11px;color:var(--cr-dim);min-width:100px;}
 
 
+
 /* ═══════════════════════════════════
    COMPATIBILITY CHECK + AI SCORE
 ═══════════════════════════════════ */
-#s-compat{background:var(--em-bg);padding-top:0;display:flex;flex-direction:column;overflow:hidden;}
+/* Fixed-height screen so keyboard never moves layout */
+#s-compat{
+  background:var(--em-bg);
+  padding-top:0;
+  padding-bottom:0!important;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  overflow:hidden;
+  position:relative;
+}
 .cp-hdr{background:var(--em-hdr);padding:14px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,140,66,0.15);flex-shrink:0;}
 .cp-hdr-info{flex:1;}
 .cp-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--em-text);font-weight:600;}
 .cp-sub{font-size:11px;color:var(--em-dim);margin-top:2px;}
-.cp-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center;padding:28px 24px 16px;}
-.cp-dots{display:flex;gap:8px;margin-bottom:32px;}
+/* Scrollable content area — keyboard shrinks this, not the whole screen */
+.cp-body{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:24px 24px 24px;
+}
+.cp-dots{display:flex;gap:8px;margin-bottom:28px;flex-shrink:0;}
 .cp-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,140,66,0.18);transition:all 0.3s;}
 .cp-dot.done{background:var(--em-glow);}
 .cp-dot.active{background:var(--em-acc);box-shadow:0 0 10px rgba(255,140,66,0.55);}
-.cp-roulette{width:100%;background:var(--em-card);border-radius:20px;border:0.5px solid rgba(255,140,66,0.2);padding:28px 24px;margin-bottom:22px;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 78%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 78%,transparent 100%);}
-.cp-spin-lbl{font-size:9px;color:var(--em-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
-.cp-question{font-family:'Cormorant Garamond',serif;font-size:23px;color:var(--em-text);text-align:center;line-height:1.5;font-style:italic;width:100%;opacity:0;transform:translateY(6px);transition:opacity 0.35s,transform 0.35s;}
-.cp-question.visible{opacity:1;transform:translateY(0);}
-.cp-blur-tape{position:absolute;inset:0;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;pointer-events:none;}
-.cp-blur-item{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--em-glow);opacity:0.35;filter:blur(2px);white-space:nowrap;overflow:hidden;max-width:90%;text-align:center;line-height:1.4;}
-.cp-answer-wrap{width:100%;}
+/* Question card */
+.cp-q-card{width:100%;background:var(--em-card);border-radius:20px;border:0.5px solid rgba(255,140,66,0.2);padding:28px 22px 24px;margin-bottom:20px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.cp-q-num{font-size:10px;color:var(--em-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
+.cp-q-text{font-family:'Cormorant Garamond',serif;font-size:23px;color:var(--em-text);text-align:center;line-height:1.5;font-style:italic;opacity:0;transform:translateY(8px);transition:opacity 0.4s,transform 0.4s;}
+.cp-q-text.visible{opacity:1;transform:translateY(0);}
+/* Answer area */
+.cp-answer-wrap{width:100%;flex-shrink:0;}
 .cp-answer-lbl{font-size:10px;color:var(--em-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;text-align:center;}
-.cp-answer-input{width:100%;background:var(--em-card);border:0.5px solid rgba(255,140,66,0.3);border-radius:14px;padding:14px 16px;font-size:16px;color:var(--em-text);font-family:'Space Grotesk',sans-serif;outline:none;resize:none;min-height:88px;-webkit-appearance:none;}
+.cp-answer-input{
+  width:100%;background:var(--em-card);
+  border:0.5px solid rgba(255,140,66,0.3);
+  border-radius:14px;padding:14px 16px;
+  font-size:16px;color:var(--em-text);
+  font-family:'Space Grotesk',sans-serif;
+  outline:none;resize:none;min-height:88px;
+  -webkit-appearance:none;
+  touch-action:manipulation;
+}
 .cp-answer-input:focus{border-color:rgba(255,140,66,0.6);}
-.cp-submit{width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1A1510;cursor:pointer;font-weight:700;margin-top:14px;touch-action:manipulation;}
+.cp-submit{
+  width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);
+  border:none;border-radius:28px;padding:16px;
+  font-family:'Space Grotesk',sans-serif;font-size:15px;
+  color:#1A1510;cursor:pointer;font-weight:700;
+  margin-top:12px;touch-action:manipulation;
+}
 .cp-submit:disabled{opacity:0.35;cursor:not-allowed;}
 .cp-waiting-msg{text-align:center;padding:24px 16px;font-size:13px;color:var(--em-dim);line-height:1.8;}
 .cp-waiting-dots span{display:inline-block;animation:emDot 1.4s ease-in-out infinite;font-size:20px;color:var(--em-glow);}
 .cp-waiting-dots span:nth-child(2){animation-delay:0.2s;}
 .cp-waiting-dots span:nth-child(3){animation-delay:0.4s;}
-/* Score reveal */
-.cp-result-overlay{position:absolute;inset:0;background:rgba(26,21,16,0.97);z-index:650;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+/* Score result overlay */
+.cp-result-overlay{position:absolute;inset:0;background:rgba(26,21,16,0.97);z-index:650;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.4s;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .cp-result-overlay.show{opacity:1;pointer-events:all;}
 .cp-result-eyebrow{font-size:10px;color:var(--em-glow);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;}
 .cp-score-ring{width:110px;height:110px;border-radius:50%;border:2px solid var(--em-glow);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;}
 .cp-score-num{font-family:'Cormorant Garamond',serif;font-size:48px;color:var(--em-text);line-height:1;font-weight:600;}
 .cp-score-denom{font-size:13px;color:var(--em-dim);}
 .cp-result-title{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--em-text);font-weight:600;margin-bottom:8px;line-height:1.2;}
-.cp-result-sub{font-size:13px;color:var(--em-dim);line-height:1.8;margin-bottom:20px;}
-.cp-answers-preview{width:100%;background:var(--em-card);border-radius:14px;padding:12px 14px;margin-bottom:20px;text-align:left;}
+.cp-result-sub{font-size:13px;color:var(--em-dim);line-height:1.8;margin-bottom:16px;}
+.cp-answers-preview{width:100%;background:var(--em-card);border-radius:14px;padding:12px 14px;margin-bottom:16px;text-align:left;}
 .cp-ans-row{margin-bottom:10px;padding-bottom:10px;border-bottom:0.5px solid rgba(255,255,255,0.05);}
 .cp-ans-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
 .cp-ans-q{font-size:10px;color:var(--em-dim);letter-spacing:0.5px;margin-bottom:4px;}
 .cp-ans-both{display:flex;gap:6px;}
 .cp-ans-me{flex:1;font-size:12px;color:var(--em-text);background:rgba(255,140,66,0.08);border-radius:8px;padding:5px 8px;line-height:1.4;}
 .cp-ans-them{flex:1;font-size:12px;color:var(--em-text);background:rgba(255,255,255,0.04);border-radius:8px;padding:5px 8px;font-style:italic;line-height:1.4;}
-.cp-align-tap{display:flex;gap:8px;margin-top:6px;}
-.cp-align-btn{flex:1;padding:7px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;border:0.5px solid;font-family:'Space Grotesk',sans-serif;touch-action:manipulation;transition:all 0.15s;}
-.cp-align-btn.yes{background:rgba(255,179,71,0.08);border-color:rgba(255,179,71,0.3);color:var(--em-glow);}
-.cp-align-btn.no{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:var(--em-dim);}
-.cp-align-btn.yes.sel{background:rgba(255,179,71,0.25);border-color:var(--em-glow);}
-.cp-align-btn.no.sel{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25);}
-.cp-tally-lbl{font-size:11px;color:var(--em-dim);text-align:center;margin-bottom:12px;}
+.cp-tally-lbl{font-size:11px;color:var(--em-dim);text-align:center;margin-bottom:14px;}
 .cp-result-chat{width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);border:none;border-radius:28px;padding:16px;font-family:'Space Grotesk',sans-serif;font-size:15px;color:#1A1510;cursor:pointer;font-weight:700;margin-bottom:10px;}
 .cp-result-anyway{width:100%;background:rgba(255,179,71,0.08);border:0.5px solid rgba(255,179,71,0.2);border-radius:28px;padding:14px;font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--em-dim);cursor:pointer;margin-bottom:8px;}
 .cp-result-pass{width:100%;background:transparent;border:none;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:12px;color:rgba(122,104,88,0.5);cursor:pointer;}
 /* Chat compat badge */
 .ch-compat-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,140,66,0.1);border:0.5px solid rgba(255,140,66,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--em-glow);cursor:pointer;touch-action:manipulation;}
-/* AI score panel sheet */
+/* AI score panel */
 .ai-score-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
 .ai-score-overlay.open{opacity:1;pointer-events:all;}
 .ai-score-sheet{width:100%;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,140,66,0.2);padding:0 24px;padding-bottom:max(32px,env(safe-area-inset-bottom,32px));transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);}
@@ -643,7 +673,35 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .ai-toggle.on{background:var(--em-acc);}
 .ai-toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left 0.2s;}
 .ai-toggle.on .ai-toggle-knob{left:21px;}
-
+/* Icebreaker Roulette */
+.ibr-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.75);z-index:550;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
+.ibr-overlay.open{opacity:1;pointer-events:all;}
+.ibr-sheet{width:100%;background:var(--sl-hdr);border-radius:24px 24px 0 0;border-top:0.5px solid rgba(255,140,66,0.25);padding:0 24px;padding-bottom:max(32px,env(safe-area-inset-bottom,32px));transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);}
+.ibr-overlay.open .ibr-sheet{transform:translateY(0);}
+.ibr-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.1);margin:14px auto 18px;}
+.ibr-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);font-weight:600;text-align:center;margin-bottom:4px;}
+.ibr-sub{font-size:12px;color:var(--ash);text-align:center;margin-bottom:20px;}
+/* Roulette wheel display */
+.ibr-wheel{width:100%;height:130px;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,90,50,0.2);border-radius:16px;overflow:hidden;position:relative;margin-bottom:16px;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 25%,black 75%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,black 25%,black 75%,transparent 100%);}
+.ibr-center-line{position:absolute;left:16px;right:16px;top:calc(50% - 1px);height:1px;background:rgba(255,90,50,0.4);z-index:2;pointer-events:none;}
+.ibr-tape{position:absolute;width:100%;display:flex;flex-direction:column;align-items:center;}
+.ibr-tape-item{height:44px;display:flex;align-items:center;justify-content:center;width:100%;padding:0 16px;font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(255,90,50,0.4);text-align:center;flex-shrink:0;line-height:1.3;}
+.ibr-tape-item.winner{color:var(--cr);font-size:18px;font-style:italic;}
+/* Spin button */
+.ibr-spin-btn{width:100%;background:var(--fl);border:none;border-radius:28px;padding:15px;font-family:'Space Grotesk',sans-serif;font-size:14px;color:#fff;cursor:pointer;font-weight:700;margin-bottom:12px;touch-action:manipulation;}
+.ibr-spin-btn:disabled{opacity:0.4;}
+/* Question card that appears in chat */
+.ibr-chat-card{background:rgba(255,90,50,0.06);border:0.5px solid rgba(255,90,50,0.25);border-radius:16px;padding:14px 16px;margin:6px 0;}
+.ibr-card-lbl{font-size:10px;color:var(--fl-lt);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.ibr-card-q{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--cr);font-style:italic;line-height:1.5;margin-bottom:12px;}
+.ibr-card-answers{display:flex;flex-direction:column;gap:6px;}
+.ibr-card-ans-row{display:flex;gap:8px;align-items:flex-start;}
+.ibr-card-who{font-size:10px;color:var(--ash);min-width:32px;margin-top:3px;text-transform:uppercase;letter-spacing:0.5px;}
+.ibr-card-ans{font-size:13px;color:var(--cr-dim);flex:1;line-height:1.5;}
+.ibr-card-ans.pending{color:var(--ash);font-style:italic;}
+.ibr-answer-input{width:100%;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,90,50,0.2);border-radius:12px;padding:11px 14px;font-size:16px;color:var(--cr-dim);font-family:'Space Grotesk',sans-serif;outline:none;margin-top:8px;-webkit-appearance:none;}
+.ibr-answer-input:focus{border-color:rgba(255,90,50,0.4);}
+.ibr-submit-ans{margin-top:8px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.3);border-radius:20px;padding:9px 20px;font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--fl-lt);cursor:pointer;font-weight:600;touch-action:manipulation;}
 /* BLIND */
 #s-blind{background:var(--vl-bg);padding-top:0;}
 .bl-hdr{background:var(--vl-hdr);padding:16px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid rgba(155,95,224,0.14);}
@@ -1302,7 +1360,8 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   </div>
   <div class="msgs" id="chat-msgs"></div>
   <div class="ch-input-row">
-    <button class="plan-btn" onclick="showDateCard()">📅 Plan a date</button>
+    <button class="plan-btn" onclick="showDateCard()">&#x1F4C5; Plan a date</button>
+    <button class="plan-btn" onclick="openIBR()" style="background:rgba(255,90,50,0.08);border-color:rgba(255,90,50,0.2);">&#x1F3B2; Ice Breaker</button>
     <input class="ch-input" id="ch-input" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendMsg()" onfocus="scrollMsgsToBottom()" oninput="scrollMsgsToBottom()">
     <div class="ch-send" onclick="sendMsg()">↑</div>
   </div>
@@ -1443,11 +1502,10 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     <button class="bk-btn" onclick="goBack()">&#8592;</button>
     <div class="cp-hdr-info">
       <div class="cp-title">See if you click</div>
-      <div class="cp-sub" id="cp-sub">5 questions &mdash; answered independently</div>
+      <div class="cp-sub" id="cp-sub">5 questions &mdash; you both answer the same ones</div>
     </div>
   </div>
   <div class="cp-body" id="cp-body">
-    <!-- Question phase -->
     <div id="cp-question-phase" style="width:100%;display:flex;flex-direction:column;align-items:center;">
       <div class="cp-dots" id="cp-dots">
         <div class="cp-dot active" id="cp-dot-0"></div>
@@ -1456,32 +1514,20 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
         <div class="cp-dot" id="cp-dot-3"></div>
         <div class="cp-dot" id="cp-dot-4"></div>
       </div>
-      <!-- Slot machine window -->
-      <div class="cp-roulette" id="cp-roulette">
-        <div class="cp-spin-lbl" id="cp-spin-lbl">Question spinning&#x2026;</div>
-        <!-- Center target line -->
-        <div style="position:absolute;left:12px;right:12px;top:50%;height:1px;background:rgba(255,179,71,0.3);pointer-events:none;z-index:3;margin-top:-10px;"></div>
-        <div style="position:absolute;left:12px;right:12px;top:50%;height:1px;background:rgba(255,179,71,0.3);pointer-events:none;z-index:3;margin-top:10px;"></div>
-        <!-- Scrolling tape -->
-        <div style="position:absolute;inset:0;overflow:hidden;border-radius:20px;">
-          <div id="cp-blur-tape" class="cp-blur-tape"></div>
-        </div>
-        <!-- Landed question (shown after spin) -->
-        <div class="cp-question" id="cp-question"></div>
+      <div class="cp-q-card" id="cp-q-card">
+        <div class="cp-q-num" id="cp-q-num">Question 1 of 5</div>
+        <div class="cp-q-text" id="cp-question"></div>
       </div>
-      <!-- Spin button (shown before spinning) -->
-      <button class="cp-submit" id="cp-spin-btn" onclick="cpDoSpin()" style="margin-top:0;margin-bottom:16px;">
-        &#x21BB; Spin for question
-      </button>
       <div class="cp-answer-wrap" id="cp-answer-wrap" style="display:none;">
         <div class="cp-answer-lbl">Your answer</div>
-        <textarea class="cp-answer-input" id="cp-answer-input" placeholder="Type your answer&#x2026;" rows="3" oninput="cpCheckSubmit()"></textarea>
+        <textarea class="cp-answer-input" id="cp-answer-input"
+          placeholder="Type your answer&#x2026;" rows="3"
+          oninput="cpCheckSubmit()"></textarea>
         <button class="cp-submit" id="cp-submit" onclick="cpSubmitAnswer()" disabled>
           <span id="cp-submit-lbl">Next question &#x2192;</span>
         </button>
       </div>
     </div>
-    <!-- Waiting phase -->
     <div id="cp-waiting-phase" style="display:none;width:100%;">
       <div class="cp-waiting-msg">
         <div style="font-size:32px;margin-bottom:14px;">&#x1F525;</div>
@@ -1491,7 +1537,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
       </div>
     </div>
   </div>
-  <!-- Score result overlay — sits inside screen -->
   <div class="cp-result-overlay" id="cp-result-overlay">
     <div class="cp-result-eyebrow">Results are in</div>
     <div class="cp-score-ring" id="cp-score-ring">
@@ -1522,11 +1567,26 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
       <div class="ai-factor-row"><div class="ai-factor-lbl">Response time</div><div class="ai-factor-bar-bg"><div class="ai-factor-fill" style="width:0%"></div></div><div class="ai-factor-val">&#x2014;</div></div>
       <div class="ai-factor-row"><div class="ai-factor-lbl">Shared interests</div><div class="ai-factor-bar-bg"><div class="ai-factor-fill" style="width:0%"></div></div><div class="ai-factor-val">&#x2014;</div></div>
     </div>
-    <div class="ai-score-note" id="ai-score-note">Updates every 10 messages. Score improves as you talk more.</div>
+    <div class="ai-score-note" id="ai-score-note">Updates every 10 messages.</div>
     <div class="ai-score-toggle-row">
       <div class="ai-toggle-lbl">AI Compatibility Insights</div>
       <button class="ai-toggle on" id="ai-score-toggle" onclick="toggleAIScore()"><div class="ai-toggle-knob"></div></button>
     </div>
+  </div>
+</div>
+
+<!-- ICEBREAKER ROULETTE OVERLAY -->
+<div class="ibr-overlay" id="ibr-overlay" onclick="closeIBR(event)">
+  <div class="ibr-sheet">
+    <div class="ibr-handle"></div>
+    <div class="ibr-title">Ice Breaker Roulette</div>
+    <div class="ibr-sub">Spin for a question. Both of you answer.</div>
+    <div class="ibr-wheel" id="ibr-wheel">
+      <div class="ibr-center-line"></div>
+      <div class="ibr-tape" id="ibr-tape"></div>
+    </div>
+    <button class="ibr-spin-btn" id="ibr-spin-btn" onclick="ibrSpin()">&#x21BB; Spin</button>
+    <button style="width:100%;background:transparent;border:none;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--ash);cursor:pointer;" onclick="closeIBR()">Cancel</button>
   </div>
 </div>
 
@@ -2863,7 +2923,6 @@ var cpMatchProfile = null;
 var cpQuestions    = [];
 var cpAnswers      = [];
 var cpCurrentQ     = 0;
-var cpSpinning     = false;
 
 const CP_QUESTIONS = [
   "Jimmies or sprinkles?",
@@ -2910,24 +2969,26 @@ function openCompatCheckFromChat(){
   cpMatchProfile = currentMatchProfile;
   openCompatCheck();
 }
+
 function openCompatCheck(){
+  /* Draw 5 questions randomly from pool */
   var pool = CP_QUESTIONS.slice();
   cpQuestions = [];
   for(var i=0;i<5;i++){
     var idx=Math.floor(Math.random()*pool.length);
     cpQuestions.push(pool.splice(idx,1)[0]);
   }
-  cpAnswers=[]; cpCurrentQ=0; cpSpinning=false;
+  cpAnswers=[]; cpCurrentQ=0;
 
   var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
   var subEl=document.getElementById('cp-sub');
-  if(subEl) subEl.textContent='You and '+name+' answer independently';
+  if(subEl) subEl.textContent='You and '+name+' answer the same questions';
   var wnEl=document.getElementById('cp-their-name');
   if(wnEl) wnEl.textContent=name;
 
   for(var d=0;d<5;d++){
     var dot=document.getElementById('cp-dot-'+d);
-    if(dot){dot.classList.remove('done','active'); if(d===0)dot.classList.add('active');}
+    if(dot){dot.classList.remove('done','active');if(d===0)dot.classList.add('active');}
   }
 
   document.getElementById('cp-question-phase').style.display='flex';
@@ -2937,113 +2998,42 @@ function openCompatCheck(){
   document.getElementById('cp-answer-input').value='';
   document.getElementById('cp-submit').disabled=true;
 
-  /* Show spin button, hide answer */
-  var spinBtn=document.getElementById('cp-spin-btn');
-  if(spinBtn){spinBtn.style.display='block';}
-
-  /* Reset roulette to idle state */
-  var spinLbl=document.getElementById('cp-spin-lbl');
-  if(spinLbl) spinLbl.textContent='Question '+(cpCurrentQ+1)+' of 5';
-  var question=document.getElementById('cp-question');
-  if(question){question.classList.remove('visible');question.textContent='';}
-  var tape=document.getElementById('cp-blur-tape');
-  if(tape){tape.innerHTML='';tape.style.transform='none';}
-
   _show('s-compat','forward');
+  /* Show first question with animation after screen transition */
+  setTimeout(function(){ cpShowQuestion(0); }, 350);
 }
 
-/* ── Spin button pressed ── */
-function cpDoSpin(){
-  if(cpSpinning)return;
-  cpSpinning=true;
-  var spinBtn=document.getElementById('cp-spin-btn');
-  if(spinBtn){spinBtn.disabled=true;}
-  cpSpinQuestion(cpCurrentQ);
-}
+function cpShowQuestion(qIdx){
+  var qText  = document.getElementById('cp-question');
+  var qNum   = document.getElementById('cp-q-num');
+  var ansWrap= document.getElementById('cp-answer-wrap');
+  var inp    = document.getElementById('cp-answer-input');
+  var card   = document.getElementById('cp-q-card');
 
-/* ── Proper slot machine spin ── */
-function cpSpinQuestion(qIdx){
-  var question  = document.getElementById('cp-question');
-  var blurTape  = document.getElementById('cp-blur-tape');
-  var spinLbl   = document.getElementById('cp-spin-lbl');
-  var ansWrap   = document.getElementById('cp-answer-wrap');
-  var inp       = document.getElementById('cp-answer-input');
-  var roulette  = document.getElementById('cp-roulette');
-
-  question.classList.remove('visible');
-  question.textContent='';
+  /* Reset */
+  qText.classList.remove('visible');
   ansWrap.style.display='none';
   inp.value='';
   document.getElementById('cp-submit').disabled=true;
-  spinLbl.textContent='Spinning...';
+  if(qNum) qNum.textContent='Question '+(qIdx+1)+' of 5';
 
-  /* Build tall tape: 20 random + target question lands at end */
-  blurTape.innerHTML='';
-  var ITEM_H=52; /* px per slot item */
-  var pool2=CP_QUESTIONS.filter(function(q){return q!==cpQuestions[qIdx];});
-
-  /* Each item div */
-  function makeItem(text,highlight){
-    var d=document.createElement('div');
-    d.style.cssText='font-family:Cormorant Garamond,serif;font-size:17px;'
-      +'color:'+(highlight?'#FFB347':'rgba(255,179,71,0.45)')+';'
-      +'text-align:center;padding:0 16px;line-height:1.4;'
-      +'height:'+ITEM_H+'px;display:flex;align-items:center;justify-content:center;'
-      +'width:100%;flex-shrink:0;';
-    d.textContent=text;
-    return d;
+  /* Animate card in */
+  if(!_reducedMotion){
+    gsap.fromTo(card,
+      {opacity:0,y:12},
+      {opacity:1,y:0,duration:0.35,ease:'power2.out',onComplete:function(){
+        qText.textContent=cpQuestions[qIdx];
+        qText.classList.add('visible');
+        setTimeout(function(){
+          ansWrap.style.display='block';
+        },300);
+      }}
+    );
+  } else {
+    qText.textContent=cpQuestions[qIdx];
+    qText.classList.add('visible');
+    ansWrap.style.display='block';
   }
-
-  var COUNT=22;
-  for(var b=0;b<COUNT;b++){
-    blurTape.appendChild(makeItem(pool2[Math.floor(Math.random()*pool2.length)],false));
-  }
-  /* Final winning item */
-  var winner=makeItem(cpQuestions[qIdx],true);
-  winner.style.fontSize='20px';
-  winner.style.fontStyle='italic';
-  blurTape.appendChild(winner);
-
-  /* Set tape starting position just below view */
-  var totalItems=COUNT+1;
-  var tapeH=totalItems*ITEM_H;
-  gsap.set(blurTape,{y:ITEM_H*2});
-
-  /* Phase 1 — fast spin */
-  var fastDist=tapeH*0.65;
-  gsap.to(blurTape,{
-    y:-fastDist,
-    duration:1.8,
-    ease:'power2.in',
-    onComplete:function(){
-      /* Phase 2 — slow down to winner */
-      var remainDist=tapeH-fastDist+ITEM_H; /* land winner at centre */
-      gsap.to(blurTape,{
-        y:-(tapeH-ITEM_H/2),
-        duration:2.4,
-        ease:'power4.out',
-        onComplete:function(){
-          /* Winner locked in */
-          spinLbl.textContent='Question '+(qIdx+1)+' of 5';
-          /* Flash the roulette border */
-          gsap.fromTo(roulette,
-            {borderColor:'rgba(255,179,71,0.8)'},
-            {borderColor:'rgba(255,140,66,0.2)',duration:0.8,ease:'power2.out'}
-          );
-          /* Show question text cleanly */
-          question.textContent=cpQuestions[qIdx];
-          question.classList.add('visible');
-          cpSpinning=false;
-          /* Show answer area after brief pause */
-          setTimeout(function(){
-            ansWrap.style.display='block';
-            var spinBtn=document.getElementById('cp-spin-btn');
-            if(spinBtn)spinBtn.style.display='none';
-          },400);
-        }
-      });
-    }
-  });
 }
 
 /* ── Answer submission ── */
@@ -3057,6 +3047,10 @@ function cpSubmitAnswer(){
   if(!val)return;
   cpAnswers.push(val);
 
+  /* Dismiss keyboard before transitioning */
+  document.getElementById('cp-answer-input').blur();
+
+  /* Update dot */
   var dot=document.getElementById('cp-dot-'+cpCurrentQ);
   if(dot){dot.classList.remove('active');dot.classList.add('done');}
   cpCurrentQ++;
@@ -3065,24 +3059,14 @@ function cpSubmitAnswer(){
     var nextDot=document.getElementById('cp-dot-'+cpCurrentQ);
     if(nextDot)nextDot.classList.add('active');
     document.getElementById('cp-answer-wrap').style.display='none';
-    document.getElementById('cp-answer-input').blur(); /* dismiss keyboard */
-
-    /* Update spin button for next question */
-    var spinBtn=document.getElementById('cp-spin-btn');
-    var spinLbl2=document.getElementById('cp-spin-lbl');
-    if(spinBtn){spinBtn.style.display='block';spinBtn.disabled=false;}
-    if(spinLbl2)spinLbl2.textContent='Question '+(cpCurrentQ+1)+' of 5';
-    var q2=document.getElementById('cp-question');
-    if(q2){q2.classList.remove('visible');q2.textContent='';}
-    var tape2=document.getElementById('cp-blur-tape');
-    if(tape2){tape2.innerHTML='';gsap.set(tape2,{y:0});}
-    cpSpinning=false;
+    /* Update submit label on last question */
+    var lbl=document.getElementById('cp-submit-lbl');
+    if(lbl)lbl.textContent=cpCurrentQ===4?'Submit answers &#x2192;':'Next question &#x2192;';
+    setTimeout(function(){ cpShowQuestion(cpCurrentQ); },200);
   } else {
     /* All 5 done */
-    document.getElementById('cp-answer-input').blur();
     document.getElementById('cp-question-phase').style.display='none';
     document.getElementById('cp-waiting-phase').style.display='block';
-    /* Simulate partner + AI scoring after 2.5s */
     setTimeout(function(){cpRevealResults();},2500);
   }
 }
@@ -3093,22 +3077,19 @@ var CP_DEMO_ANSWERS=[
   ["Jimmies all the way","Pineapple is fine if you want it","Avocado toast, sorry","Japanese","Yes obviously","Dinner is the main event"],
   ["Neither, just plain","I see both sides","Macarons","Mexican","It depends on the bread","Lunch, wildly underrated"],
   ["Sprinkles","No pineapple ever","Truffle on everything","Vietnamese","It is its own category","Brunch counts as breakfast"],
-  ["Does it matter? Both?","Pineapple belongs on pizza","Acai bowls","Thai","No, a sandwich has two pieces of bread","Second breakfast is real"]
+  ["Does it matter?","Pineapple belongs on pizza","Acai bowls","Thai","No, a sandwich has two pieces of bread","Second breakfast is real"]
 ];
 
 function cpRevealResults(){
   var demoSet=CP_DEMO_ANSWERS[Math.floor(Math.random()*CP_DEMO_ANSWERS.length)];
-  /* Use first 5 answers from demo set, matching question count */
   var theirAnswers=cpQuestions.map(function(q,i){return demoSet[i]||'I would have to think about that one';});
   cpScoreWithAI(theirAnswers);
 }
 
-/* ── AI scoring (Option B) ── */
+/* ── AI scoring ── */
 async function cpScoreWithAI(theirAnswers){
-  /* Show loading state */
-  document.getElementById('cp-waiting-phase').style.display='block';
   var waitMsg=document.querySelector('.cp-waiting-msg');
-  if(waitMsg) waitMsg.innerHTML='<div style="font-size:28px;margin-bottom:14px;">&#x2728;</div><div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--em-text);margin-bottom:10px;">Reading your answers</div><div class="cp-waiting-dots"><span>&#x25CF;</span><span>&#x25CF;</span><span>&#x25CF;</span></div>';
+  if(waitMsg) waitMsg.innerHTML='<div style="font-size:28px;margin-bottom:14px;">&#x2728;</div><div style="font-family:\'Cormorant Garamond\',serif;font-size:20px;color:var(--em-text);margin-bottom:10px;">Reading your answers</div><div class="cp-waiting-dots"><span>&#x25CF;</span><span>&#x25CF;</span><span>&#x25CF;</span></div>';
 
   var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
   var pairsText=cpQuestions.map(function(q,i){
@@ -3123,7 +3104,7 @@ async function cpScoreWithAI(theirAnswers){
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:400,
-        messages:[{role:'user',content:'Two people on a dating app answered the same 5 questions. Score their compatibility 0-5 based on shared values, personality alignment, and conversational energy -- not just literal answer matching. Return ONLY valid JSON: {"score":number,"title":"short celebratory or honest phrase max 5 words","summary":"one warm honest sentence about what their answers reveal together","q_scores":[0 or 1 for each question]}. Answers:\n\n'+pairsText}]
+        messages:[{role:'user',content:'Two people on a dating app answered the same 5 questions. Score their compatibility 0-5 based on shared values, personality alignment, and energy -- not just literal matching. Return ONLY valid JSON: {"score":number,"title":"short phrase max 5 words","summary":"one warm honest sentence about what their answers reveal together","q_scores":[0 or 1 for each question]}. Answers:\n\n'+pairsText}]
       })
     });
     var data=await resp.json();
@@ -3131,14 +3112,12 @@ async function cpScoreWithAI(theirAnswers){
     score=JSON.parse(text);
   }catch(err){
     console.error('[CP SCORE]',err);
-    /* Fallback scoring */
     var aligned=Math.floor(Math.random()*3)+2;
     score={score:aligned,title:aligned>=3?'Strong connection':'Different takes',summary:'Your answers show distinct personalities with some interesting common ground.',q_scores:cpQuestions.map(function(_,i){return i<aligned?1:0;})};
   }
   cpShowResults(theirAnswers,score);
 }
 
-/* ── Results reveal ── */
 function cpShowResults(theirAnswers,aiScore){
   document.getElementById('cp-waiting-phase').style.display='none';
   document.getElementById('cp-question-phase').style.display='none';
@@ -3146,16 +3125,14 @@ function cpShowResults(theirAnswers,aiScore){
   var score=aiScore.score||0;
   var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
 
-  /* Score ring */
   document.getElementById('cp-score-num').textContent=score;
   var ring=document.getElementById('cp-score-ring');
   if(score>=3){ring.style.borderColor='var(--em-glow)';ring.style.boxShadow='0 0 28px rgba(255,179,71,0.35)';}
   else{ring.style.borderColor='rgba(255,255,255,0.2)';ring.style.boxShadow='none';}
 
   document.getElementById('cp-result-title').textContent=aiScore.title||'Results in';
-  document.getElementById('cp-result-sub').textContent=aiScore.summary||'You both answered. See how you compare.';
+  document.getElementById('cp-result-sub').textContent=aiScore.summary||'You both answered.';
 
-  /* Show answers side by side */
   var preview=document.getElementById('cp-answers-preview');
   preview.innerHTML='<div style="display:flex;gap:6px;margin-bottom:8px;"><div style="flex:1;font-size:10px;color:var(--em-glow);letter-spacing:1px;text-align:center;">YOU</div><div style="flex:1;font-size:10px;color:var(--em-dim);letter-spacing:1px;text-align:center;">'+name.toUpperCase()+'</div></div>';
   cpQuestions.forEach(function(q,i){
@@ -3164,30 +3141,17 @@ function cpShowResults(theirAnswers,aiScore){
     row.className='cp-ans-row';
     row.style.borderLeft=aligned?'2px solid rgba(255,179,71,0.5)':'2px solid transparent';
     row.style.paddingLeft='8px';
-    row.innerHTML=
-      '<div class="cp-ans-q">'+(aligned?'&#x2746; ':'')+q+'</div>'+
-      '<div class="cp-ans-both">'+
-        '<div class="cp-ans-me">'+escapeHtml(cpAnswers[i]||'')+'</div>'+
-        '<div class="cp-ans-them">'+escapeHtml(theirAnswers[i]||'')+'</div>'+
-      '</div>';
+    row.innerHTML='<div class="cp-ans-q">'+(aligned?'&#x2746; ':'')+q+'</div>'+'<div class="cp-ans-both">'+'<div class="cp-ans-me">'+escapeHtml(cpAnswers[i]||'')+'</div>'+'<div class="cp-ans-them">'+escapeHtml(theirAnswers[i]||'')+'</div>'+'</div>';
     preview.appendChild(row);
   });
 
-  var tallyEl=document.getElementById('cp-tally-lbl');
-  if(tallyEl)tallyEl.textContent='You aligned on '+score+' out of 5';
+  document.getElementById('cp-tally-lbl').textContent='You aligned on '+score+' out of 5';
 
   var chatBtn=document.getElementById('cp-result-chat');
   var anywayBtn=document.getElementById('cp-result-anyway');
   var passBtn=document.getElementById('cp-result-pass');
-  if(score>=3){
-    if(chatBtn)chatBtn.style.display='block';
-    if(anywayBtn)anywayBtn.style.display='none';
-    if(passBtn)passBtn.style.display='none';
-  }else{
-    if(chatBtn)chatBtn.style.display='none';
-    if(anywayBtn)anywayBtn.style.display='block';
-    if(passBtn)passBtn.style.display='block';
-  }
+  if(score>=3){if(chatBtn)chatBtn.style.display='block';if(anywayBtn)anywayBtn.style.display='none';if(passBtn)passBtn.style.display='none';}
+  else{if(chatBtn)chatBtn.style.display='none';if(anywayBtn)anywayBtn.style.display='block';if(passBtn)passBtn.style.display='block';}
 
   document.getElementById('cp-result-overlay').classList.add('show');
   if(navigator.vibrate)navigator.vibrate([20,10,20]);
@@ -3197,13 +3161,194 @@ function cpStartChat(){
   document.getElementById('cp-result-overlay').classList.remove('show');
   var mId=cpMatchId||emberMatchId;
   var mProf=cpMatchProfile||emberMatchProf;
-  if(mId&&mProf){openChat(mId,mProf);}
-  else{navTo('s-matches');}
+  if(mId&&mProf){openChat(mId,mProf);}else{navTo('s-matches');}
 }
 function cpPass(){
   document.getElementById('cp-result-overlay').classList.remove('show');
   navTo('s-ember');
 }
+
+/* ═══════════════════════════════════
+   ICEBREAKER ROULETTE
+═══════════════════════════════════ */
+var ibrSpinning = false;
+var ibrCurrentQ = null;
+
+const IBR_QUESTIONS = [
+  "Jimmies or sprinkles?",
+  "Pineapple on pizza -- where do you stand?",
+  "What is a food everyone loves that you find overrated?",
+  "Is a hot dog a sandwich?",
+  "What is the most underrated meal of the day?",
+  "You find $50 on the ground outside a busy restaurant -- what do you do?",
+  "It is 2am and you are wide awake -- what are you doing?",
+  "What is something you own that you would never let someone borrow?",
+  "A stranger compliments your outfit -- what is your first reaction?",
+  "You are at a party where you know nobody -- what is your first move?",
+  "What is a hill you will absolutely die on that most people find ridiculous?",
+  "Do you think people can genuinely change?",
+  "What is something you were wrong about for way too long?",
+  "What is a small weird thing that genuinely makes your day better?",
+  "Is being early the same as being on time?",
+  "What is the most spontaneous thing you have actually done?",
+  "What is a place you have been that felt like it was made for you?",
+  "Describe the best meal you have ever had in one sentence.",
+  "What is a compliment you received that you still think about?",
+  "What is the last thing that made you laugh embarrassingly hard?",
+  "Text or call?",
+  "Museum on a rainy day or drive with no destination?",
+  "Cook together or go out -- on a third date?",
+  "Window seat or aisle?",
+  "Do you make your bed every morning?",
+  "What is the last song you listened to on purpose?"
+];
+
+function openIBR(){
+  ibrSpinning=false; ibrCurrentQ=null;
+  var tape=document.getElementById('ibr-tape');
+  if(tape) tape.innerHTML='';
+  var btn=document.getElementById('ibr-spin-btn');
+  if(btn){btn.disabled=false;btn.textContent='\u21BB Spin';}
+  document.getElementById('ibr-overlay').classList.add('open');
+}
+function closeIBR(e){
+  if(!e||e.target===document.getElementById('ibr-overlay'))
+    document.getElementById('ibr-overlay').classList.remove('open');
+}
+
+function ibrSpin(){
+  if(ibrSpinning)return;
+  ibrSpinning=true;
+  var btn=document.getElementById('ibr-spin-btn');
+  if(btn){btn.disabled=true;btn.textContent='Spinning\u2026';}
+
+  var tape=document.getElementById('ibr-tape');
+  tape.innerHTML='';
+  gsap.set(tape,{y:0});
+
+  var ITEM_H=44;
+  var pool=IBR_QUESTIONS.slice();
+  /* Pick winner */
+  var winnerQ=pool[Math.floor(Math.random()*pool.length)];
+  /* Build 18 random items + winner at end */
+  var COUNT=18;
+  for(var b=0;b<COUNT;b++){
+    var d=document.createElement('div');
+    d.className='ibr-tape-item';
+    d.textContent=pool[Math.floor(Math.random()*pool.length)];
+    tape.appendChild(d);
+  }
+  var w=document.createElement('div');
+  w.className='ibr-tape-item winner';
+  w.textContent=winnerQ;
+  tape.appendChild(w);
+
+  var totalItems=COUNT+1;
+  var wheelH=130;
+  /* Start tape so first item is below wheel */
+  gsap.set(tape,{y:wheelH/2});
+
+  /* Phase 1: fast */
+  gsap.to(tape,{
+    y:-(ITEM_H*COUNT*0.6),
+    duration:1.6,
+    ease:'power2.in',
+    onComplete:function(){
+      /* Phase 2: slow to winner */
+      var finalY=-(ITEM_H*COUNT)+(wheelH/2)-(ITEM_H/2);
+      gsap.to(tape,{
+        y:finalY,
+        duration:2.2,
+        ease:'power4.out',
+        onComplete:function(){
+          ibrCurrentQ=winnerQ;
+          ibrSpinning=false;
+          /* Flash border */
+          gsap.fromTo('#ibr-wheel',
+            {borderColor:'rgba(255,90,50,0.8)'},
+            {borderColor:'rgba(255,90,50,0.2)',duration:0.8}
+          );
+          if(btn){btn.disabled=false;btn.textContent='Use this question';}
+          btn.onclick=ibrUseQuestion;
+        }
+      });
+    }
+  });
+}
+
+function ibrUseQuestion(){
+  if(!ibrCurrentQ)return;
+  document.getElementById('ibr-overlay').classList.remove('open');
+  /* Inject as a special card into the chat */
+  ibrAddCardToChat(ibrCurrentQ);
+  ibrCurrentQ=null;
+  /* Reset spin btn for next time */
+  var btn=document.getElementById('ibr-spin-btn');
+  if(btn){btn.textContent='\u21BB Spin';btn.onclick=ibrSpin;}
+}
+
+function ibrAddCardToChat(question){
+  var msgs=document.getElementById('chat-msgs');
+  if(!msgs)return;
+
+  var myName=(currentProfile&&currentProfile.name)||'You';
+  var theirName=(currentMatchProfile&&currentMatchProfile.name)||'Them';
+  var cardId='ibr-'+Date.now();
+
+  var card=document.createElement('div');
+  card.className='ibr-chat-card';
+  card.id=cardId;
+  card.innerHTML=
+    '<div class="ibr-card-lbl">&#x1F3B2; Ice Breaker Roulette</div>'+
+    '<div class="ibr-card-q">'+escapeHtml(question)+'</div>'+
+    '<div class="ibr-card-answers" id="'+cardId+'-answers">'+
+      '<div class="ibr-card-ans-row"><div class="ibr-card-who">'+escapeHtml(myName)+'</div><div class="ibr-card-ans pending" id="'+cardId+'-my-ans">Waiting for your answer...</div></div>'+
+      '<div class="ibr-card-ans-row"><div class="ibr-card-who">'+escapeHtml(theirName)+'</div><div class="ibr-card-ans pending" id="'+cardId+'-their-ans">Waiting...</div></div>'+
+    '</div>'+
+    '<textarea class="ibr-answer-input" id="'+cardId+'-input" placeholder="Your answer..." oninput="ibrCheckAns(\''+cardId+'\')"></textarea>'+
+    '<button class="ibr-submit-ans" id="'+cardId+'-btn" onclick="ibrSubmitAns(\''+cardId+'\',\''+escapeHtml(question)+'\')" disabled>Submit answer</button>';
+  msgs.appendChild(card);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function ibrCheckAns(cardId){
+  var inp=document.getElementById(cardId+'-input');
+  var btn=document.getElementById(cardId+'-btn');
+  if(inp&&btn) btn.disabled=inp.value.trim().length<2;
+}
+
+function ibrSubmitAns(cardId,question){
+  var inp=document.getElementById(cardId+'-input');
+  var myAnsEl=document.getElementById(cardId+'-my-ans');
+  var btn=document.getElementById(cardId+'-btn');
+  if(!inp||!myAnsEl)return;
+  var ans=inp.value.trim();
+  if(!ans)return;
+
+  myAnsEl.textContent=ans;
+  myAnsEl.classList.remove('pending');
+  inp.style.display='none';
+  btn.style.display='none';
+
+  /* Simulate their answer after a moment */
+  var theirAnsEl=document.getElementById(cardId+'-their-ans');
+  var demoAnswers=[
+    "Honestly I had to think about this one",
+    "My gut says yes but my brain says no",
+    "This is the most controversial question I have ever been asked",
+    "I feel like my answer reveals too much about me",
+    "Yes. Final answer. No further questions.",
+    "Depends entirely on the context and I stand by that"
+  ];
+  setTimeout(function(){
+    if(theirAnsEl){
+      theirAnsEl.textContent=demoAnswers[Math.floor(Math.random()*demoAnswers.length)];
+      theirAnsEl.classList.remove('pending');
+      document.getElementById('chat-msgs').scrollTop=document.getElementById('chat-msgs').scrollHeight;
+    }
+  },2000);
+}
+
 
 /* ── AI SCORE ── */
 function openAIScore(){
@@ -3953,41 +4098,37 @@ function subscribePresence() {
 }
 
 
-/* ── iOS KEYBOARD SCROLL FIX ── */
+/* ── iOS KEYBOARD / VIEWPORT FIX ── */
 if(window.visualViewport){
-  var _lastVH = window.visualViewport.height;
   window.visualViewport.addEventListener('resize', function(){
-    var vv  = window.visualViewport;
-    var cur = vv.height;
-
-    /* Chat screen */
+    /* Chat — scroll to bottom when keyboard opens */
     var chatScreen = document.getElementById('s-chat');
     if(chatScreen && chatScreen.classList.contains('active')){
       scrollMsgsToBottom();
     }
-
-    /* Compat screen — when keyboard DISMISSES, reset scroll to top */
+    /* Compat — when keyboard closes (viewport grows back), reset scroll */
     var compatScreen = document.getElementById('s-compat');
     if(compatScreen && compatScreen.classList.contains('active')){
-      var keyboardOpen = cur < _lastVH - 100;
-      if(!keyboardOpen){
-        /* Keyboard just closed — scroll back to top so roulette is visible */
+      var vvH = window.visualViewport.height;
+      var winH = window.innerHeight;
+      var keyboardGone = vvH >= winH * 0.85;
+      if(keyboardGone){
         var body = document.getElementById('cp-body');
-        if(body) body.scrollTop = 0;
-        /* Also scroll the whole screen back */
-        compatScreen.scrollTop = 0;
+        if(body) setTimeout(function(){ body.scrollTop=0; },50);
       }
     }
-    _lastVH = cur;
   });
 }
 
-/* Dismiss keyboard on compat screen when tapping outside textarea */
-document.addEventListener('touchstart', function(e){
+/* Tap outside textarea on compat screen = dismiss keyboard */
+document.addEventListener('touchend', function(e){
   var compatScreen = document.getElementById('s-compat');
   if(!compatScreen || !compatScreen.classList.contains('active')) return;
   var inp = document.getElementById('cp-answer-input');
-  if(inp && !inp.contains(e.target) && document.activeElement === inp){
+  if(!inp) return;
+  /* Only blur if tap was outside the answer area */
+  var wrap = document.getElementById('cp-answer-wrap');
+  if(wrap && !wrap.contains(e.target) && document.activeElement === inp){
     inp.blur();
   }
 }, {passive:true});
