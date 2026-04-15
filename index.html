@@ -2969,9 +2969,23 @@ function dismissEmberGoCompat(){
   document.getElementById('ember-match-overlay').classList.remove('show');
   cpMatchId      = emberMatchId;
   cpMatchProfile = emberMatchProf;
-  /* Reset transition flag in case a previous animation left it stuck */
   _transitioning = false;
-  setTimeout(function(){ openCompatCheck(); }, 300);
+  gsap.killTweensOf('.screen');
+  /* Force direct DOM swap -- bypass GSAP entirely */
+  document.querySelectorAll('.screen').forEach(function(s){
+    s.classList.remove('active');
+    s.style.opacity='0';
+    s.style.transform='none';
+  });
+  var compat=document.getElementById('s-compat');
+  if(compat){
+    compat.classList.add('active');
+    compat.style.opacity='1';
+  }
+  _updateNav('s-compat');
+  _updateShell('s-compat');
+  try{history.pushState({screen:'s-compat'},'','#s-compat');}catch(e){}
+  setTimeout(function(){cpSetupAndShow();},80);
 }
 function openCompatCheckFromChat(){
   cpMatchId      = currentMatchId;
@@ -2979,47 +2993,52 @@ function openCompatCheckFromChat(){
   openCompatCheck();
 }
 
-function openCompatCheck(){
-  /* Navigate first so elements exist in visible DOM */
-  _show('s-compat','forward');
 
-  /* Draw 5 questions randomly from pool */
-  var pool = CP_QUESTIONS.slice();
-  cpQuestions = [];
+function cpSetupAndShow(){
+  /* Draw 5 questions */
+  var pool=CP_QUESTIONS.slice();
+  cpQuestions=[];
   for(var i=0;i<5;i++){
     var idx=Math.floor(Math.random()*pool.length);
     cpQuestions.push(pool.splice(idx,1)[0]);
   }
   cpAnswers=[]; cpCurrentQ=0;
 
-  /* Safe DOM setup — elements now exist */
+  /* Update header text */
   var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
   var subEl=document.getElementById('cp-sub');
   if(subEl) subEl.textContent='You and '+name+' answer the same questions';
   var wnEl=document.getElementById('cp-their-name');
   if(wnEl) wnEl.textContent=name;
 
+  /* Reset dots */
   for(var d=0;d<5;d++){
     var dot=document.getElementById('cp-dot-'+d);
     if(dot){dot.classList.remove('done','active');if(d===0)dot.classList.add('active');}
   }
 
-  var qPhase=document.getElementById('cp-question-phase');
-  var wPhase=document.getElementById('cp-waiting-phase');
-  var rOver=document.getElementById('cp-result-overlay');
-  var aWrap=document.getElementById('cp-answer-wrap');
-  var aInp=document.getElementById('cp-answer-input');
-  var aSub=document.getElementById('cp-submit');
+  /* Show question phase, hide others */
+  var qp=document.getElementById('cp-question-phase');
+  var wp=document.getElementById('cp-waiting-phase');
+  var ro=document.getElementById('cp-result-overlay');
+  var aw=document.getElementById('cp-answer-wrap');
+  var ai=document.getElementById('cp-answer-input');
+  var as=document.getElementById('cp-submit');
+  if(qp){qp.style.display='flex';}
+  if(wp){wp.style.display='none';}
+  if(ro){ro.classList.remove('show');}
+  if(aw){aw.style.display='none';}
+  if(ai){ai.value='';}
+  if(as){as.disabled=true;}
 
-  if(qPhase) qPhase.style.display='flex';
-  if(wPhase) wPhase.style.display='none';
-  if(rOver)  rOver.classList.remove('show');
-  if(aWrap)  aWrap.style.display='none';
-  if(aInp)   aInp.value='';
-  if(aSub)   aSub.disabled=true;
+  /* Show first question */
+  cpShowQuestion(0);
+}
 
-  /* Show first question after transition completes */
-  setTimeout(function(){ cpShowQuestion(0); }, 400);
+function openCompatCheck(){
+  _transitioning=false;
+  _show('s-compat','forward');
+  setTimeout(function(){ cpSetupAndShow(); }, 400);
 }
 
 function cpShowQuestion(qIdx){
