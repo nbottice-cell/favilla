@@ -568,15 +568,21 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
    COMPATIBILITY CHECK + AI SCORE
 ═══════════════════════════════════ */
 /* Fixed-height screen so keyboard never moves layout */
-#s-compat{
+.cp-fullscreen-overlay{
+  position:absolute;
+  inset:0;
   background:var(--em-bg);
-  padding-top:0;
-  padding-bottom:0!important;
+  z-index:700;
   display:flex;
   flex-direction:column;
-  height:100%;
   overflow:hidden;
-  position:relative;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.25s;
+}
+.cp-fullscreen-overlay.open{
+  opacity:1;
+  pointer-events:all;
 }
 .cp-hdr{background:var(--em-hdr);padding:14px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(255,140,66,0.15);flex-shrink:0;}
 .cp-hdr-info{flex:1;}
@@ -1497,9 +1503,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 
 
 <!-- ═══════════ COMPATIBILITY CHECK ═══════════ -->
-<div class="screen" id="s-compat">
+<div class="cp-fullscreen-overlay" id="s-compat">
   <div class="cp-hdr">
-    <button class="bk-btn" onclick="goBack()">&#8592;</button>
+    <button class="bk-btn" onclick="closeCompatCheck()">&#8592;</button>
     <div class="cp-hdr-info">
       <div class="cp-title">See if you click</div>
       <div class="cp-sub" id="cp-sub">5 questions &mdash; you both answer the same ones</div>
@@ -1959,7 +1965,7 @@ function goHome(){
 /* ── SCREEN TRANSITION ENGINE ───────────────────────────────── */
 const _screenHistory = [];
 let _transitioning = false;
-const _noNav = ['s-splash','s-login','s-signup','s-onboard','s-chat','s-findthem','s-match','s-confirmed','s-met','s-spot','s-compat','s-venue'];
+const _noNav = ['s-splash','s-login','s-signup','s-onboard','s-chat','s-findthem','s-match','s-confirmed','s-met','s-spot','s-venue'];
 const _tabMap = {'s-spark':'nav-spark','s-ember':'nav-ember','s-venues':'nav-venues','s-heatmap':'nav-venues','s-venue':'nav-venues','s-blind':'nav-blind','s-matches':'nav-matches'};
 
 /* Detect reduced motion once */
@@ -2969,41 +2975,24 @@ function dismissEmberGoCompat(){
   document.getElementById('ember-match-overlay').classList.remove('show');
   cpMatchId      = emberMatchId;
   cpMatchProfile = emberMatchProf;
-  _transitioning = false;
-
-  /* Kill any running GSAP tweens on screens */
-  if(typeof gsap!=='undefined') gsap.killTweensOf('.screen');
-
-  /* Hide every screen completely */
-  document.querySelectorAll('.screen').forEach(function(s){
-    s.classList.remove('active');
-    s.style.cssText='opacity:0;pointer-events:none;transform:none;';
-  });
-
-  /* Show s-compat exclusively */
-  var compat=document.getElementById('s-compat');
-  if(compat){
-    compat.style.cssText='opacity:1;pointer-events:all;transform:none;';
-    compat.classList.add('active');
-  }
-
-  _updateNav('s-compat');
-  _updateShell('s-compat');
-  try{history.pushState({screen:'s-compat'},'','#s-compat');}catch(e){}
-
-  /* Setup questions after paint */
-  requestAnimationFrame(function(){
-    requestAnimationFrame(function(){
-      cpSetupAndShow();
-    });
-  });
+  var compat = document.getElementById('s-compat');
+  if(compat) compat.classList.add('open');
+  cpSetupAndShow();
 }
 function openCompatCheckFromChat(){
-  cpMatchId      = currentMatchId;
-  cpMatchProfile = currentMatchProfile;
-  openCompatCheck();
+  cpMatchId=currentMatchId;
+  cpMatchProfile=currentMatchProfile;
+  var compat=document.getElementById('s-compat');
+  if(compat) compat.classList.add('open');
+  cpSetupAndShow();
 }
 
+
+
+function closeCompatCheck(){
+  var compat=document.getElementById('s-compat');
+  if(compat) compat.classList.remove('open');
+}
 
 function cpSetupAndShow(){
   /* Draw 5 questions */
@@ -3208,12 +3197,14 @@ function cpShowResults(theirAnswers,aiScore){
 
 function cpStartChat(){
   document.getElementById('cp-result-overlay').classList.remove('show');
+  closeCompatCheck();
   var mId=cpMatchId||emberMatchId;
   var mProf=cpMatchProfile||emberMatchProf;
   if(mId&&mProf){openChat(mId,mProf);}else{navTo('s-matches');}
 }
 function cpPass(){
   document.getElementById('cp-result-overlay').classList.remove('show');
+  closeCompatCheck();
   navTo('s-ember');
 }
 
