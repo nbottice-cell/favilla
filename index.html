@@ -2790,6 +2790,7 @@ function dismissEmberMaybeLater(){
 
 function dismissEmberGoChat(){
   document.getElementById('ember-match-overlay').classList.remove('show');
+  _transitioning=false;
   if(emberMatchId && emberMatchId.startsWith('demo-')){
     /* Demo match — open chat with fake profile, no real matchId */
     openChat(null, emberMatchProf);
@@ -2801,6 +2802,7 @@ function dismissEmberGoChat(){
 }
 function dismissEmberGoSpot(){
   document.getElementById('ember-match-overlay').classList.remove('show');
+  _transitioning=false;
   selectedVibe=null;
   document.querySelectorAll('.vibe-opt').forEach(o=>o.classList.remove('sel'));
   document.getElementById('spot-ask-btn').disabled=true;
@@ -2925,36 +2927,41 @@ var cpAnswers      = [];
 var cpCurrentQ     = 0;
 
 const CP_QUESTIONS = [
-  "Jimmies or sprinkles?",
-  "Pineapple on pizza -- where do you stand?",
-  "What is a food everyone loves that you find overrated?",
-  "You can only eat one cuisine for the rest of your life, what are you choosing?",
-  "Is a hot dog a sandwich?",
-  "What is the most underrated meal of the day?",
-  "You find $50 on the ground outside a busy restaurant -- what do you do?",
-  "It is 2am and you are wide awake -- what are you doing?",
-  "What is something you own that you would never let someone borrow?",
-  "A stranger compliments your outfit -- what is your first reaction?",
-  "You are at a party where you know nobody -- what is your first move?",
-  "What is the last thing you googled that you would be embarrassed to admit?",
-  "What is a hill you will absolutely die on that most people find ridiculous?",
-  "Do you think people can genuinely change?",
-  "What is something you were wrong about for way too long?",
-  "What is a small weird thing that genuinely makes your day better?",
-  "Is being early the same as being on time?",
-  "What is something you do differently from everyone you know?",
-  "What is the most spontaneous thing you have actually done?",
-  "What is a place you have been that felt like it was made for you?",
-  "Describe the best meal you have ever had in one sentence.",
-  "What is something you tried once and immediately knew was not for you?",
-  "What is a compliment you received that you still think about?",
-  "What is the last thing that made you laugh embarrassingly hard?",
-  "Text or call?",
-  "Museum on a rainy day or drive with no destination?",
-  "Cook together or go out -- on a third date?",
-  "Window seat or aisle?",
-  "Do you make your bed every morning?",
-  "What is the last song you listened to on purpose?"
+  /* How you live */
+  "Do you need alone time to recharge or do people energize you?",
+  "How do you feel about spontaneous plans versus scheduled ones?",
+  "Are you a morning person or does the night feel more like yours?",
+  "How important is it that a partner shares your interests?",
+  "Do you prefer a quiet night in or being out in the world?",
+  "How do you handle conflict -- do you address it immediately or need time first?",
+  /* What you value */
+  "What does a good day actually look like for you?",
+  "Is ambition something you find attractive or does it depend?",
+  "How do you feel about splitting finances in a relationship?",
+  "What role does family play in your everyday life?",
+  "Is travel something you need or more of a nice-to-have?",
+  "How do you feel about pets -- dealbreaker either way?",
+  /* Personality tells */
+  "Are you someone who finishes what they start or pivots freely?",
+  "Do you tend to make decisions quickly or do you take your time?",
+  "How do you feel when plans change at the last minute?",
+  "Are you more likely to over-communicate or go quiet when something is wrong?",
+  "Do you find comfort in routine or does it start to feel like a cage?",
+  "How do you feel about being around someone who is messier or tidier than you?",
+  /* Bigger picture */
+  "Where do you see yourself living five years from now?",
+  "Is having children something you want, do not want, or are undecided on?",
+  "How important is it that a partner shares your sense of humor?",
+  "What is something you would not compromise on in a relationship?",
+  "Do you think you can love someone whose politics differ significantly from yours?",
+  "How do you feel about social media in a relationship -- sharing, privacy, boundaries?",
+  /* Day to day */
+  "What does your ideal weekend look like?",
+  "How do you feel about silence -- comfortable or does it need filling?",
+  "Are you someone who needs to talk through a bad day or would rather decompress alone?",
+  "How do you show people you care about them?",
+  "What is something small that would bother you more than it probably should?",
+  "What is the thing that makes you feel most like yourself?"
 ];
 
 /* Entry points */
@@ -2962,7 +2969,9 @@ function dismissEmberGoCompat(){
   document.getElementById('ember-match-overlay').classList.remove('show');
   cpMatchId      = emberMatchId;
   cpMatchProfile = emberMatchProf;
-  openCompatCheck();
+  /* Reset transition flag in case a previous animation left it stuck */
+  _transitioning = false;
+  setTimeout(function(){ openCompatCheck(); }, 300);
 }
 function openCompatCheckFromChat(){
   cpMatchId      = currentMatchId;
@@ -3185,32 +3194,42 @@ var ibrSpinning = false;
 var ibrCurrentQ = null;
 
 const IBR_QUESTIONS = [
-  "Jimmies or sprinkles?",
-  "Pineapple on pizza -- where do you stand?",
-  "What is a food everyone loves that you find overrated?",
-  "Is a hot dog a sandwich?",
-  "What is the most underrated meal of the day?",
-  "You find $50 on the ground outside a busy restaurant -- what do you do?",
-  "It is 2am and you are wide awake -- what are you doing?",
-  "What is something you own that you would never let someone borrow?",
-  "A stranger compliments your outfit -- what is your first reaction?",
-  "You are at a party where you know nobody -- what is your first move?",
-  "What is a hill you will absolutely die on that most people find ridiculous?",
-  "Do you think people can genuinely change?",
-  "What is something you were wrong about for way too long?",
-  "What is a small weird thing that genuinely makes your day better?",
-  "Is being early the same as being on time?",
-  "What is the most spontaneous thing you have actually done?",
-  "What is a place you have been that felt like it was made for you?",
-  "Describe the best meal you have ever had in one sentence.",
-  "What is a compliment you received that you still think about?",
-  "What is the last thing that made you laugh embarrassingly hard?",
-  "Text or call?",
-  "Museum on a rainy day or drive with no destination?",
-  "Cook together or go out -- on a third date?",
-  "Window seat or aisle?",
-  "Do you make your bed every morning?",
-  "What is the last song you listened to on purpose?"
+  /* Philosophical nonsense */
+  "Is water wet?",
+  "If you punch yourself and it hurts, are you weak or strong?",
+  "Is a straw one hole or two?",
+  "If you described a color to someone blind from birth, would they understand it?",
+  "Is a hot dog a sandwich? Is a pop tart a ravioli?",
+  "If nothing is impossible, is it possible for something to be impossible?",
+  "If a tree falls in the woods and no one is around, does it make a sound?",
+  /* Completely unhinged takes */
+  "Cereal or milk first and what does your answer say about you as a person?",
+  "If animals could talk, which one would be the rudest?",
+  "Would you rather fight one horse-sized duck or a hundred duck-sized horses?",
+  "What is the most useless superpower you would actually want?",
+  "If you had to eat one crayon color, which one seems the most edible?",
+  "What flavor would the color blue be?",
+  /* Extremely specific scenarios */
+  "You discover your coworker eats their lunch at 9am every day. Do you say something?",
+  "Someone in a movie theater is eating popcorn too loudly. What is your move?",
+  "You find out your nemesis has the exact same coffee order as you. What do you do?",
+  "A seagull steals your fries. Do you chase it?",
+  "You are at a dinner party and the host serves something you genuinely cannot eat. What do you do?",
+  "Someone waves at you and you wave back but they were waving at someone behind you. Next move?",
+  /* Would you rather -- chaotic edition */
+  "Would you rather only be able to whisper or only be able to shout?",
+  "Would you rather know the last Google search of everyone you meet or have everyone know yours?",
+  "Would you rather hiccup every time you lie or sneeze every time you swear?",
+  "Would you rather only eat foods that are beige or only eat foods that are green?",
+  "Would you rather narrate your own life out loud or have theme music follow you everywhere?",
+  "Would you rather have no eyebrows or one giant eyebrow?",
+  /* The important debates */
+  "Is a pancake just a lazy waffle?",
+  "Does pineapple belong anywhere near a pizza -- be specific about the conditions?",
+  "Is gif pronounced with a hard G or a soft G and how strongly do you feel about it?",
+  "Is a hot beverage better when it has gone slightly cold or must it be piping hot?",
+  "Do you fold or scrunch your toilet paper and are you willing to defend that?",
+  "Is it acceptable to recline your airplane seat -- full recline, partial, or never?"
 ];
 
 function openIBR(){
@@ -4086,14 +4105,17 @@ function showNewMatchOptions(matchId, profile){
 
 function dismissMatchMaybeLater(){
   document.getElementById('match-overlay').classList.remove('show');
+  _transitioning=false;
   showToastMsg('Saved \u2746 \u2014 find them in your Matches tab anytime.');
 }
 function dismissMatchGoChat(){
   document.getElementById('match-overlay').classList.remove('show');
+  _transitioning=false;
   openChat(currentMatchId, currentMatchProfile);
 }
 function dismissMatchGoFind(){
   document.getElementById('match-overlay').classList.remove('show');
+  _transitioning=false;
   var name = (currentMatchProfile && currentMatchProfile.name) || 'them';
   goTo('s-findthem','s-spark');
   setTimeout(function(){ if(typeof initFindThem==='function') initFindThem(name); }, 200);
