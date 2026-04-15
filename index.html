@@ -1959,7 +1959,7 @@ function goHome(){
 /* ── SCREEN TRANSITION ENGINE ───────────────────────────────── */
 const _screenHistory = [];
 let _transitioning = false;
-const _noNav = ['s-splash','s-login','s-signup','s-onboard','s-chat','s-findthem','s-match','s-confirmed','s-met','s-spot'];
+const _noNav = ['s-splash','s-login','s-signup','s-onboard','s-chat','s-findthem','s-match','s-confirmed','s-met','s-spot','s-compat','s-venue'];
 const _tabMap = {'s-spark':'nav-spark','s-ember':'nav-ember','s-venues':'nav-venues','s-heatmap':'nav-venues','s-venue':'nav-venues','s-blind':'nav-blind','s-matches':'nav-matches'};
 
 /* Detect reduced motion once */
@@ -2971,6 +2971,9 @@ function openCompatCheckFromChat(){
 }
 
 function openCompatCheck(){
+  /* Navigate first so elements exist in visible DOM */
+  _show('s-compat','forward');
+
   /* Draw 5 questions randomly from pool */
   var pool = CP_QUESTIONS.slice();
   cpQuestions = [];
@@ -2980,6 +2983,7 @@ function openCompatCheck(){
   }
   cpAnswers=[]; cpCurrentQ=0;
 
+  /* Safe DOM setup — elements now exist */
   var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
   var subEl=document.getElementById('cp-sub');
   if(subEl) subEl.textContent='You and '+name+' answer the same questions';
@@ -2991,16 +2995,22 @@ function openCompatCheck(){
     if(dot){dot.classList.remove('done','active');if(d===0)dot.classList.add('active');}
   }
 
-  document.getElementById('cp-question-phase').style.display='flex';
-  document.getElementById('cp-waiting-phase').style.display='none';
-  document.getElementById('cp-result-overlay').classList.remove('show');
-  document.getElementById('cp-answer-wrap').style.display='none';
-  document.getElementById('cp-answer-input').value='';
-  document.getElementById('cp-submit').disabled=true;
+  var qPhase=document.getElementById('cp-question-phase');
+  var wPhase=document.getElementById('cp-waiting-phase');
+  var rOver=document.getElementById('cp-result-overlay');
+  var aWrap=document.getElementById('cp-answer-wrap');
+  var aInp=document.getElementById('cp-answer-input');
+  var aSub=document.getElementById('cp-submit');
 
-  _show('s-compat','forward');
-  /* Show first question with animation after screen transition */
-  setTimeout(function(){ cpShowQuestion(0); }, 350);
+  if(qPhase) qPhase.style.display='flex';
+  if(wPhase) wPhase.style.display='none';
+  if(rOver)  rOver.classList.remove('show');
+  if(aWrap)  aWrap.style.display='none';
+  if(aInp)   aInp.value='';
+  if(aSub)   aSub.disabled=true;
+
+  /* Show first question after transition completes */
+  setTimeout(function(){ cpShowQuestion(0); }, 400);
 }
 
 function cpShowQuestion(qIdx){
