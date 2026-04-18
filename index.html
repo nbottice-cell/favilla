@@ -3276,44 +3276,53 @@ function ibrSpin(){
   tape.innerHTML='';
   gsap.set(tape,{y:0});
 
-  var ITEM_H=44;
-  var pool=IBR_QUESTIONS.slice();
-  /* Pick winner */
-  var winnerQ=pool[Math.floor(Math.random()*pool.length)];
-  /* Build 18 random items + winner at end */
-  var COUNT=18;
-  for(var b=0;b<COUNT;b++){
+  var ITEM_H   = 44;
+  var WHEEL_H  = 130;
+  var TOTAL    = 40;  /* total items in tape — long enough to feel like endless spinning */
+
+  /* Pick winner and place it at a random index in the middle third of the tape */
+  var winnerQ   = IBR_QUESTIONS[Math.floor(Math.random()*IBR_QUESTIONS.length)];
+  var winnerIdx = 10 + Math.floor(Math.random()*20); /* lands somewhere between item 10-30 */
+
+  /* Build the full tape */
+  for(var i=0;i<TOTAL;i++){
     var d=document.createElement('div');
-    d.className='ibr-tape-item';
-    d.textContent=pool[Math.floor(Math.random()*pool.length)];
+    if(i===winnerIdx){
+      d.className='ibr-tape-item winner';
+      d.textContent=winnerQ;
+    } else {
+      d.className='ibr-tape-item';
+      /* Pick a random question that is not the winner for visual variety */
+      var q;
+      do{ q=IBR_QUESTIONS[Math.floor(Math.random()*IBR_QUESTIONS.length)]; }
+      while(q===winnerQ);
+      d.textContent=q;
+    }
     tape.appendChild(d);
   }
-  var w=document.createElement('div');
-  w.className='ibr-tape-item winner';
-  w.textContent=winnerQ;
-  tape.appendChild(w);
 
-  var totalItems=COUNT+1;
-  var wheelH=130;
-  /* Start tape so first item is below wheel */
-  gsap.set(tape,{y:wheelH/2});
+  /* Start tape positioned so item 0 is at center of wheel */
+  var startY = WHEEL_H/2 - ITEM_H/2;
+  gsap.set(tape,{y:startY});
 
-  /* Phase 1: fast */
+  /* finalY positions winnerIdx item at center of wheel */
+  var finalY = startY - (winnerIdx * ITEM_H);
+
+  /* Phase 1 — fast spin (overshoot past winner by several items) */
+  var overshootY = finalY - (ITEM_H * 6);
   gsap.to(tape,{
-    y:-(ITEM_H*COUNT*0.6),
-    duration:1.6,
-    ease:'power2.in',
-    onComplete:function(){
-      /* Phase 2: slow to winner */
-      var finalY=-(ITEM_H*COUNT)+(wheelH/2)-(ITEM_H/2);
+    y: overshootY,
+    duration: 1.8,
+    ease: 'power3.in',
+    onComplete: function(){
+      /* Phase 2 — slow back to land exactly on winner */
       gsap.to(tape,{
-        y:finalY,
-        duration:2.2,
-        ease:'power4.out',
-        onComplete:function(){
+        y: finalY,
+        duration: 2.4,
+        ease: 'power4.out',
+        onComplete: function(){
           ibrCurrentQ=winnerQ;
           ibrSpinning=false;
-          /* Flash border */
           gsap.fromTo('#ibr-wheel',
             {borderColor:'rgba(255,90,50,0.8)'},
             {borderColor:'rgba(255,90,50,0.2)',duration:0.8}
