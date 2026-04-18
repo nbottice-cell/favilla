@@ -610,26 +610,21 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 .cp-q-text.visible{opacity:1;transform:translateY(0);}
 /* Answer area */
 .cp-answer-wrap{width:100%;flex-shrink:0;}
-.cp-answer-lbl{font-size:10px;color:var(--em-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;text-align:center;}
-.cp-answer-input{
+.cp-choices{width:100%;display:flex;flex-direction:column;gap:10px;}
+.cp-choice-btn{
   width:100%;background:var(--em-card);
-  border:0.5px solid rgba(255,140,66,0.3);
-  border-radius:14px;padding:14px 16px;
-  font-size:16px;color:var(--em-text);
-  font-family:'Space Grotesk',sans-serif;
-  outline:none;resize:none;min-height:88px;
-  -webkit-appearance:none;
-  touch-action:manipulation;
+  border:0.5px solid rgba(255,140,66,0.25);
+  border-radius:14px;padding:16px 18px;
+  font-family:'Space Grotesk',sans-serif;font-size:14px;
+  color:var(--em-text);cursor:pointer;text-align:left;
+  line-height:1.45;
+  transition:background 0.18s,border-color 0.18s;
+  touch-action:manipulation;-webkit-appearance:none;
 }
-.cp-answer-input:focus{border-color:rgba(255,140,66,0.6);}
-.cp-submit{
-  width:100%;background:linear-gradient(135deg,#FF8C42,#FFB347);
-  border:none;border-radius:28px;padding:16px;
-  font-family:'Space Grotesk',sans-serif;font-size:15px;
-  color:#1A1510;cursor:pointer;font-weight:700;
-  margin-top:12px;touch-action:manipulation;
+.cp-choice-btn.selected{
+  background:rgba(255,140,66,0.14);
+  border-color:rgba(255,140,66,0.65);
 }
-.cp-submit:disabled{opacity:0.35;cursor:not-allowed;}
 .cp-waiting-msg{text-align:center;padding:24px 16px;font-size:13px;color:var(--em-dim);line-height:1.8;}
 .cp-waiting-dots span{display:inline-block;animation:emDot 1.4s ease-in-out infinite;font-size:20px;color:var(--em-glow);}
 .cp-waiting-dots span:nth-child(2){animation-delay:0.2s;}
@@ -1525,13 +1520,10 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
         <div class="cp-q-text" id="cp-question"></div>
       </div>
       <div class="cp-answer-wrap" id="cp-answer-wrap" style="display:none;">
-        <div class="cp-answer-lbl">Your answer</div>
-        <textarea class="cp-answer-input" id="cp-answer-input"
-          placeholder="Type your answer&#x2026;" rows="3"
-          oninput="cpCheckSubmit()"></textarea>
-        <button class="cp-submit" id="cp-submit" onclick="cpSubmitAnswer()" disabled>
-          <span id="cp-submit-lbl">Next question &#x2192;</span>
-        </button>
+        <div class="cp-choices">
+          <button class="cp-choice-btn" id="cp-choice-a" onclick="cpSelectChoice('a')"></button>
+          <button class="cp-choice-btn" id="cp-choice-b" onclick="cpSelectChoice('b')"></button>
+        </div>
       </div>
     </div>
     <div id="cp-waiting-phase" style="display:none;width:100%;">
@@ -2995,41 +2987,27 @@ var cpAnswers      = [];
 var cpCurrentQ     = 0;
 
 const CP_QUESTIONS = [
-  /* How you live */
-  "Do you need alone time to recharge or do people energize you?",
-  "How do you feel about spontaneous plans versus scheduled ones?",
-  "Are you a morning person or does the night feel more like yours?",
-  "How important is it that a partner shares your interests?",
-  "Do you prefer a quiet night in or being out in the world?",
-  "How do you handle conflict -- do you address it immediately or need time first?",
-  /* What you value */
-  "What does a good day actually look like for you?",
-  "Is ambition something you find attractive or does it depend?",
-  "How do you feel about splitting finances in a relationship?",
-  "What role does family play in your everyday life?",
-  "Is travel something you need or more of a nice-to-have?",
-  "How do you feel about pets -- dealbreaker either way?",
-  /* Personality tells */
-  "Are you someone who finishes what they start or pivots freely?",
-  "Do you tend to make decisions quickly or do you take your time?",
-  "How do you feel when plans change at the last minute?",
-  "Are you more likely to over-communicate or go quiet when something is wrong?",
-  "Do you find comfort in routine or does it start to feel like a cage?",
-  "How do you feel about being around someone who is messier or tidier than you?",
-  /* Bigger picture */
-  "Where do you see yourself living five years from now?",
-  "Is having children something you want, do not want, or are undecided on?",
-  "How important is it that a partner shares your sense of humor?",
-  "What is something you would not compromise on in a relationship?",
-  "Do you think you can love someone whose politics differ significantly from yours?",
-  "How do you feel about social media in a relationship -- sharing, privacy, boundaries?",
-  /* Day to day */
-  "What does your ideal weekend look like?",
-  "How do you feel about silence -- comfortable or does it need filling?",
-  "Are you someone who needs to talk through a bad day or would rather decompress alone?",
-  "How do you show people you care about them?",
-  "What is something small that would bother you more than it probably should?",
-  "What is the thing that makes you feel most like yourself?"
+  /* Energy */
+  {q:"When you need to recharge, you...", a:"Prefer time alone — people drain me", b:"Seek people out — being around others energizes me"},
+  {q:"For a Friday night you'd rather...", a:"Stay in — good food, low pressure, no agenda", b:"Go out — drinks, energy, something happening"},
+  /* Time & pace */
+  {q:"You tend to be more of a...", a:"Morning person — up early, best before noon", b:"Night owl — hit my stride after dark"},
+  {q:"When plans change at the last minute...", a:"It stresses me out — I like knowing what's happening", b:"I roll with it — flexibility is everything"},
+  {q:"You make decisions...", a:"Slowly and carefully — big things need thought", b:"Quickly — overthinking just creates anxiety"},
+  /* Conflict & communication */
+  {q:"When something's bothering you, you...", a:"Take time to process before talking", b:"Address it right away — can't let it sit"},
+  {q:"When you have a bad day, you...", a:"Need to decompress alone before talking about it", b:"Need to talk it through — bottling it up makes it worse"},
+  /* Lifestyle */
+  {q:"When it comes to travel...", a:"I need it — at least one real trip a year", b:"Home is where I'm happiest — trips are a bonus"},
+  {q:"When it comes to routine...", a:"Love it — structure keeps me grounded", b:"Feel trapped by it — I need variety"},
+  {q:"Your ideal Sunday looks like...", a:"Slow — coffee, no agenda, nowhere to be", b:"Active — errands, gym, getting things done"},
+  /* Values */
+  {q:"In a relationship, you value more...", a:"Independence — being your own person", b:"Togetherness — building a shared life"},
+  {q:"When it comes to family...", a:"They're a big part of my everyday life", b:"Love them, but I keep some distance"},
+  {q:"When it comes to kids...", a:"I want them — part of the plan", b:"Not for me — I'm sure about this"},
+  /* Personality */
+  {q:"How do you feel about pets?", a:"Love animals — they make life better", b:"Not a pet person — not my thing"},
+  {q:"You show people you care by...", a:"Actions — showing up and doing things", b:"Words — telling people directly how you feel"},
 ];
 
 /* Entry points */
@@ -3053,7 +3031,7 @@ function openCompatCheckFromChat(){
 
 function closeCompatCheck(){
   var compat=document.getElementById('s-compat');
-  if(compat) compat.classList.remove('open');
+  if(compat){compat.classList.remove('open');compat.style.opacity='';}
 }
 
 function cpSetupAndShow(){
@@ -3084,14 +3062,10 @@ function cpSetupAndShow(){
   var wp=document.getElementById('cp-waiting-phase');
   var ro=document.getElementById('cp-result-overlay');
   var aw=document.getElementById('cp-answer-wrap');
-  var ai=document.getElementById('cp-answer-input');
-  var as=document.getElementById('cp-submit');
   if(qp){qp.style.display='flex';}
   if(wp){wp.style.display='none';}
   if(ro){ro.classList.remove('show');}
   if(aw){aw.style.display='none';}
-  if(ai){ai.value='';}
-  if(as){as.disabled=true;}
 
   /* Show first question */
   cpShowQuestion(0);
@@ -3104,161 +3078,90 @@ function openCompatCheck(){
 }
 
 function cpShowQuestion(qIdx){
+  var q      = cpQuestions[qIdx];
   var qText  = document.getElementById('cp-question');
   var qNum   = document.getElementById('cp-q-num');
   var ansWrap= document.getElementById('cp-answer-wrap');
-  var inp    = document.getElementById('cp-answer-input');
+  var btnA   = document.getElementById('cp-choice-a');
+  var btnB   = document.getElementById('cp-choice-b');
   var card   = document.getElementById('cp-q-card');
 
   /* Reset */
   qText.classList.remove('visible');
   ansWrap.style.display='none';
-  inp.value='';
-  document.getElementById('cp-submit').disabled=true;
+  if(btnA){btnA.classList.remove('selected');btnA.disabled=false;}
+  if(btnB){btnB.classList.remove('selected');btnB.disabled=false;}
   if(qNum) qNum.textContent='Question '+(qIdx+1)+' of 5';
 
-  /* Animate card in */
+  /* Animate card in, then reveal choices */
   if(!_reducedMotion){
     gsap.fromTo(card,
       {opacity:0,y:12},
       {opacity:1,y:0,duration:0.35,ease:'power2.out',onComplete:function(){
-        qText.textContent=cpQuestions[qIdx];
+        qText.textContent=q.q;
         qText.classList.add('visible');
-        setTimeout(function(){
-          ansWrap.style.display='block';
-        },300);
+        if(btnA)btnA.textContent=q.a;
+        if(btnB)btnB.textContent=q.b;
+        setTimeout(function(){ ansWrap.style.display='block'; },300);
       }}
     );
   } else {
-    qText.textContent=cpQuestions[qIdx];
+    qText.textContent=q.q;
     qText.classList.add('visible');
+    if(btnA)btnA.textContent=q.a;
+    if(btnB)btnB.textContent=q.b;
     ansWrap.style.display='block';
   }
 }
 
-/* ── Answer submission ── */
-function cpCheckSubmit(){
-  var val=document.getElementById('cp-answer-input').value.trim();
-  document.getElementById('cp-submit').disabled=val.length<2;
-}
+/* ── Choice selection ── */
+function cpSelectChoice(choice){
+  var q=cpQuestions[cpCurrentQ];
+  var answer=choice==='a'?q.a:q.b;
 
-function cpSubmitAnswer(){
-  var val=document.getElementById('cp-answer-input').value.trim();
-  if(!val)return;
-  cpAnswers.push(val);
+  /* Visual feedback then advance */
+  var btn=document.getElementById('cp-choice-'+choice);
+  if(btn)btn.classList.add('selected');
+  /* Disable both buttons to prevent double-tap */
+  var btnA=document.getElementById('cp-choice-a');
+  var btnB=document.getElementById('cp-choice-b');
+  if(btnA)btnA.disabled=true;
+  if(btnB)btnB.disabled=true;
 
-  /* Dismiss keyboard before transitioning */
-  document.getElementById('cp-answer-input').blur();
+  setTimeout(function(){
+    cpAnswers.push(answer);
+    var dot=document.getElementById('cp-dot-'+cpCurrentQ);
+    if(dot){dot.classList.remove('active');dot.classList.add('done');}
+    cpCurrentQ++;
 
-  /* Update dot */
-  var dot=document.getElementById('cp-dot-'+cpCurrentQ);
-  if(dot){dot.classList.remove('active');dot.classList.add('done');}
-  cpCurrentQ++;
-
-  if(cpCurrentQ<5){
-    var nextDot=document.getElementById('cp-dot-'+cpCurrentQ);
-    if(nextDot)nextDot.classList.add('active');
-    document.getElementById('cp-answer-wrap').style.display='none';
-    /* Update submit label on last question */
-    var lbl=document.getElementById('cp-submit-lbl');
-    if(lbl)lbl.innerHTML=cpCurrentQ===4?'Submit answers →':'Next question →';
-    setTimeout(function(){ cpShowQuestion(cpCurrentQ); },200);
-  } else {
-    /* All 5 done */
-    document.getElementById('cp-question-phase').style.display='none';
-    document.getElementById('cp-waiting-phase').style.display='block';
-    setTimeout(function(){cpRevealResults();},2500);
-  }
-}
-
-/* ── Demo partner answers ── */
-/* Demo answers keyed to CP_QUESTIONS topics so AI scoring is meaningful */
-var CP_DEMO_ANSWER_SETS=[
-  /* Set A — fairly compatible */
-  {
-    "Do you need alone time to recharge or do people energize you?": "I definitely need alone time to recharge, crowds drain me after a while.",
-    "How do you feel about spontaneous plans versus scheduled ones?": "I prefer knowing plans in advance but I can do spontaneous sometimes.",
-    "Are you a morning person or does the night feel more like yours?": "Night owl completely, I do my best thinking after 10pm.",
-    "How important is it that a partner shares your interests?": "Some overlap matters but I think having separate interests is healthy too.",
-    "Do you prefer a quiet night in or being out in the world?": "Quiet night in most of the time, going out feels like a treat.",
-    "How do you handle conflict -- do you address it immediately or need time first?": "I need a little time to process before I can talk calmly.",
-    "What does a good day actually look like for you?": "Productive morning, good food, something creative in the afternoon.",
-    "Is ambition something you find attractive or does it depend?": "Yes, definitely attractive -- I like people who care about what they do.",
-    "How do you feel about splitting finances in a relationship?": "I think it should be proportional to what each person earns.",
-    "What role does family play in your everyday life?": "Important but not suffocating -- I talk to mine a few times a week.",
-    "Is travel something you need or more of a nice-to-have?": "I need it -- at least one real trip a year keeps me sane.",
-    "How do you feel about pets -- dealbreaker either way?": "I love dogs and would love to have one eventually.",
-    "Are you someone who finishes what they start or pivots freely?": "I finish things but I do pivot if something clearly is not working.",
-    "Do you tend to make decisions quickly or do you take your time?": "I take my time for big things, quick on small ones.",
-    "How do you feel when plans change at the last minute?": "A little annoyed but I get over it fast.",
-    "Are you more likely to over-communicate or go quiet when something is wrong?": "I go quiet first then over-communicate once I have figured out what I feel.",
-    "Do you find comfort in routine or does it start to feel like a cage?": "Routine is grounding for me, I like knowing what my days look like.",
-    "How do you feel about being around someone who is messier or tidier than you?": "Slightly messier is fine, but chaos would drive me a little crazy.",
-    "Where do you see yourself living five years from now?": "Probably same city but a nicer apartment with more space.",
-    "Is having children something you want, do not want, or are undecided on?": "I want them eventually, not in any rush though.",
-    "How important is it that a partner shares your sense of humor?": "Very important -- if we cannot laugh together it would not work.",
-    "What is something you would not compromise on in a relationship?": "Honesty. I can work with a lot but not deception.",
-    "Do you think you can love someone whose politics differ significantly from yours?": "Depends how different -- on core values, probably not.",
-    "How do you feel about social media in a relationship -- sharing, privacy, boundaries?": "I post occasionally but I would not want to be on someone else's feed all the time.",
-    "What does your ideal weekend look like?": "Saturday out doing something, Sunday slow with coffee and nowhere to be.",
-    "How do you feel about silence -- comfortable or does it need filling?": "Comfortable silence is one of my favorite things.",
-    "Are you someone who needs to talk through a bad day or would rather decompress alone?": "Decompress alone first, then talk if it is still bothering me.",
-    "How do you show people you care about them?": "Acts of service mostly -- I show up and do things without being asked.",
-    "What is something small that would bother you more than it probably should?": "People who do not signal when driving. It is so simple.",
-    "What is the thing that makes you feel most like yourself?": "Being outside somewhere quiet with nothing to check."
-  },
-  /* Set B — less compatible */
-  {
-    "Do you need alone time to recharge or do people energize you?": "People totally energize me, I get restless if I am alone too long.",
-    "How do you feel about spontaneous plans versus scheduled ones?": "Spontaneous always, schedules make everything feel like a chore.",
-    "Are you a morning person or does the night feel more like yours?": "Up at 6am without an alarm, mornings are my whole thing.",
-    "How important is it that a partner shares your interests?": "Really important -- I want to be able to do things together.",
-    "Do you prefer a quiet night in or being out in the world?": "Out in the world as much as possible, sitting home feels like giving up.",
-    "How do you handle conflict -- do you address it immediately or need time first?": "Address it right away, letting things sit makes them worse.",
-    "What does a good day actually look like for you?": "Early start, gym, social plans, something happening every few hours.",
-    "Is ambition something you find attractive or does it depend?": "It depends -- ambition without warmth is exhausting.",
-    "How do you feel about splitting finances in a relationship?": "50-50 down the middle, keeps things simple and equal.",
-    "What role does family play in your everyday life?": "Central -- I see mine almost every week.",
-    "Is travel something you need or more of a nice-to-have?": "Nice to have, I am happy being home honestly.",
-    "How do you feel about pets -- dealbreaker either way?": "Not a pet person, they tie you down too much.",
-    "Are you someone who finishes what they start or pivots freely?": "I pivot freely -- why finish something that is not working?",
-    "Do you tend to make decisions quickly or do you take your time?": "Very quickly, overthinking just creates anxiety.",
-    "How do you feel when plans change at the last minute?": "Honestly fine with it, I am flexible about most things.",
-    "Are you more likely to over-communicate or go quiet when something is wrong?": "I bring it up immediately, I cannot hold things in.",
-    "Do you find comfort in routine or does it start to feel like a cage?": "It starts to feel like a cage pretty quickly.",
-    "How do you feel about being around someone who is messier or tidier than you?": "I am pretty messy myself so I could not live with a neat freak.",
-    "Where do you see yourself living five years from now?": "Somewhere completely different, I want to move cities.",
-    "Is having children something you want, do not want, or are undecided on?": "I do not want children, pretty certain about that.",
-    "How important is it that a partner shares your sense of humor?": "Somewhat but it is not a dealbreaker.",
-    "What is something you would not compromise on in a relationship?": "My independence -- I need to feel like my own person.",
-    "Do you think you can love someone whose politics differ significantly from yours?": "Yes absolutely, love is bigger than politics.",
-    "How do you feel about social media in a relationship -- sharing, privacy, boundaries?": "I share a lot, I think being open is part of being close.",
-    "What does your ideal weekend look like?": "Friday night out, Saturday brunch with friends, Sunday recovery.",
-    "How do you feel about silence -- comfortable or does it need filling?": "I tend to fill it, quiet makes me a little anxious.",
-    "Are you someone who needs to talk through a bad day or would rather decompress alone?": "I need to talk it through, keeping it in just makes it worse.",
-    "How do you show people you care about them?": "Words and affection, I say what I feel pretty openly.",
-    "What is something small that would bother you more than it probably should?": "Slow walkers in the middle of the pavement.",
-    "What is the thing that makes you feel most like yourself?": "Being around people I love with music on."
-  }
-];
-
-function getDemoAnswer(questionText, setIdx){
-  var set = CP_DEMO_ANSWER_SETS[setIdx % CP_DEMO_ANSWER_SETS.length];
-  /* Try exact match first */
-  if(set[questionText]) return set[questionText];
-  /* Try partial match */
-  var keys = Object.keys(set);
-  for(var k=0;k<keys.length;k++){
-    if(questionText.toLowerCase().indexOf(keys[k].toLowerCase().substring(0,20)) !== -1)
-      return set[keys[k]];
-  }
-  return 'I would have to think about that one.';
+    if(cpCurrentQ<5){
+      var nextDot=document.getElementById('cp-dot-'+cpCurrentQ);
+      if(nextDot)nextDot.classList.add('active');
+      document.getElementById('cp-answer-wrap').style.display='none';
+      setTimeout(function(){ cpShowQuestion(cpCurrentQ); },150);
+    } else {
+      /* All 5 done */
+      document.getElementById('cp-question-phase').style.display='none';
+      document.getElementById('cp-waiting-phase').style.display='block';
+      setTimeout(function(){cpRevealResults();},2500);
+    }
+  },300);
 }
 
 function cpRevealResults(){
-  /* Pick a demo set at random — answers actually match the questions */
-  var setIdx=Math.floor(Math.random()*CP_DEMO_ANSWER_SETS.length);
-  var theirAnswers=cpQuestions.map(function(q){return getDemoAnswer(q,setIdx);});
+  /* Compatible demo: align on 3–4 questions. Less compatible: align on 1–2. */
+  var compatible=Math.random()<0.6; /* 60% chance of compatible result */
+  var targetAligned=compatible?(Math.random()<0.5?4:3):(Math.random()<0.5?1:2);
+  /* Randomly pick which question indices to align on */
+  var pool=[0,1,2,3,4];
+  var alignOn=[];
+  for(var i=0;i<targetAligned;i++){
+    var ri=Math.floor(Math.random()*pool.length);
+    alignOn.push(pool.splice(ri,1)[0]);
+  }
+  var theirAnswers=cpQuestions.map(function(q,i){
+    return alignOn.indexOf(i)!==-1 ? cpAnswers[i] : (cpAnswers[i]===q.a?q.b:q.a);
+  });
   cpScoreWithAI(theirAnswers);
 }
 
@@ -3267,9 +3170,12 @@ async function cpScoreWithAI(theirAnswers){
   var waitMsg=document.querySelector('.cp-waiting-msg');
   if(waitMsg) waitMsg.innerHTML='<div style="font-size:28px;margin-bottom:14px;">&#x2728;</div><div style="font-family:\'Cormorant Garamond\',serif;font-size:20px;color:var(--em-text);margin-bottom:10px;">Reading your answers</div><div class="cp-waiting-dots"><span>&#x25CF;</span><span>&#x25CF;</span><span>&#x25CF;</span></div>';
 
-  var name=(cpMatchProfile&&cpMatchProfile.name)||'them';
+  /* Direct score: count matching choices */
+  var q_scores=cpQuestions.map(function(q,i){return cpAnswers[i]===theirAnswers[i]?1:0;});
+  var directScore=q_scores.reduce(function(s,v){return s+v;},0);
+
   var pairsText=cpQuestions.map(function(q,i){
-    return 'Q: '+q+'\nMe: '+cpAnswers[i]+'\nThem: '+theirAnswers[i];
+    return 'Q: '+q.q+'\nMe: '+cpAnswers[i]+'\nThem: '+theirAnswers[i];
   }).join('\n\n');
 
   var score=null;
@@ -3279,17 +3185,17 @@ async function cpScoreWithAI(theirAnswers){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:400,
-        messages:[{role:'user',content:'Two people on a dating app answered the same 5 questions. Score their compatibility 0-5 based on shared values, personality alignment, and energy -- not just literal matching. Return ONLY valid JSON: {"score":number,"title":"short phrase max 5 words","summary":"one warm honest sentence about what their answers reveal together","q_scores":[0 or 1 for each question]}. Answers:\n\n'+pairsText}]
+        max_tokens:200,
+        messages:[{role:'user',content:'Two people chose between two options on 5 compatibility questions. They matched on '+directScore+' of 5. Return ONLY valid JSON: {"title":"short phrase max 5 words","summary":"one warm honest sentence about what their choices suggest together"}. Their choices:\n\n'+pairsText}]
       })
     });
     var data=await resp.json();
     var text=data.content[0].text.replace(/```json|```/g,'').trim();
-    score=JSON.parse(text);
+    var aiData=JSON.parse(text);
+    score={score:directScore,title:aiData.title||'',summary:aiData.summary||'',q_scores:q_scores};
   }catch(err){
     console.error('[CP SCORE]',err);
-    var aligned=Math.floor(Math.random()*3)+2;
-    score={score:aligned,title:aligned>=3?'Strong connection':'Different takes',summary:'Your answers show distinct personalities with some interesting common ground.',q_scores:cpQuestions.map(function(_,i){return i<aligned?1:0;})};
+    score={score:directScore,title:directScore>=3?'Something here':'Worth exploring',summary:'You aligned on some things, and that\'s a start.',q_scores:q_scores};
   }
   cpShowResults(theirAnswers,score);
 }
@@ -3317,7 +3223,7 @@ function cpShowResults(theirAnswers,aiScore){
     row.className='cp-ans-row';
     row.style.borderLeft=aligned?'2px solid rgba(255,179,71,0.5)':'2px solid transparent';
     row.style.paddingLeft='8px';
-    row.innerHTML='<div class="cp-ans-q">'+(aligned?'&#x2746; ':'')+q+'</div>'+'<div class="cp-ans-both">'+'<div class="cp-ans-me">'+escapeHtml(cpAnswers[i]||'')+'</div>'+'<div class="cp-ans-them">'+escapeHtml(theirAnswers[i]||'')+'</div>'+'</div>';
+    row.innerHTML='<div class="cp-ans-q">'+(aligned?'&#x2746; ':'')+q.q+'</div>'+'<div class="cp-ans-both">'+'<div class="cp-ans-me">'+escapeHtml(cpAnswers[i]||'')+'</div>'+'<div class="cp-ans-them">'+escapeHtml(theirAnswers[i]||'')+'</div>'+'</div>';
     preview.appendChild(row);
   });
 
@@ -3338,11 +3244,15 @@ function cpStartChat(){
   closeCompatCheck();
   var mId=cpMatchId||emberMatchId;
   var mProf=cpMatchProfile||emberMatchProf;
-  /* Wait for overlay fade (0.25s) then reset transition guard before navigating */
+  /* Wait for overlay fade then navigate — mirror dismissEmberGoChat demo handling */
   setTimeout(function(){
     _transitioning=false;
-    if(mId&&mProf){ openChat(mId,mProf); }
-    else{ navTo('s-matches'); }
+    if(mProf){
+      var chatId=(mId&&typeof mId==='string'&&mId.startsWith('demo-'))?null:mId;
+      openChat(chatId,mProf);
+    } else {
+      navTo('s-matches');
+    }
   }, 320);
 }
 function cpPass(){
@@ -3393,7 +3303,17 @@ const IBR_QUESTIONS = [
   "Is gif pronounced with a hard G or a soft G and how strongly do you feel about it?",
   "Is a hot beverage better when it has gone slightly cold or must it be piping hot?",
   "Do you fold or scrunch your toilet paper and are you willing to defend that?",
-  "Is it acceptable to recline your airplane seat -- full recline, partial, or never?"
+  "Is it acceptable to recline your airplane seat -- full recline, partial, or never?",
+  /* Open-ended — personal */
+  "What does your ideal weekend look like?",
+  "What does a good day actually look like for you?",
+  "What is the thing that makes you feel most like yourself?",
+  "What is something small that would bother you more than it probably should?",
+  "How do you show people you care about them?",
+  "What is something you would not compromise on in a relationship?",
+  "What is something you have changed your mind about in the last few years?",
+  "What is a hill you will die on that most people would find ridiculous?",
+  "What is something you are quietly proud of that you never really talk about?"
 ];
 
 function openIBR(){
