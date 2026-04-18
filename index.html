@@ -2543,6 +2543,7 @@ async function openChat(matchId, otherProfile){
   if(cfName)cfName.textContent=name;
   if(cfName2)cfName2.textContent=name;
   if(smName)smName.textContent=name;
+  _transitioning=false;
   _show('s-chat');
   dateCardShown=false;
   if(matchId){await loadMessages(matchId);subscribeMsgs(matchId);}
@@ -3337,7 +3338,12 @@ function cpStartChat(){
   closeCompatCheck();
   var mId=cpMatchId||emberMatchId;
   var mProf=cpMatchProfile||emberMatchProf;
-  if(mId&&mProf){openChat(mId,mProf);}else{navTo('s-matches');}
+  /* Wait for overlay fade (0.25s) then reset transition guard before navigating */
+  setTimeout(function(){
+    _transitioning=false;
+    if(mId&&mProf){ openChat(mId,mProf); }
+    else{ navTo('s-matches'); }
+  }, 320);
 }
 function cpPass(){
   document.getElementById('cp-result-overlay').classList.remove('show');
