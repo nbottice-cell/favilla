@@ -569,7 +569,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
 ═══════════════════════════════════ */
 /* Fixed-height screen so keyboard never moves layout */
 .cp-fullscreen-overlay{
-  position:absolute;
+  position:fixed;
   inset:0;
   background:var(--em-bg);
   z-index:700;
@@ -2326,21 +2326,82 @@ function showDateCard(){
   const msgs=document.getElementById('chat-msgs');
   const card=document.createElement('div');
   card.className='date-card';
-  card.innerHTML=`<div class="dc-top"><div class="dc-eye">📅 AI date suggestion</div><div class="dc-title">Sunday afternoon — your call</div><div class="dc-mid">📍 Midpoint: Midtown · ~0.8 mi from each of you</div></div>
+  card.innerHTML=`<div class="dc-top"><div class="dc-eye">&#x1F4C5; Plan a date</div><div class="dc-title">Sunday afternoon &#x2014; your call</div><div class="dc-mid">&#x1F4CD; Midpoint: Midtown &middot; ~0.8 mi from each of you</div></div>
   <div class="dc-opts">
-    <div class="dc-opt sel" onclick="selectOpt(this)"><div class="dc-oi" style="background:rgba(180,120,60,0.18);">☕</div><div style="flex:1;"><div class="dc-vibe" style="color:#C49020;">Coffee</div><div class="dc-oname">Brûlerie Coffee Co.</div><div class="dc-odet">Cosy, good for talking · Sun 10am–6pm</div></div><div class="dc-odist" style="color:var(--fl-lt);">0.7 mi</div></div>
-    <div class="dc-opt" onclick="selectOpt(this)"><div class="dc-oi" style="background:rgba(255,90,50,0.14);">🍸</div><div style="flex:1;"><div class="dc-vibe" style="color:var(--fl-lt);">Drinks</div><div class="dc-oname">The Veranda Bar</div><div class="dc-odet">Low-key rooftop · Opens 2pm</div></div><div class="dc-odist" style="color:var(--ash);">0.9 mi</div></div>
-    <div class="dc-opt" onclick="selectOpt(this)"><div class="dc-oi" style="background:rgba(40,180,120,0.14);">🎳</div><div style="flex:1;"><div class="dc-vibe" style="color:#40C880;">Activity</div><div class="dc-oname">Frames Bowling &amp; Bar</div><div class="dc-odet">Something to do if chat runs dry 😄</div></div><div class="dc-odist" style="color:var(--ash);">1.1 mi</div></div>
+    <div class="dc-opt sel" onclick="selectOpt(this)" data-name="Brûlerie Coffee Co." data-time="Sunday 2:00 PM"><div class="dc-oi" style="background:rgba(180,120,60,0.18);">&#x2615;</div><div style="flex:1;"><div class="dc-vibe" style="color:#C49020;">Coffee</div><div class="dc-oname">Brûlerie Coffee Co.</div><div class="dc-odet">Cosy, good for talking &middot; Sun 10am&#x2013;6pm</div></div><div class="dc-odist" style="color:var(--fl-lt);">0.7 mi</div></div>
+    <div class="dc-opt" onclick="selectOpt(this)" data-name="The Veranda Bar" data-time="Sunday 3:00 PM"><div class="dc-oi" style="background:rgba(255,90,50,0.14);">&#x1F378;</div><div style="flex:1;"><div class="dc-vibe" style="color:var(--fl-lt);">Drinks</div><div class="dc-oname">The Veranda Bar</div><div class="dc-odet">Low-key rooftop &middot; Opens 2pm</div></div><div class="dc-odist" style="color:var(--ash);">0.9 mi</div></div>
+    <div class="dc-opt" onclick="selectOpt(this)" data-name="Frames Bowling" data-time="Sunday 4:00 PM"><div class="dc-oi" style="background:rgba(40,180,120,0.14);">&#x1F3B3;</div><div style="flex:1;"><div class="dc-vibe" style="color:#40C880;">Activity</div><div class="dc-oname">Frames Bowling &amp; Bar</div><div class="dc-odet">Something to do if chat runs dry</div></div><div class="dc-odist" style="color:var(--ash);">1.1 mi</div></div>
   </div>
-  <div class="dc-acts"><button class="dc-btn yes" onclick="goTo('s-confirmed','s-chat')">✓ Propose Brûlerie</button><button class="dc-btn alt">Different vibe</button></div>`;
+  <div class="dc-acts"><button class="dc-btn yes" onclick="proposeDateAndCalendar(this)">&#x2713; Propose &amp; add to calendar</button><button class="dc-btn alt" onclick="dateCardShown=false;this.closest('.date-card').remove();">Different vibe</button></div>`;
   msgs.appendChild(card);msgs.scrollTop=msgs.scrollHeight;
 }
+
 function selectOpt(el){
   el.closest('.dc-opts').querySelectorAll('.dc-opt').forEach(o=>o.classList.remove('sel'));
   el.classList.add('sel');
-  const name=el.querySelector('.dc-oname').textContent;
-  el.closest('.date-card').querySelector('.dc-btn.yes').textContent='✓ Propose '+name.split(' ')[0];
+  const name=el.dataset.name||el.querySelector('.dc-oname').textContent;
+  const btn=el.closest('.date-card').querySelector('.dc-btn.yes');
+  btn.dataset.venue=name;
+  btn.dataset.time=el.dataset.time||'Sunday 2:00 PM';
+  btn.textContent='✓ Propose '+name.split(' ')[0]+' — add to calendar';
 }
+
+function proposeDateAndCalendar(btn){
+  var venue=btn.dataset.venue||'Brûlerie Coffee Co.';
+  var timeStr=btn.dataset.time||'Sunday 2:00 PM';
+  var matchName=(currentMatchProfile&&currentMatchProfile.name)||'your match';
+
+  /* Build calendar event — next Sunday */
+  var now=new Date();
+  var daysUntilSunday=(7-now.getDay())%7||7;
+  var eventDate=new Date(now);
+  eventDate.setDate(now.getDate()+daysUntilSunday);
+
+  /* Parse time from timeStr e.g. "Sunday 2:00 PM" */
+  var timeParts=timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  var hrs=timeParts?parseInt(timeParts[1]):14;
+  var mins=timeParts?parseInt(timeParts[2]):0;
+  if(timeParts&&timeParts[3].toUpperCase()==='PM'&&hrs!==12) hrs+=12;
+  eventDate.setHours(hrs,mins,0,0);
+
+  var endDate=new Date(eventDate);
+  endDate.setHours(endDate.getHours()+2);
+
+  /* Format for Google Calendar URL (most reliable cross-platform) */
+  function fmtGcal(d){
+    return d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  }
+  var title=encodeURIComponent('Date with '+matchName+' at '+venue);
+  var details=encodeURIComponent('Planned via Favilla ✨');
+  var location=encodeURIComponent(venue);
+  var gcalUrl='https://calendar.google.com/calendar/render?action=TEMPLATE'
+    +'&text='+title
+    +'&dates='+fmtGcal(eventDate)+'/'+fmtGcal(endDate)
+    +'&details='+details
+    +'&location='+location;
+
+  /* Also try native calendar via data URI (iOS/Android) */
+  var dtStart=eventDate.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  var dtEnd=endDate.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  var icsContent='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nDTSTART:'+dtStart+'\r\nDTEND:'+dtEnd+'\r\nSUMMARY:Date with '+matchName+' at '+venue+'\r\nDESCRIPTION:Planned via Favilla\r\nLOCATION:'+venue+'\r\nEND:VEVENT\r\nEND:VCALENDAR';
+  var icsBlob=new Blob([icsContent],{type:'text/calendar'});
+  var icsUrl=URL.createObjectURL(icsBlob);
+
+  /* Try .ics download first (works on iOS Safari to add to native calendar) */
+  var a=document.createElement('a');
+  a.href=icsUrl;
+  a.download='favilla-date.ics';
+  a.click();
+  setTimeout(function(){URL.revokeObjectURL(icsUrl);},3000);
+
+  /* Update button state */
+  btn.textContent='✓ Added to calendar';
+  btn.disabled=true;
+  btn.style.background='rgba(255,90,50,0.08)';
+  showToastMsg('Opening calendar for '+venue+' ✨');
+  goTo('s-confirmed','s-chat');
+}
+
 
 /* ---- FIND THEM MODE ---- */
 var ftOrientationActive=false, ftSimInterval=null;
@@ -3099,7 +3160,7 @@ function cpSubmitAnswer(){
     document.getElementById('cp-answer-wrap').style.display='none';
     /* Update submit label on last question */
     var lbl=document.getElementById('cp-submit-lbl');
-    if(lbl)lbl.textContent=cpCurrentQ===4?'Submit answers &#x2192;':'Next question &#x2192;';
+    if(lbl)lbl.innerHTML=cpCurrentQ===4?'Submit answers →':'Next question →';
     setTimeout(function(){ cpShowQuestion(cpCurrentQ); },200);
   } else {
     /* All 5 done */
@@ -3110,17 +3171,93 @@ function cpSubmitAnswer(){
 }
 
 /* ── Demo partner answers ── */
-var CP_DEMO_ANSWERS=[
-  ["Sprinkles -- jimmies is a regional conspiracy","Hard no on pineapple","Cronuts, way too hyped","Italian, always","No it is a sausage in a bun","Breakfast, by a mile"],
-  ["Jimmies all the way","Pineapple is fine if you want it","Avocado toast, sorry","Japanese","Yes obviously","Dinner is the main event"],
-  ["Neither, just plain","I see both sides","Macarons","Mexican","It depends on the bread","Lunch, wildly underrated"],
-  ["Sprinkles","No pineapple ever","Truffle on everything","Vietnamese","It is its own category","Brunch counts as breakfast"],
-  ["Does it matter?","Pineapple belongs on pizza","Acai bowls","Thai","No, a sandwich has two pieces of bread","Second breakfast is real"]
+/* Demo answers keyed to CP_QUESTIONS topics so AI scoring is meaningful */
+var CP_DEMO_ANSWER_SETS=[
+  /* Set A — fairly compatible */
+  {
+    "Do you need alone time to recharge or do people energize you?": "I definitely need alone time to recharge, crowds drain me after a while.",
+    "How do you feel about spontaneous plans versus scheduled ones?": "I prefer knowing plans in advance but I can do spontaneous sometimes.",
+    "Are you a morning person or does the night feel more like yours?": "Night owl completely, I do my best thinking after 10pm.",
+    "How important is it that a partner shares your interests?": "Some overlap matters but I think having separate interests is healthy too.",
+    "Do you prefer a quiet night in or being out in the world?": "Quiet night in most of the time, going out feels like a treat.",
+    "How do you handle conflict -- do you address it immediately or need time first?": "I need a little time to process before I can talk calmly.",
+    "What does a good day actually look like for you?": "Productive morning, good food, something creative in the afternoon.",
+    "Is ambition something you find attractive or does it depend?": "Yes, definitely attractive -- I like people who care about what they do.",
+    "How do you feel about splitting finances in a relationship?": "I think it should be proportional to what each person earns.",
+    "What role does family play in your everyday life?": "Important but not suffocating -- I talk to mine a few times a week.",
+    "Is travel something you need or more of a nice-to-have?": "I need it -- at least one real trip a year keeps me sane.",
+    "How do you feel about pets -- dealbreaker either way?": "I love dogs and would love to have one eventually.",
+    "Are you someone who finishes what they start or pivots freely?": "I finish things but I do pivot if something clearly is not working.",
+    "Do you tend to make decisions quickly or do you take your time?": "I take my time for big things, quick on small ones.",
+    "How do you feel when plans change at the last minute?": "A little annoyed but I get over it fast.",
+    "Are you more likely to over-communicate or go quiet when something is wrong?": "I go quiet first then over-communicate once I have figured out what I feel.",
+    "Do you find comfort in routine or does it start to feel like a cage?": "Routine is grounding for me, I like knowing what my days look like.",
+    "How do you feel about being around someone who is messier or tidier than you?": "Slightly messier is fine, but chaos would drive me a little crazy.",
+    "Where do you see yourself living five years from now?": "Probably same city but a nicer apartment with more space.",
+    "Is having children something you want, do not want, or are undecided on?": "I want them eventually, not in any rush though.",
+    "How important is it that a partner shares your sense of humor?": "Very important -- if we cannot laugh together it would not work.",
+    "What is something you would not compromise on in a relationship?": "Honesty. I can work with a lot but not deception.",
+    "Do you think you can love someone whose politics differ significantly from yours?": "Depends how different -- on core values, probably not.",
+    "How do you feel about social media in a relationship -- sharing, privacy, boundaries?": "I post occasionally but I would not want to be on someone else's feed all the time.",
+    "What does your ideal weekend look like?": "Saturday out doing something, Sunday slow with coffee and nowhere to be.",
+    "How do you feel about silence -- comfortable or does it need filling?": "Comfortable silence is one of my favorite things.",
+    "Are you someone who needs to talk through a bad day or would rather decompress alone?": "Decompress alone first, then talk if it is still bothering me.",
+    "How do you show people you care about them?": "Acts of service mostly -- I show up and do things without being asked.",
+    "What is something small that would bother you more than it probably should?": "People who do not signal when driving. It is so simple.",
+    "What is the thing that makes you feel most like yourself?": "Being outside somewhere quiet with nothing to check."
+  },
+  /* Set B — less compatible */
+  {
+    "Do you need alone time to recharge or do people energize you?": "People totally energize me, I get restless if I am alone too long.",
+    "How do you feel about spontaneous plans versus scheduled ones?": "Spontaneous always, schedules make everything feel like a chore.",
+    "Are you a morning person or does the night feel more like yours?": "Up at 6am without an alarm, mornings are my whole thing.",
+    "How important is it that a partner shares your interests?": "Really important -- I want to be able to do things together.",
+    "Do you prefer a quiet night in or being out in the world?": "Out in the world as much as possible, sitting home feels like giving up.",
+    "How do you handle conflict -- do you address it immediately or need time first?": "Address it right away, letting things sit makes them worse.",
+    "What does a good day actually look like for you?": "Early start, gym, social plans, something happening every few hours.",
+    "Is ambition something you find attractive or does it depend?": "It depends -- ambition without warmth is exhausting.",
+    "How do you feel about splitting finances in a relationship?": "50-50 down the middle, keeps things simple and equal.",
+    "What role does family play in your everyday life?": "Central -- I see mine almost every week.",
+    "Is travel something you need or more of a nice-to-have?": "Nice to have, I am happy being home honestly.",
+    "How do you feel about pets -- dealbreaker either way?": "Not a pet person, they tie you down too much.",
+    "Are you someone who finishes what they start or pivots freely?": "I pivot freely -- why finish something that is not working?",
+    "Do you tend to make decisions quickly or do you take your time?": "Very quickly, overthinking just creates anxiety.",
+    "How do you feel when plans change at the last minute?": "Honestly fine with it, I am flexible about most things.",
+    "Are you more likely to over-communicate or go quiet when something is wrong?": "I bring it up immediately, I cannot hold things in.",
+    "Do you find comfort in routine or does it start to feel like a cage?": "It starts to feel like a cage pretty quickly.",
+    "How do you feel about being around someone who is messier or tidier than you?": "I am pretty messy myself so I could not live with a neat freak.",
+    "Where do you see yourself living five years from now?": "Somewhere completely different, I want to move cities.",
+    "Is having children something you want, do not want, or are undecided on?": "I do not want children, pretty certain about that.",
+    "How important is it that a partner shares your sense of humor?": "Somewhat but it is not a dealbreaker.",
+    "What is something you would not compromise on in a relationship?": "My independence -- I need to feel like my own person.",
+    "Do you think you can love someone whose politics differ significantly from yours?": "Yes absolutely, love is bigger than politics.",
+    "How do you feel about social media in a relationship -- sharing, privacy, boundaries?": "I share a lot, I think being open is part of being close.",
+    "What does your ideal weekend look like?": "Friday night out, Saturday brunch with friends, Sunday recovery.",
+    "How do you feel about silence -- comfortable or does it need filling?": "I tend to fill it, quiet makes me a little anxious.",
+    "Are you someone who needs to talk through a bad day or would rather decompress alone?": "I need to talk it through, keeping it in just makes it worse.",
+    "How do you show people you care about them?": "Words and affection, I say what I feel pretty openly.",
+    "What is something small that would bother you more than it probably should?": "Slow walkers in the middle of the pavement.",
+    "What is the thing that makes you feel most like yourself?": "Being around people I love with music on."
+  }
 ];
 
+function getDemoAnswer(questionText, setIdx){
+  var set = CP_DEMO_ANSWER_SETS[setIdx % CP_DEMO_ANSWER_SETS.length];
+  /* Try exact match first */
+  if(set[questionText]) return set[questionText];
+  /* Try partial match */
+  var keys = Object.keys(set);
+  for(var k=0;k<keys.length;k++){
+    if(questionText.toLowerCase().indexOf(keys[k].toLowerCase().substring(0,20)) !== -1)
+      return set[keys[k]];
+  }
+  return 'I would have to think about that one.';
+}
+
 function cpRevealResults(){
-  var demoSet=CP_DEMO_ANSWERS[Math.floor(Math.random()*CP_DEMO_ANSWERS.length)];
-  var theirAnswers=cpQuestions.map(function(q,i){return demoSet[i]||'I would have to think about that one';});
+  /* Pick a demo set at random — answers actually match the questions */
+  var setIdx=Math.floor(Math.random()*CP_DEMO_ANSWER_SETS.length);
+  var theirAnswers=cpQuestions.map(function(q){return getDemoAnswer(q,setIdx);});
   cpScoreWithAI(theirAnswers);
 }
 
