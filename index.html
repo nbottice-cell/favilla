@@ -1584,6 +1584,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
       <div class="ibr-tape" id="ibr-tape"></div>
     </div>
     <button class="ibr-spin-btn" id="ibr-spin-btn" onclick="ibrSpin()">&#x21BB; Spin</button>
+    <button class="ibr-spin-btn" id="ibr-spin-again" onclick="ibrSpin()" style="display:none;background:rgba(255,90,50,0.1);color:var(--fl);border:0.5px solid rgba(255,90,50,0.3);margin-top:-4px;">&#x21BB; Spin again</button>
     <button style="width:100%;background:transparent;border:none;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--ash);cursor:pointer;" onclick="closeIBR()">Cancel</button>
   </div>
 </div>
@@ -3266,6 +3267,17 @@ function cpPass(){
 ═══════════════════════════════════ */
 var ibrSpinning = false;
 var ibrCurrentQ = null;
+var ibrRecentQuestions = [];
+
+function ibrPickQuestion(){
+  /* Avoid the last 6 questions seen — reset history only when pool is exhausted */
+  var available=IBR_QUESTIONS.filter(function(q){return ibrRecentQuestions.indexOf(q)===-1;});
+  if(available.length===0){ibrRecentQuestions=[];available=IBR_QUESTIONS.slice();}
+  var q=available[Math.floor(Math.random()*available.length)];
+  ibrRecentQuestions.push(q);
+  if(ibrRecentQuestions.length>6)ibrRecentQuestions.shift();
+  return q;
+}
 
 const IBR_QUESTIONS = [
   /* Philosophical nonsense */
@@ -3321,7 +3333,9 @@ function openIBR(){
   var tape=document.getElementById('ibr-tape');
   if(tape) tape.innerHTML='';
   var btn=document.getElementById('ibr-spin-btn');
-  if(btn){btn.disabled=false;btn.textContent='\u21BB Spin';}
+  if(btn){btn.disabled=false;btn.textContent='\u21BB Spin';btn.onclick=ibrSpin;}
+  var again=document.getElementById('ibr-spin-again');
+  if(again)again.style.display='none';
   document.getElementById('ibr-overlay').classList.add('open');
 }
 function closeIBR(e){
@@ -3333,7 +3347,9 @@ function ibrSpin(){
   if(ibrSpinning)return;
   ibrSpinning=true;
   var btn=document.getElementById('ibr-spin-btn');
-  if(btn){btn.disabled=true;btn.textContent='Spinning\u2026';}
+  var again=document.getElementById('ibr-spin-again');
+  if(btn){btn.disabled=true;btn.textContent='Spinning\u2026';btn.onclick=ibrSpin;}
+  if(again)again.style.display='none';
 
   var tape=document.getElementById('ibr-tape');
   tape.innerHTML='';
@@ -3341,11 +3357,11 @@ function ibrSpin(){
 
   var ITEM_H   = 44;
   var WHEEL_H  = 130;
-  var TOTAL    = 40;  /* total items in tape — long enough to feel like endless spinning */
+  var TOTAL    = 50;  /* longer tape for the extended spin */
 
-  /* Pick winner and place it at a random index in the middle third of the tape */
-  var winnerQ   = IBR_QUESTIONS[Math.floor(Math.random()*IBR_QUESTIONS.length)];
-  var winnerIdx = 10 + Math.floor(Math.random()*20); /* lands somewhere between item 10-30 */
+  /* Pick winner (avoids recently seen questions) */
+  var winnerQ   = ibrPickQuestion();
+  var winnerIdx = 15 + Math.floor(Math.random()*20); /* lands between item 15-35 */
 
   /* Build the full tape */
   for(var i=0;i<TOTAL;i++){
@@ -3355,7 +3371,6 @@ function ibrSpin(){
       d.textContent=winnerQ;
     } else {
       d.className='ibr-tape-item';
-      /* Pick a random question that is not the winner for visual variety */
       var q;
       do{ q=IBR_QUESTIONS[Math.floor(Math.random()*IBR_QUESTIONS.length)]; }
       while(q===winnerQ);
@@ -3364,34 +3379,34 @@ function ibrSpin(){
     tape.appendChild(d);
   }
 
-  /* Start tape positioned so item 0 is at center of wheel */
+  /* Start tape with item 0 centred in the wheel */
   var startY = WHEEL_H/2 - ITEM_H/2;
   gsap.set(tape,{y:startY});
 
-  /* finalY positions winnerIdx item at center of wheel */
+  /* finalY centres winnerIdx in the wheel */
   var finalY = startY - (winnerIdx * ITEM_H);
 
-  /* Phase 1 — fast spin (overshoot past winner by several items) */
-  var overshootY = finalY - (ITEM_H * 6);
+  /* Phase 1 — gradual build-up, overshoot past winner */
+  var overshootY = finalY - (ITEM_H * 9);
   gsap.to(tape,{
     y: overshootY,
-    duration: 1.8,
-    ease: 'power3.in',
+    duration: 2.6,
+    ease: 'power2.in',
     onComplete: function(){
-      /* Phase 2 — slow back to land exactly on winner */
+      /* Phase 2 — long, smooth deceleration to land on winner */
       gsap.to(tape,{
         y: finalY,
-        duration: 2.4,
-        ease: 'power4.out',
+        duration: 4.2,
+        ease: 'expo.out',
         onComplete: function(){
           ibrCurrentQ=winnerQ;
           ibrSpinning=false;
           gsap.fromTo('#ibr-wheel',
             {borderColor:'rgba(255,90,50,0.8)'},
-            {borderColor:'rgba(255,90,50,0.2)',duration:0.8}
+            {borderColor:'rgba(255,90,50,0.2)',duration:1.0}
           );
-          if(btn){btn.disabled=false;btn.textContent='Use this question';}
-          btn.onclick=ibrUseQuestion;
+          if(btn){btn.disabled=false;btn.textContent='Use this question';btn.onclick=ibrUseQuestion;}
+          if(again)again.style.display='block';
         }
       });
     }
@@ -3401,12 +3416,12 @@ function ibrSpin(){
 function ibrUseQuestion(){
   if(!ibrCurrentQ)return;
   document.getElementById('ibr-overlay').classList.remove('open');
-  /* Inject as a special card into the chat */
   ibrAddCardToChat(ibrCurrentQ);
   ibrCurrentQ=null;
-  /* Reset spin btn for next time */
   var btn=document.getElementById('ibr-spin-btn');
   if(btn){btn.textContent='\u21BB Spin';btn.onclick=ibrSpin;}
+  var again=document.getElementById('ibr-spin-again');
+  if(again)again.style.display='none';
 }
 
 function ibrAddCardToChat(question){
