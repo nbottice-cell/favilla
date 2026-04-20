@@ -1230,8 +1230,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
   </div>
   <div class="venue-bar" id="venue-bar" onclick="doCheckInVenue()"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></div>
   <div class="streak-bar"><span style="font-size:16px;">🔥</span><span class="streak-text">3-week check-in streak — you're a regular</span><span class="streak-cnt">3🔥</span></div>
-  <!-- DEBUG ONLY -->
-  <div id="debug-test-btn" style="margin:0 18px 10px;background:rgba(255,90,50,0.15);border:1px dashed rgba(255,90,50,0.4);border-radius:10px;padding:10px;text-align:center;font-size:12px;color:#FF7A5A;cursor:pointer;" onclick="testMatchOverlay()">⚡ TEST: Fire match overlay</div>
   <div class="sec-lbl" id="nearby-lbl">Who's here right now</div>
   <!-- RADIAL LAYOUT — populated by JS -->
   <div class="radial" id="radial-container">
@@ -1258,9 +1256,6 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Space Grot
     </div>
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:8px;">Quiet in here.</div>
     <div style="font-size:13px;color:var(--ash);line-height:1.7;" id="empty-state-msg">Check in to appear when others arrive.</div>
-  </div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:8px;">Quiet in here.</div>
-    <div style="font-size:13px;color:var(--ash);line-height:1.7;">No one else is checked in yet. You'll appear to others the moment they arrive.</div>
   </div>
   <div class="enter-btn" id="enter-btn" onclick="doCheckInVenue()">
     <div class="enter-title" id="enter-title">Enter the Room</div>
@@ -1935,6 +1930,14 @@ let currentUser=null,currentProfile=null;
 let obStep=1,obGender='',obIntention='',obInterested='';
 let photoFiles=[null,null,null];
 const navStack=[];
+let currentAIScore=null;
+let aiScoreEnabled=true;
+
+async function fetchProfileById(userId){
+  if(!userId)return null;
+  const{data}=await sb.from('profiles').select('*').eq('id',userId).maybeSingle();
+  return data;
+}
 
 /* ── NAV ─────────────────────────────── */
 function goTo(id,from){
@@ -2297,13 +2300,7 @@ function showToast(){
   setTimeout(()=>goTo('s-match','s-spark'),2400);
 }
 
-/* ── DEBUG — remove before launch ── */
-var _dbgStep = 0;
-function dbg(msg){
-  _dbgStep++;
-  showToastMsg('[' + _dbgStep + '] ' + msg);
-  console.log('[DBG ' + _dbgStep + ']', msg);
-}
+function dbg(msg){ console.log('[DBG]', msg); }
 
 function showToastMsg(msg){
   document.getElementById('toast-text').innerHTML=msg;
@@ -4031,7 +4028,7 @@ async function doSpark() {
   });
 
   if (error) {
-    dbg('INSERT ERR: ' + (error.message || error.code));
+    showToastMsg('Something went wrong — try again.');
     btn.disabled = false; btn.innerHTML = '&#x2746; Spark';
     return;
   }
@@ -4099,7 +4096,7 @@ async function createMatch(otherUserId, otherProfile) {
   }).select().single();
 
   if (error) {
-    dbg('Match insert error: ' + (error.message||error.code));
+    console.error('[Match insert]', error.message||error.code);
     return;
   }
   dbg('Match inserted: ' + insertData.id.substring(0,8));
@@ -4121,7 +4118,7 @@ function subscribeLikes() {
         if (!prof) prof = await fetchProfileById(likerId);
         await createMatch(likerId, prof);
       })
-    .subscribe(s => { console.log('[REALTIME] likes:', s); dbg('Likes sub: '+s); });
+    .subscribe(s => { dbg('Likes sub: '+s); });
 }
 
 function subscribeMatches() {
@@ -4147,7 +4144,7 @@ function subscribeMatches() {
         if (!prof) prof = await fetchProfileById(otherId);
         showMatchOverlay(prof, matchId);
       })
-    .subscribe(s => { console.log('[REALTIME] matches:', s); dbg('Matches sub: '+s); });
+    .subscribe(s => { dbg('Matches sub: '+s); });
 }
 
 
