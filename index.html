@@ -297,6 +297,68 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .plan-btn{padding:9px 14px;border-radius:22px;font-size:12px;font-family:'Inter',sans-serif;font-weight:600;flex-shrink:0;background:rgba(27,58,140,0.07);border:0.5px solid rgba(27,58,140,0.22);color:#1B3A8C;cursor:pointer;white-space:nowrap;}
 .ch-input{flex:1;background:var(--sl-card);border:0.5px solid rgba(255,255,255,0.09);border-radius:22px;padding:11px 16px;font-size:16px;color:var(--cr-dim);font-family:'Inter',sans-serif;outline:none;}
 .ch-send{width:38px;height:38px;background:var(--fl);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;cursor:pointer;flex-shrink:0;}
+
+/* ── AI FEATURES ── */
+/* Spark Nudge */
+.spark-nudge{margin:0 18px 6px;background:rgba(27,58,140,0.05);border:0.5px solid rgba(27,58,140,0.2);border-radius:14px;padding:12px 14px;flex-shrink:0;display:none;}
+.sn-label{font-size:10px;color:var(--fl-lt);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.sn-opts{display:flex;flex-direction:column;gap:6px;}
+.sn-opt{background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.15);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--cr-dim);cursor:pointer;line-height:1.45;transition:background 0.15s,border-color 0.15s;}
+.sn-opt:active{background:rgba(27,58,140,0.08);border-color:rgba(27,58,140,0.35);}
+.sn-dismiss{font-size:11px;color:var(--ash);text-align:right;margin-top:8px;cursor:pointer;padding:4px 0;}
+/* Vibe check pill */
+.vibe-pill{display:none;align-items:center;gap:5px;margin:0 18px 6px;background:transparent;border:0.5px solid rgba(27,58,140,0.25);border-radius:20px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--fl-lt);cursor:pointer;font-family:'Inter',sans-serif;align-self:flex-start;flex-shrink:0;touch-action:manipulation;}
+/* AI bottom sheet overlay */
+.ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:600;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
+.ai-overlay.open{opacity:1;pointer-events:all;}
+.ai-sheet{width:100%;background:var(--sl-bg);border-radius:20px 20px 0 0;padding:18px 20px max(24px,env(safe-area-inset-bottom,24px));max-height:88vh;overflow-y:auto;}
+.ai-handle{width:36px;height:4px;background:rgba(27,58,140,0.15);border-radius:2px;margin:0 auto 16px;}
+.ai-sheet-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);font-weight:600;margin-bottom:4px;}
+.ai-sheet-sub{font-size:12px;color:var(--ash);margin-bottom:18px;}
+/* Blueprint sheet */
+.bp-group{margin-bottom:14px;}
+.bp-group-label{font-size:10px;color:var(--ash);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}
+.bp-opts-row{display:flex;gap:6px;flex-wrap:wrap;}
+.bp-opt{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;border:0.5px solid rgba(27,58,140,0.2);color:var(--cr-dim);cursor:pointer;background:var(--sl-card);font-family:'Inter',sans-serif;touch-action:manipulation;transition:background 0.15s,border-color 0.15s,color 0.15s;}
+.bp-opt.on{background:rgba(27,58,140,0.1);border-color:rgba(27,58,140,0.45);color:var(--fl-lt);}
+.bp-constraints{width:100%;background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.15);border-radius:12px;padding:11px 14px;font-size:14px;color:var(--cr);font-family:'Inter',sans-serif;outline:none;resize:none;margin-bottom:16px;}
+.bp-gen-btn{width:100%;background:var(--fl);color:#fff;border:none;border-radius:28px;padding:15px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+/* Blueprint card in chat */
+.blueprint-card{margin:6px 0;border:0.5px solid rgba(27,58,140,0.25);border-radius:16px;overflow:hidden;flex-shrink:0;background:var(--sl-card);}
+.bp-hd{background:rgba(27,58,140,0.06);padding:13px 16px 11px;border-bottom:0.5px solid rgba(27,58,140,0.12);}
+.bp-eye{font-size:10px;color:var(--fl-lt);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.bp-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cr);font-weight:600;margin-bottom:4px;}
+.bp-narrative{font-size:12px;color:var(--ash);line-height:1.55;}
+.bp-stops{padding:12px 16px;display:flex;flex-direction:column;gap:0;}
+.bp-stop{padding:10px 0;border-bottom:0.5px solid rgba(27,58,140,0.08);}
+.bp-stop:last-child{border-bottom:none;}
+.bp-stop-num{font-size:9px;color:var(--ash);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+.bp-stop-name{font-size:14px;color:var(--cr);font-weight:600;margin-bottom:2px;}
+.bp-stop-why{font-size:12px;color:var(--ash);line-height:1.5;margin-bottom:4px;}
+.bp-stop-q{font-size:12px;color:var(--fl-lt);font-style:italic;line-height:1.5;}
+.bp-arrow{text-align:center;font-size:14px;color:rgba(27,58,140,0.3);padding:2px 0;}
+/* Vibe Check sheet */
+.vibe-read{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);line-height:1.6;margin-bottom:18px;font-style:italic;}
+.vibe-signals{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+.vibe-signal{font-size:13px;color:var(--cr-dim);line-height:1.55;padding-left:14px;position:relative;}
+.vibe-signal::before{content:'';position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:rgba(27,58,140,0.35);}
+.vibe-note{font-size:11px;color:var(--ash);text-align:center;padding-top:8px;border-top:0.5px solid rgba(27,58,140,0.08);}
+/* Meme Duel picker */
+.meme-scenario-hd{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);font-weight:600;text-align:center;padding:16px;background:var(--sl-card);border-radius:14px;margin-bottom:14px;line-height:1.4;}
+.caption-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.caption-opt{background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.15);border-radius:12px;padding:13px 15px;font-size:14px;color:var(--cr-dim);cursor:pointer;line-height:1.45;transition:background 0.15s,border-color 0.15s;}
+.caption-opt:active{background:rgba(27,58,140,0.08);border-color:rgba(27,58,140,0.4);color:var(--cr);}
+/* Meme card in chat */
+.meme-game-card{margin:6px 0;border:0.5px solid rgba(27,58,140,0.2);border-radius:16px;overflow:hidden;flex-shrink:0;background:var(--sl-card);}
+.mg-label{font-size:10px;color:var(--fl-lt);letter-spacing:1px;text-transform:uppercase;padding:10px 14px 6px;}
+.mg-scenario{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);font-weight:600;padding:0 14px 12px;line-height:1.4;border-bottom:0.5px solid rgba(27,58,140,0.1);}
+.mg-pick{padding:10px 14px;border-bottom:0.5px solid rgba(27,58,140,0.08);}
+.mg-pick:last-of-type{border-bottom:none;}
+.mg-who{font-size:10px;color:var(--ash);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.mg-caption{font-size:14px;color:var(--cr-dim);line-height:1.45;}
+.mg-caption.pending{color:var(--ash);font-style:italic;}
+.mg-play-btn{width:100%;background:rgba(27,58,140,0.08);border:none;border-top:0.5px solid rgba(27,58,140,0.12);padding:12px;font-size:13px;font-weight:600;color:var(--fl-lt);cursor:pointer;font-family:'Inter',sans-serif;touch-action:manipulation;}
+
 .date-card{margin:6px 18px;border:0.5px solid rgba(255,90,50,0.28);border-radius:16px;overflow:hidden;flex-shrink:0;}
 .dc-top{background:rgba(255,90,50,0.09);padding:12px 16px 10px;border-bottom:0.5px solid rgba(255,90,50,0.17);}
 .dc-eye{font-size:10px;color:var(--fl-lt);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
@@ -1362,10 +1424,13 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ice-lbl">✦ Something to start with</div>
     <div class="ice-text" id="ice-text"></div>
   </div>
+  <div class="spark-nudge" id="spark-nudge"></div>
+  <button class="vibe-pill" id="vibe-pill" onclick="runVibeCheck()">&#x2736; Vibe Check</button>
   <div class="msgs" id="chat-msgs"></div>
   <div class="ch-input-row">
-    <button class="plan-btn" onclick="showDateCard()">&#x1F4C5; Plan a date</button>
+    <button class="plan-btn" onclick="openBlueprintSheet()">&#x2728; Blueprint</button>
     <button class="plan-btn" onclick="openIBR()" style="background:rgba(255,90,50,0.08);border-color:rgba(255,90,50,0.2);">&#x1F3B2; Ice Breaker</button>
+    <button class="plan-btn" id="meme-duel-btn" onclick="startMemeDuel()" style="background:rgba(27,58,140,0.06);border-color:rgba(27,58,140,0.2);">&#x1F0CF; Duel</button>
     <input class="ch-input" id="ch-input" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendMsg()" onfocus="scrollMsgsToBottom()" oninput="scrollMsgsToBottom()">
     <div class="ch-send" onclick="sendMsg()">↑</div>
   </div>
@@ -1573,6 +1638,66 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
       <div class="ai-toggle-lbl">AI Compatibility Insights</div>
       <button class="ai-toggle on" id="ai-score-toggle" onclick="toggleAIScore()"><div class="ai-toggle-knob"></div></button>
     </div>
+  </div>
+</div>
+
+<!-- ═══════ AI: DATE BLUEPRINT SHEET ═══════ -->
+<div class="ai-overlay" id="blueprint-overlay" onclick="closeBlueprintSheet(event)">
+  <div class="ai-sheet">
+    <div class="ai-handle"></div>
+    <div class="ai-sheet-title">Date Blueprint</div>
+    <div class="ai-sheet-sub">Tell Claude what you're working with. It'll write the plan.</div>
+    <div class="bp-group">
+      <div class="bp-group-label">Vibe</div>
+      <div class="bp-opts-row">
+        <button class="bp-opt on" onclick="bpSelect('vibe','low-key',this)">Low-key</button>
+        <button class="bp-opt" onclick="bpSelect('vibe','adventurous',this)">Adventurous</button>
+        <button class="bp-opt" onclick="bpSelect('vibe','romantic',this)">Romantic</button>
+        <button class="bp-opt" onclick="bpSelect('vibe','active',this)">Active</button>
+      </div>
+    </div>
+    <div class="bp-group">
+      <div class="bp-group-label">Budget</div>
+      <div class="bp-opts-row">
+        <button class="bp-opt on" onclick="bpSelect('budget','casual',this)">Casual</button>
+        <button class="bp-opt" onclick="bpSelect('budget','moderate',this)">Moderate</button>
+        <button class="bp-opt" onclick="bpSelect('budget','splurge',this)">Splurge</button>
+      </div>
+    </div>
+    <div class="bp-group">
+      <div class="bp-group-label">Time of Day</div>
+      <div class="bp-opts-row">
+        <button class="bp-opt" onclick="bpSelect('time','afternoon',this)">Afternoon</button>
+        <button class="bp-opt on" onclick="bpSelect('time','evening',this)">Evening</button>
+        <button class="bp-opt" onclick="bpSelect('time','late night',this)">Late night</button>
+      </div>
+    </div>
+    <div class="bp-group-label">Anything Claude should know?</div>
+    <textarea class="bp-constraints" id="bp-constraints" rows="2" placeholder="e.g. she mentioned she's vegetarian, we've already done coffee…"></textarea>
+    <button class="bp-gen-btn" id="bp-gen-btn" onclick="generateBlueprint()">&#x2728; Generate Blueprint</button>
+  </div>
+</div>
+
+<!-- ═══════ AI: VIBE CHECK SHEET ═══════ -->
+<div class="ai-overlay" id="vibe-overlay" onclick="closeVibeSheet(event)">
+  <div class="ai-sheet">
+    <div class="ai-handle"></div>
+    <div class="ai-sheet-title">Vibe Check</div>
+    <div class="ai-sheet-sub">A private read of the conversation energy. Only you see this.</div>
+    <div class="vibe-read" id="vibe-read"></div>
+    <div class="vibe-signals" id="vibe-signals"></div>
+    <div class="vibe-note">This is a read, not a verdict. Only you can see it.</div>
+  </div>
+</div>
+
+<!-- ═══════ AI: MEME DUEL PICKER ═══════ -->
+<div class="ai-overlay" id="meme-overlay" onclick="closeMemePicker(event)">
+  <div class="ai-sheet">
+    <div class="ai-handle"></div>
+    <div class="ai-sheet-title">Meme Duel</div>
+    <div class="ai-sheet-sub">Pick the caption that fits best. They'll see the scenario and pick their own.</div>
+    <div class="meme-scenario-hd" id="meme-scenario-text"></div>
+    <div class="caption-opts" id="meme-caption-opts"></div>
   </div>
 </div>
 
@@ -2339,6 +2464,283 @@ function showToast(){
 
 function dbg(msg){ console.log('[DBG]', msg); }
 
+/* ═══════════════════════════════════════════
+   AI — CLAUDE INTEGRATION
+   All features call Supabase Edge Functions
+   which hold the Anthropic API key securely.
+═══════════════════════════════════════════ */
+
+async function callAI(fn, payload) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) throw new Error('Not signed in');
+  const res = await fetch(SUPA_URL + '/functions/v1/' + fn, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + session.access_token
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(t); }
+  return res.json();
+}
+
+/* ── 1. CONVERSATION SPARK ENGINE ── */
+async function checkSparkNudge(matchId, messages) {
+  if (!messages || messages.length < 3) return;
+  const last = messages[messages.length - 1];
+  const hoursSince = (Date.now() - new Date(last.created_at).getTime()) / 3600000;
+  if (hoursSince < 24) return;
+  const nudge = document.getElementById('spark-nudge');
+  if (!nudge) return;
+  nudge.style.display = 'block';
+  nudge.innerHTML = '<div class="sn-label">It\'s been quiet. Getting ideas\u2026</div>';
+  try {
+    const my_name = (currentProfile && currentProfile.name) || 'You';
+    const match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
+    const result = await callAI('ai-spark', { match_id: matchId, my_name, match_name });
+    if (!result.openers || result.openers.length === 0) { nudge.style.display = 'none'; return; }
+    nudge.innerHTML =
+      '<div class="sn-label">\u2736 It\'s been a day \u2014 here are some ways back in</div>' +
+      '<div class="sn-opts">' +
+        result.openers.map(function(op) {
+          return '<div class="sn-opt" onclick="useSparkOpener(this)" data-text="' + op.replace(/"/g, '&quot;') + '">' + escapeHtml(op) + '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="sn-dismiss" onclick="dismissSparkNudge()">Ignore</div>';
+  } catch(e) { nudge.style.display = 'none'; }
+}
+function useSparkOpener(el) {
+  var inp = document.getElementById('ch-input');
+  if (inp) { inp.value = el.dataset.text; inp.focus(); }
+  dismissSparkNudge();
+}
+function dismissSparkNudge() {
+  var nudge = document.getElementById('spark-nudge');
+  if (nudge) nudge.style.display = 'none';
+}
+
+/* ── 2. DATE BLUEPRINT GENERATOR ── */
+var bpVibe = 'low-key', bpBudget = 'casual', bpTime = 'evening';
+
+function openBlueprintSheet() {
+  document.getElementById('blueprint-overlay').classList.add('open');
+}
+function closeBlueprintSheet(e) {
+  if (!e || e.target === document.getElementById('blueprint-overlay'))
+    document.getElementById('blueprint-overlay').classList.remove('open');
+}
+function bpSelect(group, val, el) {
+  el.closest('.bp-group').querySelectorAll('.bp-opt').forEach(function(b) { b.classList.remove('on'); });
+  el.classList.add('on');
+  if (group === 'vibe')   bpVibe   = val;
+  if (group === 'budget') bpBudget = val;
+  if (group === 'time')   bpTime   = val;
+}
+async function generateBlueprint() {
+  var constraints = document.getElementById('bp-constraints').value.trim();
+  var match_name = (currentMatchProfile && currentMatchProfile.name) || 'your match';
+  var btn = document.getElementById('bp-gen-btn');
+  btn.textContent = '\u2728 Generating\u2026'; btn.disabled = true;
+  try {
+    var result = await callAI('ai-blueprint', {
+      vibe: bpVibe, budget: bpBudget, time_of_day: bpTime,
+      constraints: constraints || null, match_name
+    });
+    closeBlueprintSheet();
+    renderBlueprintCard(result, match_name);
+    dateCardShown = true;
+  } catch(e) {
+    showToastMsg('Could not generate blueprint — try again.');
+  } finally {
+    btn.textContent = '\u2728 Generate Blueprint'; btn.disabled = false;
+  }
+}
+function renderBlueprintCard(data, matchName) {
+  var msgs = document.getElementById('chat-msgs');
+  var card = document.createElement('div');
+  card.className = 'blueprint-card';
+  var stops = data.stops || [];
+  var labels = ['First stop', 'Then', 'If it\'s going well'];
+  var stopsHtml = stops.map(function(s, i) {
+    return '<div class="bp-stop">' +
+      '<div class="bp-stop-num">' + (labels[i] || 'Stop ' + (i+1)) + '</div>' +
+      '<div class="bp-stop-name">' + (s.emoji || '\u{1F4CD}') + ' ' + escapeHtml(s.name || '') + '</div>' +
+      '<div class="bp-stop-why">' + escapeHtml(s.why || '') + '</div>' +
+      '<div class="bp-stop-q">\u{1F4AC} \u201C' + escapeHtml(s.convo_starter || '') + '\u201D</div>' +
+      '</div>';
+  }).join('<div class="bp-arrow">&darr;</div>');
+  card.innerHTML =
+    '<div class="bp-hd">' +
+      '<div class="bp-eye">\u2728 Date Blueprint</div>' +
+      '<div class="bp-title">' + escapeHtml(data.title || 'Your date plan') + '</div>' +
+      '<div class="bp-narrative">' + escapeHtml(data.narrative || '') + '</div>' +
+    '</div>' +
+    '<div class="bp-stops">' + stopsHtml + '</div>' +
+    '<div class="dc-acts">' +
+      '<button class="dc-btn yes" onclick="proposeBlueprintDate(this)" data-venue="' + escapeHtml((stops[0]&&stops[0].name)||'') + '">\u2713 Propose this plan</button>' +
+      '<button class="dc-btn alt" onclick="dateCardShown=false;this.closest(\'.blueprint-card\').remove()">Different vibe</button>' +
+    '</div>';
+  msgs.appendChild(card);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function proposeBlueprintDate(btn) {
+  var venue = btn.dataset.venue || 'the venue';
+  btn.textContent = '\u2713 Proposed \u2014 waiting for them';
+  btn.disabled = true;
+  showToastMsg('Blueprint proposed to ' + ((currentMatchProfile&&currentMatchProfile.name)||'them') + ' \u2728');
+}
+
+/* ── 3. VIBE CHECK ── */
+function showVibeCheckBanner() {
+  var pill = document.getElementById('vibe-pill');
+  if (pill) pill.style.display = 'flex';
+}
+async function runVibeCheck() {
+  var pill = document.getElementById('vibe-pill');
+  if (pill) { pill.textContent = '\u2736 Reading\u2026'; pill.style.pointerEvents = 'none'; }
+  try {
+    var my_name = (currentProfile && currentProfile.name) || 'You';
+    var match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
+    var result = await callAI('ai-vibe', { match_id: currentMatchId, my_name, match_name });
+    showVibeSheet(result);
+  } catch(e) {
+    showToastMsg('Could not run Vibe Check — try again.');
+  } finally {
+    if (pill) { pill.innerHTML = '\u2736 Vibe Check'; pill.style.pointerEvents = ''; }
+  }
+}
+function showVibeSheet(data) {
+  var overlay = document.getElementById('vibe-overlay');
+  var readEl  = document.getElementById('vibe-read');
+  var sigsEl  = document.getElementById('vibe-signals');
+  if (!overlay) return;
+  if (readEl) readEl.textContent = data.read || '';
+  if (sigsEl) sigsEl.innerHTML = (data.signals || []).map(function(s) {
+    return '<div class="vibe-signal">' + escapeHtml(s) + '</div>';
+  }).join('');
+  overlay.classList.add('open');
+}
+function closeVibeSheet(e) {
+  if (!e || e.target === document.getElementById('vibe-overlay'))
+    document.getElementById('vibe-overlay').classList.remove('open');
+}
+
+/* ── 4. MEME DUEL ── */
+var _memeDuelData = null;
+
+async function startMemeDuel() {
+  var btn = document.getElementById('meme-duel-btn');
+  if (btn) { btn.textContent = '\u2026'; btn.disabled = true; }
+  var match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
+  try {
+    var result = await callAI('ai-meme', { match_name });
+    _memeDuelData = result;
+    showMemePicker(result);
+  } catch(e) {
+    showToastMsg('Could not start Meme Duel — try again.');
+  } finally {
+    if (btn) { btn.textContent = '\u{1F0CF} Duel'; btn.disabled = false; }
+  }
+}
+function showMemePicker(data) {
+  var overlay = document.getElementById('meme-overlay');
+  var scenEl  = document.getElementById('meme-scenario-text');
+  var optsEl  = document.getElementById('meme-caption-opts');
+  if (!overlay) return;
+  if (scenEl) scenEl.textContent = data.scenario || '';
+  if (optsEl) optsEl.innerHTML = (data.captions || []).map(function(c) {
+    return '<div class="caption-opt" onclick="pickMemeCaption(this)" data-caption="' + c.replace(/"/g,'&quot;') + '">' + escapeHtml(c) + '</div>';
+  }).join('');
+  overlay.classList.add('open');
+}
+function closeMemePicker(e) {
+  if (!e || e.target === document.getElementById('meme-overlay'))
+    document.getElementById('meme-overlay').classList.remove('open');
+}
+function pickMemeCaption(el) {
+  document.getElementById('meme-overlay').classList.remove('open');
+  var caption  = el.dataset.caption;
+  var scenario = _memeDuelData ? _memeDuelData.scenario : '';
+  var myName   = (currentProfile && currentProfile.name) || 'You';
+  sendMemeMessage(scenario, myName, caption);
+  _memeDuelData = null;
+}
+async function sendMemeMessage(scenario, myName, myCaption) {
+  if (!currentMatchId || !currentUser) return;
+  var content = JSON.stringify({
+    type: 'meme_duel', scenario: scenario,
+    initiator_name: myName, initiator_caption: myCaption, status: 'open'
+  });
+  var { data } = await sb.from('messages').insert({
+    match_id: currentMatchId, sender_id: currentUser.id,
+    content: content, message_type: 'meme_duel'
+  }).select().single();
+  if (data) appendMemeCard(data, true);
+}
+function appendMemeCard(msg, isInitiator) {
+  var msgs = document.getElementById('chat-msgs');
+  if (!msgs) return;
+  var data;
+  try { data = JSON.parse(msg.content); } catch(e) { return; }
+  var matchName = (currentMatchProfile && currentMatchProfile.name) || 'them';
+  var myName    = (currentProfile && currentProfile.name) || 'You';
+  var card = document.createElement('div');
+  card.className = 'meme-game-card';
+  card.dataset.msgId = msg.id;
+  card.innerHTML =
+    '<div class="mg-label">\u{1F0CF} Meme Duel</div>' +
+    '<div class="mg-scenario">' + escapeHtml(data.scenario || '') + '</div>' +
+    '<div class="mg-pick"><div class="mg-who">' + escapeHtml(data.initiator_name || myName) + '</div>' +
+      '<div class="mg-caption">' + escapeHtml(data.initiator_caption || '') + '</div></div>' +
+    (!isInitiator
+      ? '<div class="mg-pick"><div class="mg-who">' + escapeHtml(myName) + '</div><div class="mg-caption pending">Your turn \u2014 pick your caption</div></div>' +
+        '<button class="mg-play-btn" onclick="joinMemeDuel(' + "'" + escapeHtml(data.scenario||'').replace(/'/g,"\\'") + "'" + ',this)">Pick yours \u2192</button>'
+      : ''
+    );
+  msgs.appendChild(card);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+async function joinMemeDuel(scenario, btn) {
+  if (btn) { btn.textContent = 'Getting captions\u2026'; btn.disabled = true; }
+  var match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
+  try {
+    var result = await callAI('ai-meme', { match_name, scenario });
+    _memeDuelData = result;
+    result.scenario = scenario; /* keep the original scenario */
+    showMemePicker(result);
+    /* After they pick, the reply is sent via sendMemeReply */
+    _memeJoinBtn = btn;
+  } catch(e) {
+    showToastMsg('Could not load captions \u2014 try again.');
+    if (btn) { btn.textContent = 'Pick yours \u2192'; btn.disabled = false; }
+  }
+}
+var _memeJoinBtn = null;
+/* Override pickMemeCaption for join flow — send reply message */
+var _originalPickMeme = pickMemeCaption;
+function pickMemeCaption(el) {
+  document.getElementById('meme-overlay').classList.remove('open');
+  var caption  = el.dataset.caption;
+  var scenario = _memeDuelData ? _memeDuelData.scenario : '';
+  if (_memeJoinBtn) {
+    /* Joining an existing duel — update the card in place */
+    var card = _memeJoinBtn.closest('.meme-game-card');
+    if (card) {
+      var myName = (currentProfile && currentProfile.name) || 'You';
+      var myPickDiv = card.querySelector('.mg-caption.pending');
+      if (myPickDiv) myPickDiv.textContent = caption;
+      if (myPickDiv) myPickDiv.classList.remove('pending');
+      _memeJoinBtn.remove();
+    }
+    _memeJoinBtn = null;
+  } else {
+    var myName = (currentProfile && currentProfile.name) || 'You';
+    sendMemeMessage(scenario, myName, caption);
+  }
+  _memeDuelData = null;
+}
+
 function showToastMsg(msg){
   document.getElementById('toast-text').innerHTML=msg;
   const t=document.getElementById('toast');
@@ -2585,14 +2987,26 @@ async function loadMessages(matchId){
   if(!msgs)return;
   msgs.innerHTML='<div style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Loading...</div>';
   const{data,error}=await sb.from('messages')
-    .select('id,sender_id,content,created_at')
+    .select('id,sender_id,content,created_at,message_type')
     .eq('match_id',matchId)
     .order('created_at',{ascending:true});
   if(error){msgs.innerHTML='<div style="text-align:center;padding:24px;font-size:13px;color:var(--ash);">Could not load messages.</div>';return;}
   msgs.innerHTML='';
+  /* Reset AI nudges for this chat */
+  dismissSparkNudge();
+  var vpill = document.getElementById('vibe-pill');
+  if (vpill) vpill.style.display = 'none';
+
   if(!data||data.length===0){msgs.innerHTML='<div style="text-align:center;padding:32px 20px;font-size:13px;color:var(--ash);">Say something. You\'re both here.</div>';return;}
   data.forEach(m=>appendMessage(m));
   msgs.scrollTop=msgs.scrollHeight;
+
+  /* Spark Engine: nudge if silent for 24h+ */
+  var textMsgs = data.filter(function(m){ return !m.message_type || m.message_type === 'text'; });
+  checkSparkNudge(matchId, textMsgs);
+
+  /* Vibe Check: show pill after 20+ messages */
+  if (textMsgs.length >= 20) showVibeCheckBanner();
 }
 
 
@@ -2600,8 +3014,14 @@ function appendMessage(msg){
   const msgs=document.getElementById('chat-msgs');
   if(!msgs)return;
   /* Remove empty state */
-  const empty=msgs.querySelector('div:not(.msg):not(.date-card):not(.nudge)');
-  if(empty)empty.remove();
+  const empty=msgs.querySelector('div:not(.msg):not(.date-card):not(.nudge):not(.meme-game-card):not(.blueprint-card)');
+  if(empty&&empty.tagName!=='BUTTON')empty.remove();
+  /* Meme Duel messages render as game cards */
+  if(msg.message_type==='meme_duel'){
+    const isInitiator=msg.sender_id===currentUser.id;
+    appendMemeCard(msg,isInitiator);
+    return;
+  }
   const isMe=msg.sender_id===currentUser.id;
   const time=new Date(msg.created_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
   const div=document.createElement('div');
