@@ -2473,7 +2473,7 @@ function dbg(msg){ console.log('[DBG]', msg); }
 async function callAI(fn, payload) {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) throw new Error('Not signed in');
-  const res = await fetch(SUPA_URL + '/functions/v1/' + fn, {
+  const res = await fetch('/api/' + fn, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
