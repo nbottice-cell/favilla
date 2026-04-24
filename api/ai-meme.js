@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ error: 'Missing authorization' });
 
-    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+    const sb = createClient('https://aoquyilyrvsefhfrnukb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvcXV5aWx5cnZzZWZoZnJudWtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMDY0NTYsImV4cCI6MjA4OTc4MjQ1Nn0.xn7zoQeic5mW-S0DnHQZxe6UcmoJ3r1QRiw30-dpMIw', {
       global: { headers: { Authorization: authHeader } }
     });
     const { data: { user } } = await sb.auth.getUser();
