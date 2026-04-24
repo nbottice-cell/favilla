@@ -690,7 +690,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .ibr-sub{font-size:12px;color:var(--ash);text-align:center;margin-bottom:20px;}
 /* Roulette wheel display */
 .ibr-wheel{width:100%;height:130px;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,90,50,0.2);border-radius:16px;overflow:hidden;position:relative;margin-bottom:16px;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 25%,black 75%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0%,black 25%,black 75%,transparent 100%);}
-.ibr-center-line{position:absolute;left:16px;right:16px;top:calc(50% - 1px);height:1px;background:rgba(255,90,50,0.4);z-index:2;pointer-events:none;}
+.ibr-center-line{position:absolute;left:16px;right:16px;top:calc(50% - 1px);height:1px;background:rgba(27,58,140,0.35);z-index:2;pointer-events:none;}
 .ibr-tape{position:absolute;width:100%;display:flex;flex-direction:column;align-items:center;}
 .ibr-tape-item{height:44px;display:flex;align-items:center;justify-content:center;width:100%;padding:0 16px;font-family:'Inter',sans-serif;font-size:13px;color:rgba(27,58,140,0.4);text-align:center;flex-shrink:0;line-height:1.3;}
 .ibr-tape-item.winner{color:#1A1C22;font-size:16px;font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;}
@@ -1583,7 +1583,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ibr-title">Ice Breaker Roulette</div>
     <div class="ibr-sub">Spin for a question. Both of you answer.</div>
     <div class="ibr-wheel" id="ibr-wheel">
-      <div class="ibr-center-line"></div>
+      <div class="ibr-center-line" id="ibr-center-line"></div>
       <div class="ibr-tape" id="ibr-tape"></div>
     </div>
     <button class="ibr-spin-btn" id="ibr-spin-btn" onclick="ibrSpin()">&#x21BB; Spin</button>
@@ -3020,6 +3020,7 @@ var cpMatchProfile = null;
 var cpQuestions    = [];
 var cpAnswers      = [];
 var cpCurrentQ     = 0;
+var cpUsedQuestions = [];
 
 const CP_QUESTIONS = [
   /* Energy */
@@ -3070,13 +3071,16 @@ function closeCompatCheck(){
 }
 
 function cpSetupAndShow(){
-  /* Draw 5 questions */
-  var pool=CP_QUESTIONS.slice();
+  /* Draw 5 questions, excluding the previous session's questions */
+  var available=CP_QUESTIONS.filter(function(q){return cpUsedQuestions.indexOf(q)===-1;});
+  if(available.length<5){cpUsedQuestions=[];available=CP_QUESTIONS.slice();}
+  var pool=available.slice();
   cpQuestions=[];
   for(var i=0;i<5;i++){
     var idx=Math.floor(Math.random()*pool.length);
     cpQuestions.push(pool.splice(idx,1)[0]);
   }
+  cpUsedQuestions=cpQuestions.slice(); /* remember this session to skip next time */
   cpAnswers=[]; cpCurrentQ=0;
 
   /* Update header text */
@@ -3387,15 +3391,17 @@ function ibrSpin(){
 
   var tape=document.getElementById('ibr-tape');
   tape.innerHTML='';
+  gsap.killTweensOf(tape);
   gsap.set(tape,{y:0});
 
-  var ITEM_H   = 44;
-  var WHEEL_H  = 130;
-  var TOTAL    = 50;  /* longer tape for the extended spin */
+  var ITEM_H  = 44;
+  var WHEEL_H = 130;
+  var TOTAL   = 80; /* long tape so the wheel spins plenty before stopping */
 
   /* Pick winner (avoids recently seen questions) */
   var winnerQ   = ibrPickQuestion();
-  var winnerIdx = 15 + Math.floor(Math.random()*20); /* lands between item 15-35 */
+  /* Winner sits 55-65 items deep — plenty of spin before it arrives */
+  var winnerIdx = 55 + Math.floor(Math.random()*10);
 
   /* Build the full tape */
   for(var i=0;i<TOTAL;i++){
@@ -3405,44 +3411,56 @@ function ibrSpin(){
       d.textContent=winnerQ;
     } else {
       d.className='ibr-tape-item';
-      var q;
-      do{ q=IBR_QUESTIONS[Math.floor(Math.random()*IBR_QUESTIONS.length)]; }
-      while(q===winnerQ);
-      d.textContent=q;
+      var rq;
+      do{ rq=IBR_QUESTIONS[Math.floor(Math.random()*IBR_QUESTIONS.length)]; }
+      while(rq===winnerQ);
+      d.textContent=rq;
     }
     tape.appendChild(d);
   }
 
-  /* Start tape with item 0 centred in the wheel */
+  /* Centre item 0 in the wheel window */
   var startY = WHEEL_H/2 - ITEM_H/2;
   gsap.set(tape,{y:startY});
 
-  /* finalY centres winnerIdx in the wheel */
+  /* finalY centres the winner item */
   var finalY = startY - (winnerIdx * ITEM_H);
 
-  /* Phase 1 — gradual build-up, overshoot past winner */
-  var overshootY = finalY - (ITEM_H * 9);
+  /* --- Big Bass Wheel ---
+     Single tween, one direction only.
+     power3.out = starts fast, decelerates gradually,
+     long tail so the last few items tick by one-at-a-time. */
+  var lastTick=-1;
+  var centerLine=document.getElementById('ibr-center-line');
+
   gsap.to(tape,{
-    y: overshootY,
-    duration: 2.6,
-    ease: 'power2.in',
-    onComplete: function(){
-      /* Phase 2 — long, smooth deceleration to land on winner */
-      gsap.to(tape,{
-        y: finalY,
-        duration: 4.2,
-        ease: 'expo.out',
-        onComplete: function(){
-          ibrCurrentQ=winnerQ;
-          ibrSpinning=false;
-          gsap.fromTo('#ibr-wheel',
-            {borderColor:'rgba(255,90,50,0.8)'},
-            {borderColor:'rgba(255,90,50,0.2)',duration:1.0}
+    y: finalY,
+    duration: 7.0,
+    ease: 'power3.out',
+    onUpdate: function(){
+      /* Flash center line each time a new item crosses centre */
+      var curY=gsap.getProperty(tape,'y');
+      var centeredIdx=Math.round((startY-curY)/ITEM_H);
+      if(centeredIdx!==lastTick){
+        lastTick=centeredIdx;
+        if(centerLine){
+          gsap.fromTo(centerLine,
+            {opacity:1,background:'rgba(27,58,140,0.9)'},
+            {opacity:0.35,background:'rgba(27,58,140,0.35)',duration:0.12,overwrite:true}
           );
-          if(btn){btn.disabled=false;btn.textContent='Use this question';btn.onclick=ibrUseQuestion;}
-          if(again)again.style.display='block';
         }
-      });
+      }
+    },
+    onComplete: function(){
+      ibrCurrentQ=winnerQ;
+      ibrSpinning=false;
+      /* Winner flash on wheel border */
+      gsap.fromTo('#ibr-wheel',
+        {borderColor:'rgba(27,58,140,0.7)'},
+        {borderColor:'rgba(27,58,140,0.2)',duration:1.2}
+      );
+      if(btn){btn.disabled=false;btn.textContent='Use this question';btn.onclick=ibrUseQuestion;}
+      if(again)again.style.display='block';
     }
   });
 }
