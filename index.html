@@ -743,6 +743,8 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .mp-toggle{display:flex;background:rgba(27,58,140,0.06);border:0.5px solid rgba(27,58,140,0.18);border-radius:22px;padding:3px;gap:2px;}
 .mt-btn{padding:7px 16px;border-radius:18px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;font-weight:600;border:none;background:transparent;color:var(--cr-dim);min-height:36px;touch-action:manipulation;-webkit-appearance:none;transition:background 0.18s,color 0.18s;}
 .mt-btn.on{background:#1B3A8C;color:#fff;}
+.vf-pill{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;border:0.5px solid rgba(27,58,140,0.2);color:var(--ash);cursor:pointer;white-space:nowrap;background:transparent;transition:background 0.18s,color 0.18s,border-color 0.18s;touch-action:manipulation;-webkit-appearance:none;font-family:'Inter',sans-serif;}
+.vf-pill.on{background:rgba(27,58,140,0.12);border-color:rgba(27,58,140,0.45);color:var(--fl-lt);}
 .map-area{margin:14px 18px;border-radius:16px;overflow:hidden;border:0.5px solid rgba(27,58,140,0.18);background:#0A0D14;position:relative;height:255px;}
 .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(27,58,140,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(27,58,140,0.06) 1px,transparent 1px);background-size:26px 26px;}
 .road{position:absolute;background:rgba(255,255,255,0.05);}
@@ -1775,25 +1777,46 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
   </div>
   <!-- VENUES LIST VIEW -->
   <div id="venues-view" style="display:none;padding:14px 0;">
-    <div style="padding:0 18px 10px;display:flex;gap:6px;overflow-x:auto;">
-      <div style="padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.35);color:var(--fl-lt);cursor:pointer;white-space:nowrap;">Favilla Nights</div>
-      <div style="padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;border:0.5px solid rgba(255,255,255,0.09);color:var(--ash);cursor:pointer;white-space:nowrap;">Bars</div>
-      <div style="padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;border:0.5px solid rgba(255,255,255,0.09);color:var(--ash);cursor:pointer;white-space:nowrap;">Coffee</div>
-      <div style="padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;border:0.5px solid rgba(255,255,255,0.09);color:var(--ash);cursor:pointer;white-space:nowrap;">Restaurants</div>
+    <div id="vf-pills" style="padding:0 18px 10px;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <button class="vf-pill on" onclick="filterVenues('all',this)">Favilla Nights</button>
+      <button class="vf-pill" onclick="filterVenues('bars',this)">Bars</button>
+      <button class="vf-pill" onclick="filterVenues('coffee',this)">Coffee</button>
+      <button class="vf-pill" onclick="filterVenues('restaurants',this)">Restaurants</button>
+      <button class="vf-pill" onclick="filterVenues('fun',this)">Fun + Games</button>
     </div>
-    <div style="padding:0 18px;display:flex;flex-direction:column;gap:10px;">
-      <div style="background:var(--sl-card);border:0.5px solid rgba(255,90,50,0.3);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="openVenuePage('anchor-and-vine','s-heatmap')">
+    <div id="vf-list" style="padding:0 18px;display:flex;flex-direction:column;gap:10px;">
+      <!-- BARS -->
+      <div class="vf-card" data-category="bars" style="background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.22);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="openVenuePage('anchor-and-vine','s-heatmap')">
         <div style="height:72px;background:#21242E;position:relative;display:flex;align-items:center;justify-content:center;">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(255,90,50,0.2);font-style:italic;">The Anchor</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(27,58,140,0.2);font-style:italic;">The Anchor</div>
           <div style="position:absolute;top:7px;left:8px;background:var(--sl-hdr);border-radius:6px;padding:2px 8px;font-size:9px;color:var(--cr);font-weight:600;">Featured</div>
           <div style="position:absolute;top:7px;right:8px;background:rgba(212,146,26,0.18);border:0.5px solid rgba(212,146,26,0.5);border-radius:6px;padding:2px 8px;font-size:9px;color:#B07010;font-weight:600;">Favilla Friday</div>
-          <div style="position:absolute;bottom:7px;left:8px;background:rgba(255,90,50,0.12);border:0.5px solid rgba(255,90,50,0.35);border-radius:10px;padding:2px 9px;display:flex;align-items:center;gap:3px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--fl);"></div><div style="font-size:9px;color:var(--fl-lt);font-weight:600;">Bonfire · 32 here</div></div>
+          <div style="position:absolute;bottom:7px;left:8px;background:rgba(27,58,140,0.1);border:0.5px solid rgba(27,58,140,0.35);border-radius:10px;padding:2px 9px;display:flex;align-items:center;gap:3px;"><div style="width:5px;height:5px;border-radius:50%;background:var(--fl);"></div><div style="font-size:9px;color:var(--fl-lt);font-weight:600;">Bonfire · 32 here</div></div>
         </div>
-        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">The Anchor &amp; Vine</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Cocktail bar · 0.0 mi · You're here</div><div style="display:flex;gap:5px;margin-top:6px;"><div style="font-size:10px;color:#88807A;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:2px 7px;">Low-key</div><div style="font-size:10px;color:#88807A;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:2px 7px;">Good conversation</div><div style="font-size:10px;color:#88807A;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:2px 7px;">Late night</div></div></div>
+        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">The Anchor &amp; Vine</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Cocktail bar · 0.0 mi · You're here</div><div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Low-key</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Good conversation</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Late night</div></div></div>
       </div>
-      <div style="background:var(--sl-card);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="openVenuePage('rooftop-22','s-heatmap')">
-        <div style="height:72px;background:#1C1F28;position:relative;display:flex;align-items:center;justify-content:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(60,100,200,0.2);font-style:italic;">Rooftop 22</div><div style="position:absolute;bottom:7px;left:8px;background:rgba(255,130,50,0.1);border:0.5px solid rgba(255,130,50,0.35);border-radius:10px;padding:2px 9px;display:flex;align-items:center;gap:3px;"><div style="width:5px;height:5px;border-radius:50%;background:#FFB840;"></div><div style="font-size:9px;color:#FFB840;font-weight:600;">Warming Up · 18 here</div></div></div>
-        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">Rooftop 22</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Bar &amp; cocktails · 0.3 mi</div><div style="display:flex;gap:5px;margin-top:6px;"><div style="font-size:10px;color:#88807A;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:2px 7px;">Views</div><div style="font-size:10px;color:#88807A;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:2px 7px;">Date night</div><div style="font-size:10px;color:#88807A;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:2px 7px;">Outdoor</div></div></div>
+      <div class="vf-card" data-category="bars" style="background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.12);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="openVenuePage('rooftop-22','s-heatmap')">
+        <div style="height:72px;background:#1C1F28;position:relative;display:flex;align-items:center;justify-content:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(27,58,140,0.18);font-style:italic;">Rooftop 22</div><div style="position:absolute;bottom:7px;left:8px;background:rgba(255,184,64,0.1);border:0.5px solid rgba(255,184,64,0.35);border-radius:10px;padding:2px 9px;display:flex;align-items:center;gap:3px;"><div style="width:5px;height:5px;border-radius:50%;background:#FFB840;"></div><div style="font-size:9px;color:#FFB840;font-weight:600;">Warming Up · 18 here</div></div></div>
+        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">Rooftop 22</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Bar &amp; cocktails · 0.3 mi</div><div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Views</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Date night</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Outdoor</div></div></div>
+      </div>
+      <div class="vf-card" data-category="bars" style="background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.12);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="showToastMsg('The Loft coming soon')">
+        <div style="height:72px;background:#1A1D26;position:relative;display:flex;align-items:center;justify-content:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(27,58,140,0.18);font-style:italic;">The Loft</div></div>
+        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">The Loft</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Bar &amp; dancing · 0.8 mi</div><div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">High energy</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Dancing</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Late night</div></div></div>
+      </div>
+      <!-- COFFEE -->
+      <div class="vf-card" data-category="coffee" style="background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.12);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="showToastMsg('Café Lucid coming soon')">
+        <div style="height:72px;background:#1E1B16;position:relative;display:flex;align-items:center;justify-content:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(180,130,60,0.25);font-style:italic;">Café Lucid</div></div>
+        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">Café Lucid</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Coffee &amp; espresso · 0.6 mi</div><div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Relaxed</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Daytime</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">No pressure</div></div></div>
+      </div>
+      <!-- RESTAURANTS -->
+      <div class="vf-card" data-category="restaurants" style="background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.12);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="showToastMsg('The Garden Room coming soon')">
+        <div style="height:72px;background:#181C18;position:relative;display:flex;align-items:center;justify-content:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(60,140,80,0.22);font-style:italic;">The Garden Room</div></div>
+        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">The Garden Room</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Restaurant · 1.1 mi</div><div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Cozy</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Candlelit</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">First meal</div></div></div>
+      </div>
+      <!-- FUN + GAMES -->
+      <div class="vf-card" data-category="fun" style="background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.12);border-radius:14px;overflow:hidden;cursor:pointer;" onclick="showToastMsg('Frames Bowling coming soon')">
+        <div style="height:72px;background:#161C1A;position:relative;display:flex;align-items:center;justify-content:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:rgba(40,160,100,0.22);font-style:italic;">Frames</div></div>
+        <div style="padding:10px 13px;"><div style="font-size:14px;color:var(--cr);font-weight:600;">Frames Bowling &amp; Bar</div><div style="font-size:11px;color:var(--ash);margin-top:2px;">Bowling &amp; games · 1.1 mi</div><div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;"><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Activity</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Group-friendly</div><div style="font-size:10px;color:#88807A;background:var(--sl-hdr);border:0.5px solid rgba(27,58,140,0.1);border-radius:7px;padding:2px 7px;">Ice breaker</div></div></div>
       </div>
     </div>
   </div>
@@ -3803,6 +3826,13 @@ function openVenuePage(venueId, from){
   goTo('s-venue', from||'s-heatmap');
 }
 
+function filterVenues(cat,btn){
+  document.querySelectorAll('#vf-pills .vf-pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#vf-list .vf-card').forEach(function(card){
+    card.style.display=(cat==='all'||card.dataset.category===cat)?'block':'none';
+  });
+}
 function mapView(view,btn){
   /* Scope to only the heatmap header buttons */
   var hdr=document.querySelector('#s-heatmap .mp-toggle');
