@@ -1,29 +1,25 @@
-import { createClient } from '@supabase/supabase-js';
-
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+
+function extractJSON(text) {
+  // Strip markdown code fences if present
+  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const raw = match ? match[1] : text;
+  return JSON.parse(raw.trim());
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'authorization, content-type');
+  res.setHeader('Access-Control-Allow-Headers', 'content-type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: 'Missing authorization' });
-
-    const sb = createClient('https://aoquyilyrvsefhfrnukb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvcXV5aWx5cnZzZWZoZnJudWtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMDY0NTYsImV4cCI6MjA4OTc4MjQ1Nn0.xn7zoQeic5mW-S0DnHQZxe6UcmoJ3r1QRiw30-dpMIw', {
-      global: { headers: { Authorization: authHeader } }
-    });
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return res.status(401).json({ error: 'Unauthorized' });
-
     const { match_name, scenario } = req.body;
     const scenarioLine = scenario
       ? `Use this exact scenario (do not change it): "${scenario}"`
       : `Create a new funny, universally relatable scenario — something like a reaction image would depict. Think: social situations, awkward moments, late-night decisions. Keep it under 12 words.`;
 
-    const prompt = `You are writing captions for a two-player caption game on a dating app called Meme Duel. One player is playing against ${match_name}.\n\n${scenarioLine}\n\nGenerate 6 caption options for one player to choose from. Make them funny in different ways:\n- One dry/deadpan\n- One absurdist\n- One self-aware/meta\n- One that escalates unexpectedly\n- One uncomfortably relatable\n- One that is just chaos\n\nKeep each caption under 15 words. They should feel like things a real person would actually say, not polished jokes.\n\nReturn ONLY valid JSON, no markdown:\n{"scenario":"the scenario text","captions":["caption1","caption2","caption3","caption4","caption5","caption6"]}`;
+    const prompt = `You are writing captions for a two-player caption game on a dating app called Meme Duel. One player is playing against ${match_name}.\n\n${scenarioLine}\n\nGenerate 6 caption options. Make them funny in different ways:\n- One dry/deadpan\n- One absurdist\n- One self-aware/meta\n- One that escalates unexpectedly\n- One uncomfortably relatable\n- One that is just chaos\n\nKeep each caption under 15 words. They should feel like things a real person would say.\n\nReturn ONLY valid JSON, no markdown:\n{"scenario":"the scenario text","captions":["caption1","caption2","caption3","caption4","caption5","caption6"]}`;
 
     const aiRes = await fetch(ANTHROPIC_API, {
       method: 'POST',
@@ -40,7 +36,7 @@ export default async function handler(req, res) {
     });
 
     const aiData = await aiRes.json();
-    const parsed = JSON.parse(aiData.content[0].text);
+    const parsed = extractJSON(aiData.content[0].text);
     return res.status(200).json(parsed);
   } catch (e) {
     return res.status(400).json({ error: e.message });
