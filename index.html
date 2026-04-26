@@ -358,6 +358,53 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .mg-caption{font-size:14px;color:var(--cr-dim);line-height:1.45;}
 .mg-caption.pending{color:var(--ash);font-style:italic;}
 .mg-play-btn{width:100%;background:rgba(27,58,140,0.08);border:none;border-top:0.5px solid rgba(27,58,140,0.12);padding:12px;font-size:13px;font-weight:600;color:var(--fl-lt);cursor:pointer;font-family:'Inter',sans-serif;touch-action:manipulation;}
+/* DEBRIEF ROOM */
+.debrief-btn{width:44px;height:44px;border-radius:50%;background:rgba(27,58,140,0.07);border:0.5px solid rgba(27,58,140,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;-webkit-appearance:none;touch-action:manipulation;position:relative;z-index:401;}
+#s-debrief{background:var(--sl-bg);}
+.dr-hdr{background:var(--sl-hdr);padding:14px 20px 0;border-bottom:0.5px solid rgba(27,58,140,0.1);position:sticky;top:0;z-index:10;}
+.dr-hdr-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.dr-title{font-family:'Inter',sans-serif;font-size:12px;color:#1B3A8C;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+.dr-room-tabs{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;margin-bottom:0;}
+.dr-room-tabs::-webkit-scrollbar{display:none;}
+.dr-room-tab{flex-shrink:0;padding:9px 16px;font-size:13px;font-weight:600;color:var(--ash);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color 0.2s,border-color 0.2s;background:transparent;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif;touch-action:manipulation;}
+.dr-room-tab.on{color:var(--fl);border-bottom-color:var(--fl);}
+.dr-ch-bar{background:var(--sl-hdr);padding:0 20px;border-bottom:0.5px solid rgba(27,58,140,0.08);display:flex;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:69px;z-index:9;}
+.dr-ch-bar::-webkit-scrollbar{display:none;}
+.dr-ch-tab{flex-shrink:0;padding:9px 14px;font-size:12px;font-weight:500;color:var(--ash);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:color 0.2s,border-color 0.2s;background:transparent;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif;touch-action:manipulation;}
+.dr-ch-tab.on{color:var(--fl);border-bottom-color:var(--fl);}
+.dr-feed{padding:16px 18px 100px;display:flex;flex-direction:column;gap:12px;}
+.dr-post{background:var(--sl-card);border:0.5px solid rgba(27,58,140,0.1);border-radius:16px;padding:14px 16px;cursor:pointer;}
+.dr-post-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.dr-post-avatar{width:34px;height:34px;border-radius:50%;background:rgba(27,58,140,0.1);border:0.5px solid rgba(27,58,140,0.2);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--cr);font-weight:600;flex-shrink:0;}
+.dr-post-meta{flex:1;min-width:0;}
+.dr-post-name{font-size:13px;font-weight:600;color:var(--cr-dim);}
+.dr-post-time{font-size:11px;color:var(--ash);margin-top:1px;}
+.dr-post-tag{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;padding:3px 8px;border-radius:6px;flex-shrink:0;}
+.dr-tag-tonight{background:rgba(212,146,26,0.12);color:#B8860B;}
+.dr-tag-redflag{background:rgba(255,50,50,0.08);color:#CC3333;}
+.dr-tag-venue{background:rgba(27,58,140,0.1);color:var(--fl);}
+.dr-tag-debrief{background:rgba(255,90,50,0.1);color:#CC4A1A;}
+.dr-post-body{font-size:14px;color:var(--cr);line-height:1.65;margin-bottom:12px;}
+.dr-post-actions{display:flex;align-items:center;gap:16px;}
+.dr-like-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ash);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;padding:0;touch-action:manipulation;}
+.dr-like-btn.liked{color:var(--fl);}
+.dr-empty{text-align:center;padding:48px 24px;color:var(--ash);font-size:14px;line-height:1.7;}
+.dr-fab{position:fixed;bottom:calc(88px + 16px);right:20px;width:52px;height:52px;border-radius:50%;background:var(--fl);border:none;color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 18px rgba(27,58,140,0.35);touch-action:manipulation;z-index:20;display:none;}
+#s-debrief.active .dr-fab{display:flex;}
+.dr-compose-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.dr-compose-overlay.open{opacity:1;pointer-events:all;}
+.dr-compose-sheet{background:var(--sl-hdr);border-radius:22px 22px 0 0;padding:20px 20px 36px;width:100%;max-height:72vh;display:flex;flex-direction:column;gap:14px;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);}
+.dr-compose-overlay.open .dr-compose-sheet{transform:translateY(0);}
+.dr-compose-handle{width:36px;height:4px;border-radius:2px;background:rgba(27,58,140,0.2);margin:0 auto 4px;}
+.dr-compose-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cr);font-weight:600;}
+.dr-compose-ch-row{display:flex;gap:8px;flex-wrap:wrap;}
+.dr-compose-ch{font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;border:0.5px solid rgba(27,58,140,0.25);color:var(--ash);background:transparent;cursor:pointer;font-family:'Inter',sans-serif;touch-action:manipulation;}
+.dr-compose-ch.on{background:rgba(27,58,140,0.1);border-color:rgba(27,58,140,0.4);color:var(--fl);}
+.dr-compose-textarea{width:100%;min-height:90px;background:rgba(27,58,140,0.04);border:0.5px solid rgba(27,58,140,0.18);border-radius:14px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;color:var(--cr);resize:none;outline:none;box-sizing:border-box;line-height:1.6;}
+.dr-compose-footer{display:flex;align-items:center;justify-content:space-between;}
+.dr-anon-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ash);cursor:pointer;user-select:none;}
+.dr-anon-toggle input{width:16px;height:16px;accent-color:var(--fl);cursor:pointer;}
+.dr-compose-submit{background:var(--fl);border:none;border-radius:22px;padding:10px 24px;color:#fff;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;touch-action:manipulation;}
 /* AI panel */
 .ai-menu-btn{background:rgba(27,58,140,0.08);border-color:rgba(27,58,140,0.25);color:var(--fl-lt);}
 .ai-panel-item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:0.5px solid rgba(27,58,140,0.08);cursor:pointer;touch-action:manipulation;}
@@ -1305,6 +1352,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     </div>
     <div class="sp-right">
       <button class="map-btn" onclick="showMapSheet()" aria-label="View map">🗺</button>
+      <button class="debrief-btn" onclick="openDebrief()" aria-label="Debrief Room">💬</button>
       <button class="bell-btn" onclick="openNT()" aria-label="Notifications">🔔</button>
       <button class="pp-pill" id="user-initial" onclick="openPP()" aria-label="Profile">?</button>
     </div>
@@ -2110,6 +2158,50 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     </div>
   </div>
   <div class="venue-nav">
+  </div>
+</div>
+
+<!-- ═══════════ DEBRIEF ROOM ═══════════ -->
+<div class="screen with-nav" id="s-debrief">
+  <div class="dr-hdr">
+    <div class="dr-hdr-top">
+      <button class="bk-btn" onclick="goBack()">&#8592;</button>
+      <div class="dr-title">Debrief Room</div>
+    </div>
+    <div class="dr-room-tabs" id="dr-room-tabs">
+      <button class="dr-room-tab on" id="dr-tab-men"   onclick="drSelectRoom('men',this)">Men&apos;s Room</button>
+      <button class="dr-room-tab"    id="dr-tab-women" onclick="drSelectRoom('women',this)">Women&apos;s Room</button>
+      <button class="dr-room-tab"    id="dr-tab-all"   onclick="drSelectRoom('all',this)">All</button>
+    </div>
+  </div>
+  <div class="dr-ch-bar" id="dr-ch-bar">
+    <button class="dr-ch-tab on" onclick="drSelectChannel('tonight',this)">🗓 Tonight</button>
+    <button class="dr-ch-tab"   onclick="drSelectChannel('redflag',this)">🚩 Red Flags</button>
+    <button class="dr-ch-tab"   onclick="drSelectChannel('venue',this)">📍 Venue Intel</button>
+    <button class="dr-ch-tab"   onclick="drSelectChannel('debrief',this)">☕ Debrief</button>
+  </div>
+  <div class="dr-feed" id="dr-feed">
+    <div class="dr-empty" id="dr-empty" style="display:none;">Nothing posted yet in here.<br>Be the first to drop something.</div>
+  </div>
+  <button class="dr-fab" onclick="openDrCompose()" aria-label="New post">+</button>
+</div>
+
+<!-- DEBRIEF COMPOSE SHEET -->
+<div class="dr-compose-overlay" id="dr-compose-overlay" onclick="closeDrCompose(event)">
+  <div class="dr-compose-sheet">
+    <div class="dr-compose-handle"></div>
+    <div class="dr-compose-title" id="dr-compose-room-label">Post to Men&apos;s Room</div>
+    <div class="dr-compose-ch-row" id="dr-compose-chs">
+      <button class="dr-compose-ch on" onclick="drPickCh('tonight',this)">🗓 Tonight</button>
+      <button class="dr-compose-ch"   onclick="drPickCh('redflag',this)">🚩 Red Flag</button>
+      <button class="dr-compose-ch"   onclick="drPickCh('venue',this)">📍 Venue Intel</button>
+      <button class="dr-compose-ch"   onclick="drPickCh('debrief',this)">☕ Debrief</button>
+    </div>
+    <textarea class="dr-compose-textarea" id="dr-compose-text" placeholder="What's on your mind…" maxlength="500"></textarea>
+    <div class="dr-compose-footer">
+      <label class="dr-anon-toggle"><input type="checkbox" id="dr-anon-toggle"> Post anonymously</label>
+      <button class="dr-compose-submit" onclick="submitDrPost()">Post</button>
+    </div>
   </div>
 </div>
 
@@ -3569,6 +3661,214 @@ async function suggestSpot(venueName){
   });
   showToastMsg('Spot suggested ✦ — heading to chat');
   setTimeout(()=>{openChat(emberMatchId,emberMatchProf);},600);
+}
+
+/* ═══════════════════════════════════════════════════
+   DEBRIEF ROOM
+═══════════════════════════════════════════════════ */
+var drRoom = 'men';
+var drChannel = 'tonight';
+var drComposeChannel = 'tonight';
+var _drLiked = JSON.parse(localStorage.getItem('drLiked') || '[]');
+var _drRealtime = null;
+
+function openDebrief() {
+  /* Show/hide room tabs based on gender */
+  var gender = currentProfile && currentProfile.gender;
+  var interest = currentProfile && currentProfile.interested_in;
+  var menTab   = document.getElementById('dr-tab-men');
+  var womenTab = document.getElementById('dr-tab-women');
+
+  /* Men's Room: visible to Men + anyone interested in men */
+  var showMen = gender === 'Man' || interest === 'Men' || interest === 'Everyone';
+  /* Women's Room: visible to Women + anyone interested in women */
+  var showWomen = gender === 'Woman' || interest === 'Women' || interest === 'Everyone';
+  /* Something else gets access to both */
+  if (gender === 'Something else') { showMen = true; showWomen = true; }
+
+  if (menTab)   menTab.style.display   = showMen   ? '' : 'none';
+  if (womenTab) womenTab.style.display = showWomen ? '' : 'none';
+
+  /* Default room to the one the user belongs to */
+  if (!showMen && drRoom === 'men') {
+    drRoom = showWomen ? 'women' : 'all';
+    document.querySelectorAll('.dr-room-tab').forEach(function(t){ t.classList.remove('on'); });
+    var defaultTab = document.getElementById('dr-tab-' + drRoom);
+    if (defaultTab) defaultTab.classList.add('on');
+  }
+
+  goTo('s-debrief', 's-spark');
+  setTimeout(loadDrPosts, 200);
+}
+
+function drSelectRoom(room, btn) {
+  drRoom = room;
+  document.querySelectorAll('.dr-room-tab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  loadDrPosts();
+}
+
+function drSelectChannel(ch, btn) {
+  drChannel = ch;
+  document.querySelectorAll('.dr-ch-tab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  loadDrPosts();
+}
+
+async function loadDrPosts() {
+  var feed = document.getElementById('dr-feed');
+  var empty = document.getElementById('dr-empty');
+  feed.innerHTML = '';
+  feed.appendChild(empty);
+  empty.style.display = 'none';
+
+  var { data: posts, error } = await sb
+    .from('debrief_posts')
+    .select('*')
+    .eq('room', drRoom)
+    .eq('channel', drChannel)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error || !posts || posts.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+
+  posts.forEach(function(post) { feed.insertBefore(renderDrPost(post), empty); });
+
+  /* Realtime — resubscribe on room/channel change */
+  if (_drRealtime) { sb.removeChannel(_drRealtime); }
+  _drRealtime = sb.channel('debrief-' + drRoom + '-' + drChannel)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'debrief_posts',
+      filter: 'room=eq.' + drRoom + '&channel=eq.' + drChannel },
+      function(payload) {
+        var el = renderDrPost(payload.new);
+        feed.insertBefore(el, feed.firstChild === empty ? empty : feed.firstChild);
+        empty.style.display = 'none';
+      })
+    .subscribe();
+}
+
+function renderDrPost(post) {
+  var isAnon = post.anonymous;
+  var displayName = isAnon ? 'Anonymous' : (post.author_name || 'Someone');
+  var initial = isAnon ? '?' : displayName.charAt(0).toUpperCase();
+  var timeAgo = drTimeAgo(post.created_at);
+  var tagClass = { tonight:'dr-tag-tonight', redflag:'dr-tag-redflag', venue:'dr-tag-venue', debrief:'dr-tag-debrief' }[post.channel] || 'dr-tag-debrief';
+  var tagLabel = { tonight:'Tonight', redflag:'Red Flag', venue:'Venue Intel', debrief:'Debrief' }[post.channel] || post.channel;
+  var liked = _drLiked.indexOf(post.id) !== -1;
+  var likeCount = post.likes || 0;
+
+  var el = document.createElement('div');
+  el.className = 'dr-post';
+  el.dataset.postId = post.id;
+  el.innerHTML =
+    '<div class="dr-post-top">' +
+      '<div class="dr-post-avatar">' + escapeHtml(initial) + '</div>' +
+      '<div class="dr-post-meta">' +
+        '<div class="dr-post-name">' + escapeHtml(displayName) + '</div>' +
+        '<div class="dr-post-time">' + escapeHtml(timeAgo) + '</div>' +
+      '</div>' +
+      '<div class="dr-post-tag ' + tagClass + '">' + tagLabel + '</div>' +
+    '</div>' +
+    '<div class="dr-post-body">' + escapeHtml(post.content) + '</div>' +
+    '<div class="dr-post-actions">' +
+      '<button class="dr-like-btn' + (liked ? ' liked' : '') + '" onclick="drToggleLike(\'' + post.id + '\',this)">' +
+        (liked ? '♥' : '♡') + ' <span>' + likeCount + '</span>' +
+      '</button>' +
+    '</div>';
+  return el;
+}
+
+async function drToggleLike(postId, btn) {
+  var idx = _drLiked.indexOf(postId);
+  var isLiked = idx !== -1;
+  var countEl = btn.querySelector('span');
+  var current = parseInt(countEl.textContent) || 0;
+
+  if (isLiked) {
+    _drLiked.splice(idx, 1);
+    btn.classList.remove('liked');
+    btn.childNodes[0].textContent = '♡ ';
+    countEl.textContent = Math.max(0, current - 1);
+    await sb.from('debrief_posts').update({ likes: Math.max(0, current - 1) }).eq('id', postId);
+  } else {
+    _drLiked.push(postId);
+    btn.classList.add('liked');
+    btn.childNodes[0].textContent = '♥ ';
+    countEl.textContent = current + 1;
+    await sb.from('debrief_posts').update({ likes: current + 1 }).eq('id', postId);
+  }
+  localStorage.setItem('drLiked', JSON.stringify(_drLiked));
+}
+
+function openDrCompose() {
+  drComposeChannel = drChannel;
+  document.querySelectorAll('.dr-compose-ch').forEach(function(b){ b.classList.remove('on'); });
+  var chMap = { tonight:0, redflag:1, venue:2, debrief:3 };
+  var idx = chMap[drChannel] !== undefined ? chMap[drChannel] : 0;
+  document.querySelectorAll('.dr-compose-ch')[idx].classList.add('on');
+  var roomLabel = { men:"Men's Room", women:"Women's Room", all:"All" }[drRoom] || drRoom;
+  document.getElementById('dr-compose-room-label').textContent = 'Post to ' + roomLabel;
+  document.getElementById('dr-compose-text').value = '';
+  document.getElementById('dr-anon-toggle').checked = false;
+  document.getElementById('dr-compose-overlay').classList.add('open');
+}
+
+function closeDrCompose(e) {
+  if (!e || e.target === document.getElementById('dr-compose-overlay'))
+    document.getElementById('dr-compose-overlay').classList.remove('open');
+}
+
+function drPickCh(ch, btn) {
+  drComposeChannel = ch;
+  document.querySelectorAll('.dr-compose-ch').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+}
+
+async function submitDrPost() {
+  var content = document.getElementById('dr-compose-text').value.trim();
+  if (!content) { showToastMsg('Write something first.'); return; }
+  if (!currentUser || !currentProfile) { showToastMsg('Sign in to post.'); return; }
+
+  var anon = document.getElementById('dr-anon-toggle').checked;
+  var btn = document.querySelector('.dr-compose-submit');
+  btn.disabled = true; btn.textContent = 'Posting\u2026';
+
+  var { error } = await sb.from('debrief_posts').insert({
+    room: drRoom,
+    channel: drComposeChannel,
+    author_id: currentUser.id,
+    author_name: currentProfile.name || 'Someone',
+    content: content,
+    anonymous: anon,
+    likes: 0
+  });
+
+  btn.disabled = false; btn.textContent = 'Post';
+
+  if (error) { showToastMsg('Could not post — try again.'); return; }
+
+  document.getElementById('dr-compose-overlay').classList.remove('open');
+  /* Switch to the channel they posted in */
+  if (drComposeChannel !== drChannel) {
+    drChannel = drComposeChannel;
+    document.querySelectorAll('.dr-ch-tab').forEach(function(t,i){
+      var channels = ['tonight','redflag','venue','debrief'];
+      t.classList.toggle('on', channels[i] === drChannel);
+    });
+    loadDrPosts();
+  }
+}
+
+function drTimeAgo(ts) {
+  if (!ts) return '';
+  var diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
 }
 
 /* ── Milestones ── */
