@@ -1694,6 +1694,15 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
         <div class="ai-pi-arrow">›</div>
       </div>
 
+      <div class="ai-panel-item" id="ai-spot2-item" onclick="closeAIPanel();setTimeout(runMutualSpot2,200)">
+        <div class="ai-pi-icon">&#x1F5FA;</div>
+        <div class="ai-pi-body">
+          <div class="ai-pi-name">Mutual Spot 2.0</div>
+          <div class="ai-pi-desc" id="ai-spot2-desc">Claude reads your conversation and picks the best place to meet — based on what you've actually talked about.</div>
+        </div>
+        <div class="ai-pi-arrow" id="ai-spot2-arrow">›</div>
+      </div>
+
       <div class="ai-panel-item ai-panel-item-dim" onclick="closeAIPanel();setTimeout(openCommentBattle,200)">
         <div class="ai-pi-icon">&#x1F525;</div>
         <div class="ai-pi-body">
@@ -1704,6 +1713,24 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- ═══════ AI: MUTUAL SPOT 2.0 SHEET ═══════ -->
+<div class="ai-overlay" id="spot2-overlay" onclick="closeSpot2Sheet(event)">
+  <div class="ai-sheet" style="max-height:88vh;overflow-y:auto;">
+    <div class="ai-handle"></div>
+    <div class="ai-sheet-title">Mutual Spot 2.0</div>
+    <div class="ai-sheet-sub" id="spot2-sheet-sub">Finding the best place based on your conversation…</div>
+    <div id="spot2-thinking" style="display:none;text-align:center;padding:32px 0;">
+      <div style="font-size:13px;color:var(--ash);margin-bottom:10px;">Reading your vibe…</div>
+      <div class="spot-ai-dots"><span>●</span><span>●</span><span>●</span></div>
+    </div>
+    <div id="spot2-results" style="display:none;">
+      <div id="spot2-insight" style="display:none;background:rgba(27,58,140,0.06);border:0.5px solid rgba(27,58,140,0.18);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--fl);line-height:1.5;"></div>
+      <div id="spot2-venue-list"></div>
+    </div>
+    <button style="width:100%;background:transparent;border:none;padding:12px;font-family:'Inter',sans-serif;font-size:13px;color:var(--ash);cursor:pointer;margin-top:4px;" onclick="closeSpot2Sheet()">Close</button>
   </div>
 </div>
 
@@ -1753,6 +1780,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="vibe-read" id="vibe-read"></div>
     <div class="vibe-signals" id="vibe-signals"></div>
     <div class="vibe-note">This is a read, not a verdict. Only you can see it.</div>
+    <div style="text-align:center;margin-top:14px;"><span onclick="optOutVibeCheck()" style="font-size:12px;color:var(--ash);cursor:pointer;text-decoration:underline;text-underline-offset:3px;">Turn off Vibe Check</span></div>
   </div>
 </div>
 
@@ -2570,9 +2598,10 @@ async function callAI(fn, payload) {
 
 /* ── AI PANEL ── */
 function openAIPanel() {
-  /* Update Vibe Check availability */
   var msgs = document.getElementById('chat-msgs');
   var msgCount = msgs ? msgs.querySelectorAll('.msg').length : 0;
+
+  /* Vibe Check availability */
   var vibeItem = document.getElementById('ai-vibe-item');
   var vibeDesc = document.getElementById('ai-vibe-desc');
   var vibeArrow = document.getElementById('ai-vibe-arrow');
@@ -2587,11 +2616,115 @@ function openAIPanel() {
       if (vibeArrow) vibeArrow.style.opacity = '0.3';
     }
   }
+
+  /* Mutual Spot 2.0 availability */
+  var spot2Item = document.getElementById('ai-spot2-item');
+  var spot2Desc = document.getElementById('ai-spot2-desc');
+  var spot2Arrow = document.getElementById('ai-spot2-arrow');
+  var textMsgCount = _cachedTextMsgs ? _cachedTextMsgs.length : 0;
+  if (spot2Item) {
+    if (textMsgCount >= 3) {
+      spot2Item.classList.remove('ai-panel-item-dim');
+      if (spot2Desc) spot2Desc.textContent = 'Claude reads your conversation and picks the best place to meet \u2014 based on what you\u2019ve actually talked about.';
+      if (spot2Arrow) spot2Arrow.style.opacity = '1';
+    } else {
+      spot2Item.classList.add('ai-panel-item-dim');
+      if (spot2Desc) spot2Desc.textContent = 'Available after 3 messages (' + textMsgCount + ' so far).';
+      if (spot2Arrow) spot2Arrow.style.opacity = '0.3';
+    }
+  }
+
   document.getElementById('ai-panel-overlay').classList.add('open');
 }
 function closeAIPanel(e) {
   if (!e || e.target === document.getElementById('ai-panel-overlay'))
     document.getElementById('ai-panel-overlay').classList.remove('open');
+}
+
+/* ── MUTUAL SPOT 2.0 ── */
+function closeSpot2Sheet(e) {
+  if (!e || e.target === document.getElementById('spot2-overlay'))
+    document.getElementById('spot2-overlay').classList.remove('open');
+}
+
+async function runMutualSpot2() {
+  if (!_cachedTextMsgs || _cachedTextMsgs.length < 3) {
+    showToastMsg('Keep chatting \u2014 need at least 3 messages first.');
+    return;
+  }
+  var overlay = document.getElementById('spot2-overlay');
+  var thinkEl = document.getElementById('spot2-thinking');
+  var resultsEl = document.getElementById('spot2-results');
+  var insightEl = document.getElementById('spot2-insight');
+  var listEl = document.getElementById('spot2-venue-list');
+  var subEl = document.getElementById('spot2-sheet-sub');
+
+  /* Reset */
+  thinkEl.style.display = 'block';
+  resultsEl.style.display = 'none';
+  listEl.innerHTML = '';
+  insightEl.style.display = 'none';
+  if (subEl) subEl.textContent = 'Finding the best place based on your conversation\u2026';
+  overlay.classList.add('open');
+
+  var my_name = (currentProfile && currentProfile.name) || 'You';
+  var match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
+
+  var formatted = _cachedTextMsgs.map(function(m) {
+    return { who: m.sender_id === currentUser.id ? my_name : match_name, text: m.content, time: m.created_at };
+  });
+
+  try {
+    var result = await callAI('ai-spot', {
+      messages: formatted,
+      my_name: my_name,
+      match_name: match_name,
+      venues: SPOT_VENUES
+    });
+    thinkEl.style.display = 'none';
+    if (subEl) subEl.textContent = 'Here\u2019s what Claude picked for you two.';
+
+    if (result.insight) {
+      insightEl.textContent = '\u201C' + result.insight + '\u201D';
+      insightEl.style.display = 'block';
+    }
+
+    var allRecs = [result.top].concat(result.alternatives || []).filter(Boolean);
+    allRecs.forEach(function(rec, i) {
+      var venue = SPOT_VENUES.find(function(v){ return v.name === rec.name; }) || SPOT_VENUES[i] || SPOT_VENUES[0];
+      var card = document.createElement('div');
+      card.className = 'spot-venue-card' + (i === 0 ? ' featured' : '');
+      card.style.marginBottom = '10px';
+      card.innerHTML =
+        (i === 0 ? '<div style="font-size:10px;color:var(--em-glow);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Top pick</div>' : '') +
+        '<div class="spot-venue-name">' + escapeHtml(venue.name) + '</div>' +
+        '<div class="spot-venue-meta">' + venue.distance + ' away</div>' +
+        '<div class="spot-venue-reason">\u201C' + escapeHtml(rec.reason) + '\u201D</div>' +
+        '<div class="spot-venue-tags">' + venue.tags.map(function(t){ return '<div class="spot-venue-tag">' + t + '</div>'; }).join('') + '</div>' +
+        (i === 0 ? '<button class="spot-suggest-btn" onclick="suggestSpotFromChat(\'' + escapeHtml(venue.name) + '\')" style="margin-top:10px;">Suggest this to ' + escapeHtml(match_name) + ' \u2192</button>' : '');
+      listEl.appendChild(card);
+    });
+
+    resultsEl.style.display = 'block';
+  } catch(err) {
+    thinkEl.style.display = 'none';
+    if (subEl) subEl.textContent = 'Something went wrong. Try again.';
+    console.error('Mutual Spot 2.0 error:', err);
+  }
+}
+
+function suggestSpotFromChat(venueName) {
+  closeSpot2Sheet();
+  setTimeout(async function() {
+    if (!emberMatchId || !currentUser) return;
+    await sb.from('messages').insert({
+      match_id: emberMatchId,
+      sender_id: currentUser.id,
+      content: '\uD83D\uDCCD How about ' + venueName + '? I think it fits our vibe.',
+      message_type: 'spot_proposal'
+    });
+    showToastMsg('Spot suggested \u2756');
+  }, 300);
 }
 
 /* ── 1. CONVERSATION SPARK ENGINE ── */
@@ -2716,22 +2849,38 @@ function proposeBlueprintDate(btn) {
 
 /* ── 3. VIBE CHECK ── */
 function showVibeCheckBanner() {
+  if (localStorage.getItem('vibeCheckOptOut') === '1') return;
   var pill = document.getElementById('vibe-pill');
   if (pill) pill.style.display = 'flex';
 }
 async function runVibeCheck() {
+  if (localStorage.getItem('vibeCheckOptOut') === '1') return;
   var pill = document.getElementById('vibe-pill');
   if (pill) { pill.textContent = '\u2736 Reading\u2026'; pill.style.pointerEvents = 'none'; }
   try {
     var my_name = (currentProfile && currentProfile.name) || 'You';
     var match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
-    var result = await callAI('ai-vibe', { match_id: currentMatchId, my_name, match_name });
+    if (_cachedTextMsgs.length < 5) {
+      showToastMsg('Keep chatting — Vibe Check needs a bit more to read.');
+      return;
+    }
+    var formatted = _cachedTextMsgs.map(function(m) {
+      return { who: m.sender_id === currentUser.id ? my_name : match_name, text: m.content, time: m.created_at };
+    });
+    var result = await callAI('ai-vibe', { messages: formatted, my_name, match_name });
     showVibeSheet(result);
   } catch(e) {
     showToastMsg('Could not run Vibe Check — try again.');
   } finally {
     if (pill) { pill.innerHTML = '\u2736 Vibe Check'; pill.style.pointerEvents = ''; }
   }
+}
+function optOutVibeCheck() {
+  localStorage.setItem('vibeCheckOptOut', '1');
+  document.getElementById('vibe-overlay').classList.remove('open');
+  var pill = document.getElementById('vibe-pill');
+  if (pill) pill.style.display = 'none';
+  showToastMsg('Vibe Check turned off. You can re-enable it in settings.');
 }
 function showVibeSheet(data) {
   var overlay = document.getElementById('vibe-overlay');
@@ -3339,10 +3488,13 @@ function dismissEmberGoSpot(){
   _transitioning=false;
   selectedVibe=null;
   document.querySelectorAll('.vibe-opt').forEach(o=>o.classList.remove('sel'));
-  document.getElementById('spot-ask-btn').disabled=true;
+  var askBtn = document.getElementById('spot-ask-btn');
+  if(askBtn){ askBtn.disabled=true; askBtn.textContent='Find spots for us \u2192'; }
+  document.getElementById('spot-thinking').style.display='none';
+  document.getElementById('spot-venue-list').innerHTML='';
   document.getElementById('spot-results').style.display='none';
   const sub=document.getElementById('spot-sub');
-  if(sub) sub.textContent=(emberMatchProf?.name||'your match')+' will see your suggestion';
+  if(sub) sub.textContent='Pick a vibe for your meetup';
   _show('s-spot','forward');
 }
 
@@ -3354,54 +3506,55 @@ function selectVibe(el,vibe){
 }
 
 async function askAIForSpot(){
-  const btn=document.getElementById('spot-ask-btn');
-  btn.disabled=true; btn.textContent='Finding spots…';
+  var btn = document.getElementById('spot-ask-btn');
+  if (btn) { btn.disabled=true; btn.textContent='Finding the right spot\u2026'; }
   document.getElementById('spot-results').style.display='block';
   document.getElementById('spot-thinking').style.display='block';
   document.getElementById('spot-venue-list').innerHTML='';
 
-  /* Filter venues by vibe */
-  const vibeVenues=SPOT_VENUES.filter(v=>v.vibe.includes(selectedVibe)||selectedVibe==='surprise');
+  var my_name = (currentProfile && currentProfile.name) || 'You';
+  var match_name = (emberMatchProf && emberMatchProf.name) || (currentMatchProfile && currentMatchProfile.name) || 'them';
 
-  /* Call Claude API for personalised recommendations */
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:400,
-        messages:[{role:'user',content:'Two people just matched on a dating app. They want a "'+selectedVibe+'" vibe. Here are the available venues: '+vibeVenues.map(v=>v.name+' ('+v.tags.join(', ')+')').join('; ')+'. Pick the top 3 and write one short, warm sentence (max 12 words) for each explaining why it fits their vibe. Respond ONLY with JSON array: [{"name":"...","reason":"..."}]'}]
-      })
+  try {
+    var result = await callAI('ai-spot', {
+      my_name: my_name,
+      match_name: match_name,
+      venues: SPOT_VENUES,
+      vibe: selectedVibe || 'surprise'
     });
-    const data=await resp.json();
-    const text=data.content[0].text;
-    const clean=text.replace(/```json|```/g,'').trim();
-    const recs=JSON.parse(clean);
     document.getElementById('spot-thinking').style.display='none';
-    renderSpotResults(recs,vibeVenues);
-  } catch(err){
-    /* Fallback — show top 3 without AI reason */
+    renderSpotResults(result);
+  } catch(err) {
     document.getElementById('spot-thinking').style.display='none';
-    renderSpotResults(vibeVenues.slice(0,3).map(v=>({name:v.name,reason:v.note})),vibeVenues);
+    renderSpotResults({
+      top: { name: SPOT_VENUES[0].name, reason: SPOT_VENUES[0].note },
+      alternatives: [
+        { name: SPOT_VENUES[1].name, reason: SPOT_VENUES[1].note },
+        { name: SPOT_VENUES[2].name, reason: SPOT_VENUES[2].note }
+      ]
+    });
   }
 
-  btn.disabled=false; btn.textContent='Find spots for us →';
+  if (btn) { btn.disabled=false; btn.textContent='Find the right spot \u2192'; }
 }
 
-function renderSpotResults(recs,venueData){
-  const list=document.getElementById('spot-venue-list');
-  list.innerHTML='';
-  recs.slice(0,3).forEach((rec,i)=>{
-    const venue=venueData.find(v=>v.name===rec.name)||venueData[i]||venueData[0];
-    const card=document.createElement('div');
-    card.className='spot-venue-card'+(i===0?' featured':'');
-    card.innerHTML=
-      '<div class="spot-venue-name">'+venue.name+'</div>'+
-      '<div class="spot-venue-meta">'+venue.distance+' away</div>'+
-      '<div class="spot-venue-reason">"'+rec.reason+'"</div>'+
-      '<div class="spot-venue-tags">'+venue.tags.map(t=>'<div class="spot-venue-tag">'+t+'</div>').join('')+'</div>'+
-      '<button class="spot-suggest-btn" onclick="suggestSpot(this.dataset.venue)" data-venue="'+venue.name+'">Suggest this to '+(emberMatchProf?.name||'your match')+' →</button>';
+function renderSpotResults(result){
+  var list = document.getElementById('spot-venue-list');
+  list.innerHTML = '';
+  var matchName = (emberMatchProf && emberMatchProf.name) || (currentMatchProfile && currentMatchProfile.name) || 'your match';
+
+  var allRecs = [result.top].concat(result.alternatives || []).filter(Boolean);
+  allRecs.forEach(function(rec, i) {
+    var venue = SPOT_VENUES.find(function(v){ return v.name === rec.name; }) || SPOT_VENUES[i] || SPOT_VENUES[0];
+    var card = document.createElement('div');
+    card.className = 'spot-venue-card' + (i === 0 ? ' featured' : '');
+    card.innerHTML =
+      (i === 0 ? '<div style="font-size:10px;color:var(--em-glow);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Top pick</div>' : '') +
+      '<div class="spot-venue-name">' + escapeHtml(venue.name) + '</div>' +
+      '<div class="spot-venue-meta">' + venue.distance + ' away</div>' +
+      '<div class="spot-venue-reason">\u201C' + escapeHtml(rec.reason) + '\u201D</div>' +
+      '<div class="spot-venue-tags">' + venue.tags.map(function(t){ return '<div class="spot-venue-tag">' + t + '</div>'; }).join('') + '</div>' +
+      (i === 0 ? '<button class="spot-suggest-btn" onclick="suggestSpot(this.dataset.venue)" data-venue="' + escapeHtml(venue.name) + '">Suggest this to ' + escapeHtml(matchName) + ' \u2192</button>' : '');
     list.appendChild(card);
   });
 }
