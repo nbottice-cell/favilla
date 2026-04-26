@@ -358,6 +358,17 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .mg-caption{font-size:14px;color:var(--cr-dim);line-height:1.45;}
 .mg-caption.pending{color:var(--ash);font-style:italic;}
 .mg-play-btn{width:100%;background:rgba(27,58,140,0.08);border:none;border-top:0.5px solid rgba(27,58,140,0.12);padding:12px;font-size:13px;font-weight:600;color:var(--fl-lt);cursor:pointer;font-family:'Inter',sans-serif;touch-action:manipulation;}
+/* AI panel */
+.ai-menu-btn{background:rgba(27,58,140,0.08);border-color:rgba(27,58,140,0.25);color:var(--fl-lt);}
+.ai-panel-item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:0.5px solid rgba(27,58,140,0.08);cursor:pointer;touch-action:manipulation;}
+.ai-panel-item:last-child{border-bottom:none;}
+.ai-panel-item:active{background:rgba(27,58,140,0.04);border-radius:12px;}
+.ai-panel-item-dim{opacity:0.6;}
+.ai-pi-icon{width:38px;height:38px;border-radius:12px;background:rgba(27,58,140,0.08);border:0.5px solid rgba(27,58,140,0.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ai-pi-body{flex:1;}
+.ai-pi-name{font-size:14px;color:var(--cr);font-weight:600;margin-bottom:2px;}
+.ai-pi-desc{font-size:12px;color:var(--ash);line-height:1.5;}
+.ai-pi-arrow{font-size:20px;color:rgba(27,58,140,0.3);flex-shrink:0;}
 
 .date-card{margin:6px 18px;border:0.5px solid rgba(255,90,50,0.28);border-radius:16px;overflow:hidden;flex-shrink:0;}
 .dc-top{background:rgba(255,90,50,0.09);padding:12px 16px 10px;border-bottom:0.5px solid rgba(255,90,50,0.17);}
@@ -1428,9 +1439,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
   <button class="vibe-pill" id="vibe-pill" onclick="runVibeCheck()">&#x2736; Vibe Check</button>
   <div class="msgs" id="chat-msgs"></div>
   <div class="ch-input-row">
-    <button class="plan-btn" onclick="openBlueprintSheet()">&#x2728; Blueprint</button>
-    <button class="plan-btn" onclick="openIBR()" style="background:rgba(255,90,50,0.08);border-color:rgba(255,90,50,0.2);">&#x1F3B2; Ice Breaker</button>
-    <button class="plan-btn" onclick="openCommentBattle()" style="background:rgba(27,58,140,0.06);border-color:rgba(27,58,140,0.2);">&#x1F525; Comment Battle</button>
+    <button class="plan-btn ai-menu-btn" onclick="openAIPanel()">&#x2728; AI</button>
     <input class="ch-input" id="ch-input" placeholder="Say something…" onkeydown="if(event.key==='Enter')sendMsg()" onfocus="scrollMsgsToBottom()" oninput="scrollMsgsToBottom()">
     <div class="ch-send" onclick="sendMsg()">↑</div>
   </div>
@@ -1637,6 +1646,63 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ai-score-toggle-row">
       <div class="ai-toggle-lbl">AI Compatibility Insights</div>
       <button class="ai-toggle on" id="ai-score-toggle" onclick="toggleAIScore()"><div class="ai-toggle-knob"></div></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ AI FEATURES PANEL ═══════ -->
+<div class="ai-overlay" id="ai-panel-overlay" onclick="closeAIPanel(event)">
+  <div class="ai-sheet">
+    <div class="ai-handle"></div>
+    <div class="ai-sheet-title">AI Features</div>
+    <div class="ai-sheet-sub">Powered by Claude. Only you see the results unless you choose to share.</div>
+    <div id="ai-panel-items" style="display:flex;flex-direction:column;gap:2px;margin-bottom:8px;">
+
+      <div class="ai-panel-item" onclick="closeAIPanel();setTimeout(runSparkEngine,200)">
+        <div class="ai-pi-icon">&#x2736;</div>
+        <div class="ai-pi-body">
+          <div class="ai-pi-name">Spark Engine</div>
+          <div class="ai-pi-desc">Reads your conversation and suggests 3 ways to re-open it — specific to what you actually talked about.</div>
+        </div>
+        <div class="ai-pi-arrow">›</div>
+      </div>
+
+      <div class="ai-panel-item" onclick="closeAIPanel();setTimeout(openBlueprintSheet,200)">
+        <div class="ai-pi-icon">&#x2728;</div>
+        <div class="ai-pi-body">
+          <div class="ai-pi-name">Date Blueprint</div>
+          <div class="ai-pi-desc">Pick a vibe and budget. Claude writes a full 3-stop date plan with conversation starters at each stop.</div>
+        </div>
+        <div class="ai-pi-arrow">›</div>
+      </div>
+
+      <div class="ai-panel-item" id="ai-vibe-item" onclick="closeAIPanel();setTimeout(runVibeCheck,200)">
+        <div class="ai-pi-icon">&#x1F52E;</div>
+        <div class="ai-pi-body">
+          <div class="ai-pi-name">Vibe Check</div>
+          <div class="ai-pi-desc" id="ai-vibe-desc">Reads the conversation energy privately. Available after 20 messages.</div>
+        </div>
+        <div class="ai-pi-arrow" id="ai-vibe-arrow">›</div>
+      </div>
+
+      <div class="ai-panel-item" onclick="closeAIPanel();setTimeout(openIBR,200)">
+        <div class="ai-pi-icon">&#x1F3B2;</div>
+        <div class="ai-pi-body">
+          <div class="ai-pi-name">Ice Breaker Roulette</div>
+          <div class="ai-pi-desc">Spin for a random question. Both of you answer.</div>
+        </div>
+        <div class="ai-pi-arrow">›</div>
+      </div>
+
+      <div class="ai-panel-item ai-panel-item-dim" onclick="closeAIPanel();setTimeout(openCommentBattle,200)">
+        <div class="ai-pi-icon">&#x1F525;</div>
+        <div class="ai-pi-body">
+          <div class="ai-pi-name">Comment Battle <span style="font-size:9px;background:rgba(27,58,140,0.1);border:0.5px solid rgba(27,58,140,0.25);border-radius:6px;padding:2px 6px;color:var(--fl-lt);vertical-align:middle;margin-left:4px;">Soon</span></div>
+          <div class="ai-pi-desc">A viral photo drops in your chat. Compete to write the best comment. Claude picks the winner.</div>
+        </div>
+        <div class="ai-pi-arrow">›</div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -2502,30 +2568,70 @@ async function callAI(fn, payload) {
   return res.json();
 }
 
+/* ── AI PANEL ── */
+function openAIPanel() {
+  /* Update Vibe Check availability */
+  var msgs = document.getElementById('chat-msgs');
+  var msgCount = msgs ? msgs.querySelectorAll('.msg').length : 0;
+  var vibeItem = document.getElementById('ai-vibe-item');
+  var vibeDesc = document.getElementById('ai-vibe-desc');
+  var vibeArrow = document.getElementById('ai-vibe-arrow');
+  if (vibeItem) {
+    if (msgCount >= 20) {
+      vibeItem.classList.remove('ai-panel-item-dim');
+      if (vibeDesc) vibeDesc.textContent = 'Reads the conversation energy privately. Just for you.';
+      if (vibeArrow) vibeArrow.style.opacity = '1';
+    } else {
+      vibeItem.classList.add('ai-panel-item-dim');
+      if (vibeDesc) vibeDesc.textContent = 'Available after 20 messages (' + msgCount + ' so far).';
+      if (vibeArrow) vibeArrow.style.opacity = '0.3';
+    }
+  }
+  document.getElementById('ai-panel-overlay').classList.add('open');
+}
+function closeAIPanel(e) {
+  if (!e || e.target === document.getElementById('ai-panel-overlay'))
+    document.getElementById('ai-panel-overlay').classList.remove('open');
+}
+
 /* ── 1. CONVERSATION SPARK ENGINE ── */
-async function checkSparkNudge(matchId, messages) {
-  if (!messages || messages.length < 3) return;
-  const last = messages[messages.length - 1];
-  const hoursSince = (Date.now() - new Date(last.created_at).getTime()) / 3600000;
-  if (hoursSince < 24) return;
-  const nudge = document.getElementById('spark-nudge');
+var _cachedTextMsgs = []; /* set by loadMessages */
+
+async function runSparkEngine() {
+  var nudge = document.getElementById('spark-nudge');
   if (!nudge) return;
   nudge.style.display = 'block';
-  nudge.innerHTML = '<div class="sn-label">It\'s been quiet. Getting ideas\u2026</div>';
+  nudge.innerHTML = '<div class="sn-label">\u2736 Reading your conversation\u2026</div>';
   try {
-    const my_name = (currentProfile && currentProfile.name) || 'You';
-    const match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
-    const result = await callAI('ai-spark', { match_id: matchId, my_name, match_name });
+    var my_name = (currentProfile && currentProfile.name) || 'You';
+    var match_name = (currentMatchProfile && currentMatchProfile.name) || 'them';
+    /* Format messages for the API */
+    var formatted = _cachedTextMsgs.slice(-10).map(function(m) {
+      return { who: m.sender_id === currentUser.id ? my_name : match_name, text: m.content, time: m.created_at };
+    });
+    if (formatted.length === 0) {
+      nudge.innerHTML = '<div class="sn-label">No messages yet to read.</div><div class="sn-dismiss" onclick="dismissSparkNudge()">Dismiss</div>';
+      return;
+    }
+    var result = await callAI('ai-spark', { messages: formatted, my_name, match_name });
     if (!result.openers || result.openers.length === 0) { nudge.style.display = 'none'; return; }
     nudge.innerHTML =
-      '<div class="sn-label">\u2736 It\'s been a day \u2014 here are some ways back in</div>' +
+      '<div class="sn-label">\u2736 Ways back into the conversation</div>' +
       '<div class="sn-opts">' +
         result.openers.map(function(op) {
           return '<div class="sn-opt" onclick="useSparkOpener(this)" data-text="' + op.replace(/"/g, '&quot;') + '">' + escapeHtml(op) + '</div>';
         }).join('') +
       '</div>' +
-      '<div class="sn-dismiss" onclick="dismissSparkNudge()">Ignore</div>';
-  } catch(e) { nudge.style.display = 'none'; }
+      '<div class="sn-dismiss" onclick="dismissSparkNudge()">Dismiss</div>';
+  } catch(e) {
+    nudge.innerHTML = '<div class="sn-label">Could not generate ideas — try again.</div><div class="sn-dismiss" onclick="dismissSparkNudge()">Dismiss</div>';
+  }
+}
+function checkSparkNudge(matchId, messages) {
+  if (!messages || messages.length < 3) return;
+  var last = messages[messages.length - 1];
+  var hoursSince = (Date.now() - new Date(last.created_at).getTime()) / 3600000;
+  if (hoursSince >= 24) runSparkEngine();
 }
 function useSparkOpener(el) {
   var inp = document.getElementById('ch-input');
@@ -2912,8 +3018,10 @@ async function loadMessages(matchId){
   data.forEach(m=>appendMessage(m));
   msgs.scrollTop=msgs.scrollHeight;
 
-  /* Spark Engine: nudge if silent for 24h+ */
+  /* Cache messages for Spark Engine */
   var textMsgs = data.filter(function(m){ return !m.message_type || m.message_type === 'text'; });
+  _cachedTextMsgs = textMsgs;
+  /* Auto-nudge if silent for 24h+ */
   checkSparkNudge(matchId, textMsgs);
 
   /* Vibe Check: show pill after 20+ messages */
