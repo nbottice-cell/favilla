@@ -161,6 +161,48 @@ create policy "Insert match" on matches
 
 ---
 
+## AI Features — Claude Integration Setup
+
+These steps only need to be done once. After that, edge functions deploy with `supabase functions deploy`.
+
+### Step 1 — Install Supabase CLI
+```bash
+brew install supabase/tap/supabase
+```
+
+### Step 2 — Log in and link your project
+```bash
+supabase login
+supabase link --project-ref aoquyilyrvsefhfrnukb
+```
+
+### Step 3 — Set your Anthropic API key as a secret
+```bash
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-YOUR_KEY_HERE
+```
+Get your key at console.anthropic.com → API Keys. Never put this in index.html.
+
+### Step 4 — Deploy all 4 AI edge functions
+```bash
+supabase functions deploy ai-spark
+supabase functions deploy ai-blueprint
+supabase functions deploy ai-vibe
+supabase functions deploy ai-meme
+```
+
+### Re-deploy after edits
+```bash
+supabase functions deploy ai-spark --no-verify-jwt
+# (remove --no-verify-jwt for production — it's on by default)
+```
+
+### Check function logs
+```bash
+supabase functions logs ai-spark
+```
+
+---
+
 ## Quick Reference — Key URLs
 
 | Resource | URL |
