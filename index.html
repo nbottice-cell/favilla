@@ -3215,11 +3215,36 @@ var _receivedHints = ['Near the bar','Dark jacket','Sitting down'];
 var _selectedHints = { location: null, look: null, doing: null };
 var _hintSimTimer = null;
 
-var _HINT_OPTS = {
-  location: ['Near the bar','At the bar','By the entrance','On the dance floor','Near the stage','At a table','Outside','Back of the room','By the windows','Near the DJ'],
-  look:     ['Dark jacket','Red top','White shirt','Baseball cap','Wearing glasses','Colorful outfit','All black'],
-  doing:    ['Dancing','Getting a drink','People watching','Looking for you','Just chilling','On my way over','Laughing with someone']
+var _HINT_OPTS_BY_TYPE = {
+  bar: {
+    location: ['Near the bar','At the bar','By the entrance','On the dance floor','Near the stage','At a table','Outside','Back of the room','By the windows','Near the DJ'],
+    doing:    ['Dancing','Getting a drink','People watching','Looking for you','Just chilling','On my way over','Laughing with someone']
+  },
+  cafe: {
+    location: ['By the window','At the counter','Corner table','Near the door','On the patio','Waiting in line','Back of the café','Sofa area'],
+    doing:    ['Reading','Working on something','Just got my order','Waiting for mine','People watching','Just arrived','On my way out']
+  },
+  restaurant: {
+    location: ['At the bar','Near the entrance','By the window','At a table','On the patio','Waiting to be seated','Near the back','Upstairs'],
+    doing:    ['Just ordered','Waiting for food','Looking at the menu','Just arrived','Almost done','At the bar','Catching up with friends']
+  },
+  concert: {
+    location: ['Near the stage','Up front','At the bar','By the entrance','On the floor','In the back','Near the merch','Side of the stage'],
+    doing:    ['Dancing','Getting a drink','Watching the set','Waiting for the headliner','Just arrived','Moving through the crowd','Near the speakers']
+  },
+  outdoor: {
+    location: ['Near the entrance','By the fountain','On the grass','Near the path','Under a tree','By the water','At the benches','Near the food stalls'],
+    doing:    ['Walking around','Sitting down','With a dog','Reading','People watching','Just arrived','Heading your way']
+  }
 };
+
+// Shared across all venue types
+var _HINT_LOOK = ['Dark jacket','Red top','White shirt','Black dress','Floral top','All black','Colorful outfit','Wearing glasses','Sunglasses on','Baseball cap','Beanie','Hoodie on','Blazer on','Long hair','Hair up','Curly hair','Bright sneakers','Bag with me'];
+
+var _HINT_OPTS = (function(){
+  var t = _HINT_OPTS_BY_TYPE[VENUE_TYPE] || _HINT_OPTS_BY_TYPE['bar'];
+  return { location: t.location, look: _HINT_LOOK, doing: t.doing };
+})();
 
 function _buildHintOptions(){
   ['location','look','doing'].forEach(function(cat){
@@ -4966,6 +4991,7 @@ function mapView(view,btn){
 /* ── PRESENCE & CHECK-IN ──────────── */
 const VENUE_ID   = 'anchor-and-vine';
 const VENUE_NAME = 'The Anchor & Vine';
+const VENUE_TYPE = 'bar'; // options: bar | cafe | restaurant | concert | outdoor
 let currentCheckInId    = null;
 let presenceSub         = null;
 let likesSub            = null;
