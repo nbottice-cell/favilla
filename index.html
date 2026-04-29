@@ -516,6 +516,29 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .ft-hint-pill span{font-size:12px;color:var(--cr-dim);}
 .ft-hint-pill.active span{color:#FFB840;}
 .ft-drop-btn{margin:12px 18px 14px;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.28);border-radius:12px;padding:13px;text-align:center;font-size:13px;color:var(--fl-lt);font-weight:600;cursor:pointer;}
+.ft-your-hints-area{margin:4px 18px 0;}
+.ft-your-lbl{font-size:10px;color:var(--ash);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.ft-sent-pill{display:flex;align-items:center;gap:5px;background:rgba(255,90,50,0.08);border:0.5px solid rgba(255,90,50,0.28);border-radius:20px;padding:6px 13px;}
+.ft-sent-pill span{font-size:12px;color:var(--fl-lt);}
+/* Hint badge on 📍 button */
+.hint-badge-wrap{position:relative;display:inline-flex;}
+.hint-notif-dot{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#FF5A32;border:1.5px solid #0D0F14;display:none;}
+.hint-notif-dot.show{display:block;}
+/* Hint picker sheet */
+.hint-picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9000;display:none;align-items:flex-end;justify-content:center;}
+.hint-picker-overlay.open{display:flex;}
+.hint-picker-sheet{background:#13161E;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;padding:0 0 24px;}
+.hint-picker-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin:12px auto 16px;}
+.hint-picker-title{font-size:15px;font-weight:700;color:#fff;padding:0 18px;margin-bottom:4px;}
+.hint-picker-sub{font-size:12px;color:var(--ash);padding:0 18px;margin-bottom:16px;}
+.hint-cat-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ash);padding:12px 18px 8px;}
+.hint-options{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px;}
+.hint-opt{background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--cr-dim);cursor:pointer;transition:all .15s;}
+.hint-opt.selected{background:rgba(255,90,50,0.14);border-color:rgba(255,90,50,0.45);color:var(--fl-lt);}
+.hint-picker-footer{padding:16px 18px 0;display:flex;gap:10px;}
+.hint-send-btn{flex:1;background:linear-gradient(135deg,#FF5A32,#FF8C42);border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;opacity:.4;transition:opacity .2s;}
+.hint-send-btn.ready{opacity:1;}
+.hint-cancel-btn{background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:13px 18px;font-size:13px;color:var(--ash);cursor:pointer;}
 /* FAVILLA HOUR */
 .fh-banner{margin:0 18px 12px;background:rgba(255,90,50,0.09);border:0.5px solid rgba(255,90,50,0.35);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;}
 @keyframes fhPulse{0%,100%{opacity:1;}50%{opacity:0.45;}}
@@ -1476,7 +1499,10 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
       <div class="ch-name" id="ch-name">Match</div>
       <div class="ch-status">✦ Spark match · <span id="ch-venue">The Anchor &amp; Vine</span></div>
     </div>
-    <div style="font-size:20px;color:var(--ash);cursor:pointer;" onclick="goTo('s-findthem','s-chat');setTimeout(function(){initFindThem(currentMatchProfile&&currentMatchProfile.name);},100);">📍</div>
+    <div class="hint-badge-wrap" onclick="goTo('s-findthem','s-chat');setTimeout(function(){initFindThem(currentMatchProfile&&currentMatchProfile.name);},100);" style="cursor:pointer;">
+      <div style="font-size:20px;color:var(--ash);">📍</div>
+      <div class="hint-notif-dot" id="hint-notif-dot"></div>
+    </div>
   </div>
   <div class="ch-ctx">You're both here tonight · <span>Still nearby</span></div>
   <div class="ice-card" id="ice-card" style="display:none;">
@@ -1562,13 +1588,36 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
   </div>
   <div class="ft-hints-area">
     <div class="ft-hints-lbl" id="ft-hints-lbl">Their hints</div>
-    <div class="ft-hint-pills">
-      <div class="ft-hint-pill active"><span>Near the bar</span></div>
-      <div class="ft-hint-pill"><span>Dark jacket</span></div>
-      <div class="ft-hint-pill"><span>Sitting down</span></div>
+    <div class="ft-hint-pills" id="ft-received-pills"></div>
+  </div>
+  <div class="ft-your-hints-area" id="ft-your-hints-area" style="display:none;">
+    <div class="ft-your-lbl">You sent</div>
+    <div class="ft-hint-pills" id="ft-sent-pills"></div>
+  </div>
+  <div class="ft-drop-btn" onclick="openHintPicker()">Drop a hint &#8594;</div>
+</div>
+
+<!-- ═══════════ HINT PICKER ═══════════ -->
+<div class="hint-picker-overlay" id="hint-picker-overlay" onclick="closeHintPicker(event)">
+  <div class="hint-picker-sheet" onclick="event.stopPropagation()">
+    <div class="hint-picker-handle"></div>
+    <div class="hint-picker-title">Drop a hint</div>
+    <div class="hint-picker-sub">Choose one clue to send — they will see it on their screen.</div>
+
+    <div class="hint-cat-lbl">📍 Where I am</div>
+    <div class="hint-options" id="hint-opts-location"></div>
+
+    <div class="hint-cat-lbl">👀 What I look like</div>
+    <div class="hint-options" id="hint-opts-look"></div>
+
+    <div class="hint-cat-lbl">💫 What I'm doing</div>
+    <div class="hint-options" id="hint-opts-doing"></div>
+
+    <div class="hint-picker-footer">
+      <div class="hint-cancel-btn" onclick="closeHintPicker()">Cancel</div>
+      <div class="hint-send-btn" id="hint-send-btn" onclick="sendHint()">Send hint →</div>
     </div>
   </div>
-  <div class="ft-drop-btn" onclick="showToastMsg('Hint sent')">Drop a hint &#8594;</div>
 </div>
 
 <!-- ═══════════ EMBER MODE ═══════════ -->
@@ -3100,6 +3149,11 @@ function initFindThem(matchName){
   if(badge)badge.textContent=name+' nearby';
   if(themLbl)themLbl.textContent=name;
   if(themLegend)themLegend.textContent=name+' (approx)';
+  // Render hint pills and clear notification badge
+  _renderReceivedHints();
+  _renderSentHints();
+  var dot=document.getElementById('hint-notif-dot');
+  if(dot)dot.classList.remove('show');
   setTemperature(72);
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     DeviceOrientationEvent.requestPermission()
@@ -3141,6 +3195,121 @@ function startSimulatedArrow(){
 function stopFindThem(){
   if(ftOrientationActive){window.removeEventListener('deviceorientation',handleOrientation,true);ftOrientationActive=false;}
   if(ftSimInterval){clearInterval(ftSimInterval);ftSimInterval=null;}
+}
+
+// ── HINT SYSTEM ──
+var _sentHints = [];
+var _receivedHints = ['Near the bar','Dark jacket','Sitting down'];
+var _selectedHint = null;
+var _hintSimTimer = null;
+
+var _HINT_OPTS = {
+  location: ['Near the bar','By the entrance','On the dance floor','Near the stage','Outside','Back of the room','By the windows'],
+  look:     ['Dark jacket','Red top','White shirt','Baseball cap','Wearing glasses','Colorful outfit','All black'],
+  doing:    ['Sitting down','Standing up','With friends','At a table','At the bar','Just arrived','Heading your way']
+};
+
+function _buildHintOptions(){
+  ['location','look','doing'].forEach(function(cat){
+    var wrap = document.getElementById('hint-opts-'+cat);
+    if(!wrap) return;
+    wrap.innerHTML = '';
+    _HINT_OPTS[cat].forEach(function(h){
+      var el = document.createElement('div');
+      el.className = 'hint-opt';
+      el.textContent = h;
+      el.onclick = function(){ selectHintOption(el, h); };
+      wrap.appendChild(el);
+    });
+  });
+}
+
+function openHintPicker(){
+  _selectedHint = null;
+  _buildHintOptions();
+  var btn = document.getElementById('hint-send-btn');
+  if(btn) btn.classList.remove('ready');
+  var overlay = document.getElementById('hint-picker-overlay');
+  if(overlay) overlay.classList.add('open');
+}
+
+function closeHintPicker(e){
+  if(e && e.target !== document.getElementById('hint-picker-overlay')) return;
+  var overlay = document.getElementById('hint-picker-overlay');
+  if(overlay) overlay.classList.remove('open');
+  _selectedHint = null;
+}
+
+function selectHintOption(el, hint){
+  // Deselect all
+  document.querySelectorAll('.hint-opt').forEach(function(o){ o.classList.remove('selected'); });
+  el.classList.add('selected');
+  _selectedHint = hint;
+  var btn = document.getElementById('hint-send-btn');
+  if(btn) btn.classList.add('ready');
+}
+
+function sendHint(){
+  if(!_selectedHint) return;
+  var hint = _selectedHint;
+  // Store sent hint
+  _sentHints.push(hint);
+  // Close picker
+  var overlay = document.getElementById('hint-picker-overlay');
+  if(overlay) overlay.classList.remove('open');
+  _selectedHint = null;
+  // Update sent pills
+  _renderSentHints();
+  // Show toast
+  showToastMsg('Hint sent to ' + ((currentMatchProfile&&currentMatchProfile.name)||'them') + ' \u2192 ' + hint);
+  // Simulate match receiving hint — after a short delay, trigger a "new hint" notification back
+  // so the demo shows the notification badge working
+  if(_hintSimTimer) clearTimeout(_hintSimTimer);
+  _hintSimTimer = setTimeout(function(){
+    var matchName = (currentMatchProfile&&currentMatchProfile.name)||'them';
+    // Simulate them dropping a hint back (makes the notification demo work)
+    var autoHints = ['Looking your way','Near the exit','Just smiled at you'];
+    var auto = autoHints[Math.floor(Math.random()*autoHints.length)];
+    _receivedHints.push(auto);
+    // Show notification badge on 📍 in chat
+    var dot = document.getElementById('hint-notif-dot');
+    if(dot) dot.classList.add('show');
+    // If user is already on findthem screen, refresh pills
+    var ftScreen = document.getElementById('s-findthem');
+    if(ftScreen && ftScreen.classList.contains('active')){
+      _renderReceivedHints();
+      if(dot) dot.classList.remove('show');
+    } else {
+      showToastMsg(matchName+' dropped a hint \u2714');
+    }
+  }, 3000);
+}
+
+function _renderReceivedHints(){
+  var wrap = document.getElementById('ft-received-pills');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  _receivedHints.forEach(function(h, i){
+    var el = document.createElement('div');
+    el.className = 'ft-hint-pill' + (i===0?' active':'');
+    el.innerHTML = '<span>'+h+'</span>';
+    wrap.appendChild(el);
+  });
+}
+
+function _renderSentHints(){
+  var area = document.getElementById('ft-your-hints-area');
+  var wrap = document.getElementById('ft-sent-pills');
+  if(!wrap || !area) return;
+  if(_sentHints.length === 0){ area.style.display='none'; return; }
+  area.style.display = 'block';
+  wrap.innerHTML = '';
+  _sentHints.forEach(function(h){
+    var el = document.createElement('div');
+    el.className = 'ft-sent-pill';
+    el.innerHTML = '<span>'+h+'</span>';
+    wrap.appendChild(el);
+  });
 }
 function setTemperature(pct){
   pct=Math.max(0,Math.min(100,pct));
