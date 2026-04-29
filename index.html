@@ -1619,7 +1619,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
       <input id="hint-custom-look" type="text" maxlength="60" placeholder="Optional: write your own…" oninput="_updateSendBtnReady()" class="hint-custom-input" />
     </div>
 
-    <div class="hint-cat-lbl">💫 What I'm doing</div>
+    <div class="hint-cat-lbl">💫 Right now I'm…</div>
     <div class="hint-options" id="hint-opts-doing"></div>
     <div style="padding:4px 18px 0;">
       <input id="hint-custom-doing" type="text" maxlength="60" placeholder="Optional: write your own…" oninput="_updateSendBtnReady()" class="hint-custom-input" />
@@ -3216,9 +3216,9 @@ var _selectedHints = { location: null, look: null, doing: null };
 var _hintSimTimer = null;
 
 var _HINT_OPTS = {
-  location: ['Near the bar','By the entrance','On the dance floor','Near the stage','Outside','Back of the room','By the windows'],
+  location: ['Near the bar','At the bar','By the entrance','On the dance floor','Near the stage','At a table','Outside','Back of the room','By the windows','Near the DJ'],
   look:     ['Dark jacket','Red top','White shirt','Baseball cap','Wearing glasses','Colorful outfit','All black'],
-  doing:    ['Sitting down','Standing up','With friends','At a table','At the bar','Just arrived','Heading your way']
+  doing:    ['Dancing','Getting a drink','People watching','Looking for you','Just chilling','On my way over','Laughing with someone']
 };
 
 function _buildHintOptions(){
