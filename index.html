@@ -502,6 +502,8 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .ft-orient-note{position:absolute;bottom:8px;right:12px;font-size:9px;color:rgba(255,90,50,0.4);}
 @keyframes threadFlow{to{stroke-dashoffset:-14;}}
 @keyframes ftScanLine{0%,100%{opacity:0.06;}50%{opacity:0.14;}}
+/* Prevent iOS touch-scroll layer on inactive Find Them screen from blocking other screens */
+#s-findthem:not(.active), #s-findthem:not(.active) *{pointer-events:none!important;touch-action:none!important;}
 /* Find Them mode toggle */
 .ft-mode-toggle{display:flex;margin:10px 18px 0;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:3px;gap:3px;}
 .ft-mode-btn{flex:1;padding:9px 6px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:600;color:var(--ash);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;-webkit-appearance:none;}
@@ -1563,7 +1565,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
   </div>
 
   <!-- Warmer/Colder panel -->
-  <div class="ft-warmer-panel" id="ft-warmer-panel">
+  <div class="ft-warmer-panel" id="ft-warmer-panel" style="display:none;">
     <div class="ft-warm-icon" id="ft-warm-icon">🌤</div>
     <div class="ft-warm-lbl" id="ft-warm-lbl" style="color:#FF5A32;">Getting warmer</div>
     <div class="ft-warm-dist" id="ft-warm-dist">~20 ft away</div>
