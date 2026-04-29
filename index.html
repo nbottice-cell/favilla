@@ -5086,7 +5086,7 @@ const BG_COLORS = [
 ];
 
 async function doCheckInVenue() {
-  if (!currentUser) return;
+  if (!currentUser) { showToastMsg('Tap received — please sign in first'); return; }
   if (currentCheckInId) {
     await sb.from('check_ins').delete().eq('id', currentCheckInId);
     currentCheckInId = null;
