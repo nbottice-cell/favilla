@@ -502,6 +502,17 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .ft-orient-note{position:absolute;bottom:8px;right:12px;font-size:9px;color:rgba(255,90,50,0.4);}
 @keyframes threadFlow{to{stroke-dashoffset:-14;}}
 @keyframes ftScanLine{0%,100%{opacity:0.06;}50%{opacity:0.14;}}
+/* Find Them mode toggle */
+.ft-mode-toggle{display:flex;margin:10px 18px 0;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:3px;gap:3px;}
+.ft-mode-btn{flex:1;padding:9px 6px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:600;color:var(--ash);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;-webkit-appearance:none;}
+.ft-mode-btn.active{background:rgba(255,90,50,0.15);color:var(--fl-lt);border:0.5px solid rgba(255,90,50,0.3);}
+/* Warmer/Colder big panel */
+.ft-warmer-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 28px 20px;min-height:260px;}
+.ft-warm-icon{font-size:72px;margin-bottom:14px;line-height:1;transition:all 0.8s ease;}
+.ft-warm-lbl{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;text-align:center;transition:color 1.2s;margin-bottom:5px;letter-spacing:-0.5px;}
+.ft-warm-dist{font-size:13px;color:var(--ash);margin-bottom:22px;}
+.ft-warm-bar-bg{width:100%;height:10px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:hidden;}
+.ft-warm-bar-fill{height:100%;border-radius:5px;transition:width 1.8s ease,background-color 1.8s ease;}
 .ft-temp-card{margin:14px 18px 0;background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;}
 .ft-temp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .ft-temp-lbl{font-size:13px;font-weight:600;transition:color 0.8s;}
@@ -1544,6 +1555,23 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ft-title">Find Them</div>
     <div class="ft-badge" id="ft-badge">Sofia nearby</div>
   </div>
+
+  <!-- Mode toggle -->
+  <div class="ft-mode-toggle">
+    <button class="ft-mode-btn active" id="ft-mode-btn-warmer" onclick="switchFtMode('warmer')">🌡 Warmer / Colder</button>
+    <button class="ft-mode-btn" id="ft-mode-btn-compass" onclick="switchFtMode('compass')">🧭 Compass</button>
+  </div>
+
+  <!-- Warmer/Colder panel -->
+  <div class="ft-warmer-panel" id="ft-warmer-panel">
+    <div class="ft-warm-icon" id="ft-warm-icon">🌤</div>
+    <div class="ft-warm-lbl" id="ft-warm-lbl" style="color:#FF5A32;">Getting warmer</div>
+    <div class="ft-warm-dist" id="ft-warm-dist">~20 ft away</div>
+    <div class="ft-warm-bar-bg"><div class="ft-warm-bar-fill" id="ft-warm-fill" style="width:50%;background:#FF5A32;"></div></div>
+  </div>
+
+  <!-- Compass panel (hidden by default) -->
+  <div id="ft-compass-panel" style="display:none;">
   <div class="ft-map-wrap">
     <svg class="ft-map-svg" viewBox="0 0 360 260" fill="none">
       <defs><marker id="ft-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#FF5A32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
@@ -1586,9 +1614,11 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ft-orient-note" id="ft-orient-note">Arrow follows your heading</div>
   </div>
   <div class="ft-temp-card">
-    <div class="ft-temp-row"><div class="ft-temp-lbl" id="ft-temp-lbl" style="color:#FF5A32;">Getting warmer</div><div class="ft-temp-val" id="ft-temp-val">~12 ft away</div></div>
-    <div class="ft-temp-bar-bg"><div class="ft-temp-bar-fill" id="ft-temp-fill" style="width:72%;background:#FF5A32;"></div></div>
+    <div class="ft-temp-row"><div class="ft-temp-lbl" id="ft-temp-lbl" style="color:#FF5A32;">Getting warmer</div><div class="ft-temp-val" id="ft-temp-val">~20 ft away</div></div>
+    <div class="ft-temp-bar-bg"><div class="ft-temp-bar-fill" id="ft-temp-fill" style="width:50%;background:#FF5A32;"></div></div>
   </div>
+  </div><!-- end ft-compass-panel -->
+
   <div class="ft-hints-area">
     <div class="ft-hints-lbl" id="ft-hints-lbl">Their hints</div>
     <div class="ft-hint-pills" id="ft-received-pills"></div>
@@ -3153,6 +3183,31 @@ function proposeDateAndCalendar(btn){
 
 /* ---- FIND THEM MODE ---- */
 var ftOrientationActive=false, ftSimInterval=null;
+var _ftMode='warmer', _ftSimPct=50, _ftSimDir=1, _ftWarmInterval=null;
+
+function switchFtMode(mode){
+  _ftMode=mode;
+  document.getElementById('ft-mode-btn-warmer').classList.toggle('active', mode==='warmer');
+  document.getElementById('ft-mode-btn-compass').classList.toggle('active', mode==='compass');
+  document.getElementById('ft-warmer-panel').style.display = mode==='warmer'?'flex':'none';
+  document.getElementById('ft-compass-panel').style.display = mode==='compass'?'block':'none';
+  if(mode==='compass'){
+    if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+      DeviceOrientationEvent.requestPermission()
+        .then(function(s){if(s==='granted')startOrientationListener();else startSimulatedArrow();})
+        .catch(function(){startSimulatedArrow();});
+    }else if(window.DeviceOrientationEvent){startOrientationListener();}
+    else{startSimulatedArrow();}
+  }
+}
+
+function _ftWarmTick(){
+  _ftSimPct += _ftSimDir * (1.5 + Math.random() * 3);
+  if(_ftSimPct >= 88) _ftSimDir = -1;
+  if(_ftSimPct <= 12) _ftSimDir = 1;
+  _ftSimPct = Math.max(5, Math.min(95, _ftSimPct));
+  setTemperature(_ftSimPct);
+}
 function initFindThem(matchName){
   var name=matchName||(currentMatchProfile&&currentMatchProfile.name)||'them';
   var badge=document.getElementById('ft-badge');
@@ -3166,13 +3221,13 @@ function initFindThem(matchName){
   _renderSentHints();
   var dot=document.getElementById('hint-notif-dot');
   if(dot)dot.classList.remove('show');
-  setTemperature(72);
-  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
-    DeviceOrientationEvent.requestPermission()
-      .then(function(s){if(s==='granted')startOrientationListener();else startSimulatedArrow();})
-      .catch(function(){startSimulatedArrow();});
-  }else if(window.DeviceOrientationEvent){startOrientationListener();}
-  else{startSimulatedArrow();}
+  // Start in warmer/colder mode by default
+  _ftSimPct = 45 + Math.random() * 20;
+  _ftSimDir = 1;
+  switchFtMode('warmer');
+  setTemperature(_ftSimPct);
+  if(_ftWarmInterval) clearInterval(_ftWarmInterval);
+  _ftWarmInterval = setInterval(_ftWarmTick, 2000);
 }
 function startOrientationListener(){
   ftOrientationActive=true;
@@ -3207,6 +3262,7 @@ function startSimulatedArrow(){
 function stopFindThem(){
   if(ftOrientationActive){window.removeEventListener('deviceorientation',handleOrientation,true);ftOrientationActive=false;}
   if(ftSimInterval){clearInterval(ftSimInterval);ftSimInterval=null;}
+  if(_ftWarmInterval){clearInterval(_ftWarmInterval);_ftWarmInterval=null;}
 }
 
 // ── HINT SYSTEM ──
@@ -3381,15 +3437,28 @@ function setTemperature(pct){
   var t=(pct-lo[0])/(hi[0]-lo[0]);
   function lerp(a,b){return Math.round(a+(b-a)*t);}
   var hex='#'+[lerp(lo[1][0],hi[1][0]),lerp(lo[1][1],hi[1][1]),lerp(lo[1][2],hi[1][2])].map(function(v){return v.toString(16).padStart(2,'0');}).join('');
+  var labelText = pct>=90?'Right here \uD83D\uDD25':pct>=70?'Getting hot — keep going':pct>=50?'Getting warmer':pct>=30?'Getting cooler':pct>=10?'Ice cold — turn around':'Freezing — go back';
+  var icon = pct>=90?'\uD83D\uDD25':pct>=70?'\u2600\uFE0F':pct>=50?'\uD83C\uDF24':pct>=30?'\uD83C\uDF2C\uFE0F':'\u2744\uFE0F';
+  var ft=Math.round((1-pct/100)*40);
+  var distText = ft<=0?'Right here!':'~'+ft+' ft away';
+  // Small compass-panel elements
   var fill=document.getElementById('ft-temp-fill');
   if(fill){fill.style.width=pct+'%';fill.style.backgroundColor=hex;}
   var lbl=document.getElementById('ft-temp-lbl');
-  if(lbl){lbl.style.color=hex;lbl.textContent=pct>=75?'Getting hot':pct>=50?'Getting warmer':pct>=25?'Getting cooler':'Ice cold -- turn around';}
+  if(lbl){lbl.style.color=hex;lbl.textContent=labelText;}
   var val=document.getElementById('ft-temp-val');
+  if(val)val.textContent=distText;
   var distNum=document.getElementById('ft-dist-num');
-  var ft=Math.round((1-pct/100)*40);
-  if(val)val.textContent=ft<=0?'Right here!':'~'+ft+' ft away';
   if(distNum)distNum.textContent=ft<=0?'0':ft;
+  // Big warmer panel elements
+  var warmFill=document.getElementById('ft-warm-fill');
+  if(warmFill){warmFill.style.width=pct+'%';warmFill.style.backgroundColor=hex;}
+  var warmLbl=document.getElementById('ft-warm-lbl');
+  if(warmLbl){warmLbl.style.color=hex;warmLbl.textContent=labelText;}
+  var warmDist=document.getElementById('ft-warm-dist');
+  if(warmDist)warmDist.textContent=distText;
+  var warmIcon=document.getElementById('ft-warm-icon');
+  if(warmIcon)warmIcon.textContent=icon;
 }
 function updateFavillaHour(count){
   var el=document.getElementById('fh-count');
