@@ -503,10 +503,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 @keyframes threadFlow{to{stroke-dashoffset:-14;}}
 @keyframes ftScanLine{0%,100%{opacity:0.06;}50%{opacity:0.14;}}
 /* Prevent iOS touch-scroll layer on inactive Find Them screen from blocking other screens */
-#s-findthem:not(.active), #s-findthem:not(.active) *{pointer-events:none!important;touch-action:none!important;}
 /* Find Them mode toggle */
 .ft-mode-toggle{display:flex;margin:10px 18px 0;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:3px;gap:3px;}
-.ft-mode-btn{flex:1;padding:9px 6px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:600;color:var(--ash);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;-webkit-appearance:none;}
+.ft-mode-btn{flex:1;padding:9px 6px;background:transparent;border-radius:9px;font-size:12px;font-weight:600;color:var(--ash);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;text-align:center;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
 .ft-mode-btn.active{background:rgba(255,90,50,0.15);color:var(--fl-lt);border:0.5px solid rgba(255,90,50,0.3);}
 /* Warmer/Colder big panel */
 .ft-warmer-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 28px 20px;min-height:260px;}
@@ -1560,8 +1559,8 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 
   <!-- Mode toggle (hidden until screen is active) -->
   <div class="ft-mode-toggle" id="ft-mode-toggle" style="display:none;">
-    <button class="ft-mode-btn active" id="ft-mode-btn-warmer" onclick="switchFtMode('warmer')">🌡 Warmer / Colder</button>
-    <button class="ft-mode-btn" id="ft-mode-btn-compass" onclick="switchFtMode('compass')">🧭 Compass</button>
+    <div class="ft-mode-btn active" id="ft-mode-btn-warmer" onclick="switchFtMode('warmer')">🌡 Warmer / Colder</div>
+    <div class="ft-mode-btn" id="ft-mode-btn-compass" onclick="switchFtMode('compass')">🧭 Compass</div>
   </div>
 
   <!-- Warmer/Colder panel -->
@@ -2594,13 +2593,6 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   }catch(err){console.error('Boot error:',err);clearTimeout(safetyTimer);hideLoading();_show('s-splash');}
 });
-/* iOS: use document-level delegation (proven to fire) to catch taps on venue bar.
-   Element-level listeners inside scroll containers are unreliable on iOS Safari. */
-document.addEventListener('touchstart', function(e){
-  if(e.target.closest && e.target.closest('#venue-bar')){
-    doCheckInVenue();
-  }
-}, {passive:true});
 function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
 function setInitial(name){
   const el=document.getElementById('user-initial');
@@ -3635,7 +3627,7 @@ const SPOT_VENUES = [
 
 /* ── Boot Ember when tab is opened ── */
 async function bootEmber(){
-  if(!currentUser||!currentProfile){ injectEmberDemoCards(); renderEmberCard(); return; }
+  if(!currentUser||!currentProfile){injectEmberDemoCards();renderEmberCard();return;}
   emberIdx=0;
   emberQueue=[];
   document.getElementById('em-empty').style.display='none';
@@ -3673,7 +3665,7 @@ function injectEmberDemoCards(){
 
 async function loadEmberProfiles(){
   /* Load profiles excluding self, people already liked, and existing matches */
-  const{data:liked}=await sb.from('ember_likes').select('liked_user_id').eq('user_id',currentUser.id);
+  const{data:liked}=await sb.from('ember_likes').select('liked_user_id').eq('user_id',currentUser.id).then(r=>r).catch(()=>({data:[]}));
   const likedIds=(liked||[]).map(r=>r.liked_user_id);
 
   let q=sb.from('profiles').select('id,name,age,photo_url,icebreaker,prompt_1_q,prompt_1_a,intention,gender,interested_in').neq('id',currentUser.id);
