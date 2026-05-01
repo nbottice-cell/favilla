@@ -2594,17 +2594,13 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   }catch(err){console.error('Boot error:',err);clearTimeout(safetyTimer);hideLoading();_show('s-splash');}
 });
-/* iOS: touchend never fires when the scroll container cancels the gesture.
-   Use touchstart instead — it fires immediately before iOS can steal it. */
-document.addEventListener('DOMContentLoaded', function(){
-  var vb = document.getElementById('venue-bar');
-  if(vb){
-    vb.addEventListener('touchstart', function(e){
-      e.preventDefault(); /* prevent ghost click */
-      doCheckInVenue();
-    }, {passive:false});
+/* iOS: use document-level delegation (proven to fire) to catch taps on venue bar.
+   Element-level listeners inside scroll containers are unreliable on iOS Safari. */
+document.addEventListener('touchstart', function(e){
+  if(e.target.closest && e.target.closest('#venue-bar')){
+    doCheckInVenue();
   }
-});
+}, {passive:true});
 function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
 function setInitial(name){
   const el=document.getElementById('user-initial');
