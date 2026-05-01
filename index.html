@@ -5090,22 +5090,42 @@ const BG_COLORS = [
 ];
 
 async function doCheckInVenue() {
-  if (!currentUser) { showToastMsg('Please sign in to check in.'); return; }
+  showToastMsg('Step 1: doCheckInVenue() called');
+  await new Promise(r => setTimeout(r, 1200));
+
+  if (!currentUser) {
+    showToastMsg('Step 2: No user — not signed in');
+    return;
+  }
+  showToastMsg('Step 2: User found — ' + (currentUser.email || currentUser.id));
+  await new Promise(r => setTimeout(r, 1200));
+
   if (currentCheckInId) {
+    showToastMsg('Step 3: Already checked in — checking out now');
     await sb.from('check_ins').delete().eq('id', currentCheckInId);
     currentCheckInId = null;
     updateCheckInUI(false);
-    showToastMsg('Checked out. You\'re no longer visible here.');
+    showToastMsg('Done: Checked out successfully');
     return;
   }
+  showToastMsg('Step 3: No existing check-in — inserting new one');
+  await new Promise(r => setTimeout(r, 1200));
+
   await sb.from('check_ins').delete().eq('user_id', currentUser.id);
   const {data, error} = await sb.from('check_ins').insert({
     user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
   }).select().single();
-  if (error) { showToastMsg('Could not check in: ' + error.message); return; }
+
+  if (error) {
+    showToastMsg('Step 4 ERROR: ' + error.message);
+    return;
+  }
+  showToastMsg('Step 4: Check-in saved — id ' + data.id);
+  await new Promise(r => setTimeout(r, 1200));
+
   currentCheckInId = data.id;
   updateCheckInUI(true);
-  showToastMsg('You\'re in. Visible to other Favilla users here. ✦');
+  showToastMsg('Done: You are now visible in the room ✦');
   if(navigator.vibrate)navigator.vibrate(20);
   recordCheckinHistory(VENUE_ID,VENUE_NAME);
   loadPresence();
