@@ -1558,8 +1558,8 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ft-badge" id="ft-badge">Sofia nearby</div>
   </div>
 
-  <!-- Mode toggle -->
-  <div class="ft-mode-toggle">
+  <!-- Mode toggle (hidden until screen is active) -->
+  <div class="ft-mode-toggle" id="ft-mode-toggle" style="display:none;">
     <button class="ft-mode-btn active" id="ft-mode-btn-warmer" onclick="switchFtMode('warmer')">🌡 Warmer / Colder</button>
     <button class="ft-mode-btn" id="ft-mode-btn-compass" onclick="switchFtMode('compass')">🧭 Compass</button>
   </div>
@@ -3223,6 +3223,9 @@ function initFindThem(matchName){
   _renderSentHints();
   var dot=document.getElementById('hint-notif-dot');
   if(dot)dot.classList.remove('show');
+  // Show mode toggle now that screen is active
+  var toggle = document.getElementById('ft-mode-toggle');
+  if(toggle) toggle.style.display = 'flex';
   // Start in warmer/colder mode by default
   _ftSimPct = 45 + Math.random() * 20;
   _ftSimDir = 1;
@@ -3265,6 +3268,8 @@ function stopFindThem(){
   if(ftOrientationActive){window.removeEventListener('deviceorientation',handleOrientation,true);ftOrientationActive=false;}
   if(ftSimInterval){clearInterval(ftSimInterval);ftSimInterval=null;}
   if(_ftWarmInterval){clearInterval(_ftWarmInterval);_ftWarmInterval=null;}
+  var toggle = document.getElementById('ft-mode-toggle');
+  if(toggle) toggle.style.display = 'none';
 }
 
 // ── HINT SYSTEM ──
