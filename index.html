@@ -156,7 +156,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .map-btn{width:44px;height:44px;border-radius:50%;background:rgba(27,58,140,0.07);border:0.5px solid rgba(27,58,140,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#1B3A8C;font-size:16px;-webkit-appearance:none;touch-action:manipulation;position:relative;z-index:401;}
 .bell-btn{width:44px;height:44px;border-radius:50%;background:rgba(27,58,140,0.07);border:0.5px solid rgba(27,58,140,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#1B3A8C;-webkit-appearance:none;touch-action:manipulation;position:relative;z-index:401;}
 .pp-pill{width:44px;height:44px;border-radius:50%;background:rgba(27,58,140,0.1);border:1px solid rgba(27,58,140,0.3);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cr);cursor:pointer;font-weight:600;-webkit-appearance:none;touch-action:manipulation;position:relative;z-index:401;}
-.venue-bar{margin:14px 18px;background:rgba(27,58,140,0.05);border:0.5px solid rgba(27,58,140,0.2);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.venue-bar{margin:14px 18px;background:rgba(27,58,140,0.05);border:0.5px solid rgba(27,58,140,0.2);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-user-select:none;user-select:none;}
 @keyframes vp{0%{box-shadow:0 0 0 0 rgba(27,58,140,0.4);}70%{box-shadow:0 0 0 8px rgba(27,58,140,0);}100%{box-shadow:0 0 0 0 rgba(27,58,140,0);}}
 .v-pulse{width:9px;height:9px;border-radius:50%;background:var(--fl);flex-shrink:0;animation:vp 2.2s infinite;}
 .v-name{font-size:14px;color:var(--cr);font-weight:600;}
@@ -2594,6 +2594,24 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   }catch(err){console.error('Boot error:',err);clearTimeout(safetyTimer);hideLoading();_show('s-splash');}
 });
+/* Tap diagnostic — remove once venue bar issue resolved */
+document.addEventListener('touchend', function(e){
+  var el = e.target;
+  var id = el.id || '';
+  var cls = (el.className && typeof el.className === 'string') ? el.className.split(' ')[0] : '';
+  showToastMsg('touch: ' + (id || cls || el.tagName));
+}, {passive:true});
+
+/* Belt-and-suspenders touch handler for venue bar */
+document.addEventListener('DOMContentLoaded', function(){
+  var vb = document.getElementById('venue-bar');
+  if(vb){
+    vb.addEventListener('touchend', function(e){
+      e.preventDefault();
+      doCheckInVenue();
+    }, {passive:false});
+  }
+});
 function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
 function setInitial(name){
   const el=document.getElementById('user-initial');
@@ -3628,7 +3646,7 @@ const SPOT_VENUES = [
 
 /* ── Boot Ember when tab is opened ── */
 async function bootEmber(){
-  if(!currentUser||!currentProfile) return;
+  if(!currentUser||!currentProfile){ injectEmberDemoCards(); renderEmberCard(); return; }
   emberIdx=0;
   emberQueue=[];
   document.getElementById('em-empty').style.display='none';
@@ -5091,7 +5109,7 @@ const BG_COLORS = [
 ];
 
 async function doCheckInVenue() {
-  if (!currentUser) { showToastMsg('Tap received — please sign in first'); return; }
+  if (!currentUser) { showToastMsg('Please sign in to check in.'); return; }
   if (currentCheckInId) {
     await sb.from('check_ins').delete().eq('id', currentCheckInId);
     currentCheckInId = null;
