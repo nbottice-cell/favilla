@@ -5067,15 +5067,15 @@ function mapView(view,btn){
 const VENUE_ID   = 'anchor-and-vine';
 const VENUE_NAME = 'The Anchor & Vine';
 const VENUE_TYPE = 'bar'; // options: bar | cafe | restaurant | concert | outdoor
-let currentCheckInId    = null;
-let presenceSub         = null;
-let likesSub            = null;
-let matchesSub          = null;
-let msgSub              = null;
-let presenceCache       = [];
-let activeSheetUser     = null;
-let currentMatchId      = null;
-let currentMatchProfile = null;
+var currentCheckInId    = null;
+var presenceSub         = null;
+var likesSub            = null;
+var matchesSub          = null;
+var msgSub              = null;
+var presenceCache       = [];
+var activeSheetUser     = null;
+var currentMatchId      = null;
+var currentMatchProfile = null;
 
 const POSITIONS = [
   {left:'50%',top:'50%'},{left:'22%',top:'22%'},{left:'78%',top:'22%'},
@@ -5090,47 +5090,25 @@ const BG_COLORS = [
 ];
 
 async function doCheckInVenue() {
-  try {
-    showToastMsg('Step 1: function called');
-    await new Promise(r => setTimeout(r, 1500));
-
-    if (!currentUser) { showToastMsg('Step 2: no user'); return; }
-    showToastMsg('Step 2: user ok');
-    await new Promise(r => setTimeout(r, 1500));
-
-    showToastMsg('Step 3: checkInId=' + currentCheckInId);
-    await new Promise(r => setTimeout(r, 1500));
-
-    if (currentCheckInId) {
-      showToastMsg('Step 4: checking out...');
-      await sb.from('check_ins').delete().eq('id', currentCheckInId);
-      currentCheckInId = null;
-      updateCheckInUI(false);
-      showToastMsg('Done: checked out');
-      return;
-    }
-
-    showToastMsg('Step 4: inserting check-in...');
-    await new Promise(r => setTimeout(r, 1500));
-
-    await sb.from('check_ins').delete().eq('user_id', currentUser.id);
-    const {data, error} = await sb.from('check_ins').insert({
-      user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
-    }).select().single();
-
-    if (error) { showToastMsg('DB ERROR: ' + error.message); return; }
-    showToastMsg('Step 5: saved id=' + data.id);
-    await new Promise(r => setTimeout(r, 1500));
-
-    currentCheckInId = data.id;
-    updateCheckInUI(true);
-    showToastMsg('Done: you are visible ✦');
-    if(navigator.vibrate)navigator.vibrate(20);
-    recordCheckinHistory(VENUE_ID,VENUE_NAME);
-    loadPresence();
-  } catch(err) {
-    showToastMsg('EXCEPTION: ' + err.message);
+  if (!currentUser) { showToastMsg('Please sign in to check in.'); return; }
+  if (currentCheckInId) {
+    await sb.from('check_ins').delete().eq('id', currentCheckInId);
+    currentCheckInId = null;
+    updateCheckInUI(false);
+    showToastMsg('Checked out. You\'re no longer visible here.');
+    return;
   }
+  await sb.from('check_ins').delete().eq('user_id', currentUser.id);
+  const {data, error} = await sb.from('check_ins').insert({
+    user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
+  }).select().single();
+  if (error) { showToastMsg('Could not check in: ' + error.message); return; }
+  currentCheckInId = data.id;
+  updateCheckInUI(true);
+  showToastMsg('You\'re in. Visible to other Favilla users here. ✦');
+  if(navigator.vibrate)navigator.vibrate(20);
+  recordCheckinHistory(VENUE_ID,VENUE_NAME);
+  loadPresence();
 }
 
 function updateCheckInUI(in_) {
