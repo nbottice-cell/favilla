@@ -35,8 +35,8 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .notch{width:120px;height:34px;background:var(--sl-bg);border-radius:0 0 20px 20px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:100;}
 .sbar{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:space-between;padding:0 28px;z-index:99;font-size:12px;color:var(--ash);}
 @media(max-width:499px){.notch,.sbar{display:none;}}
-.screen{position:absolute;inset:0;opacity:0;pointer-events:none;overflow:hidden;scrollbar-width:none;padding-bottom:88px;will-change:transform,opacity;z-index:0;}
-.screen.active{opacity:1;pointer-events:all;z-index:1;overflow-y:auto;overflow-x:hidden;}
+.screen{position:absolute;inset:0;opacity:0;pointer-events:none;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:88px;will-change:transform,opacity;z-index:0;}
+.screen.active{opacity:1;pointer-events:all;z-index:1;}
 .screen.slide-up{transform:translateY(24px);}
 .screen.slide-down{transform:translateY(-24px);}
 @media(prefers-reduced-motion:reduce){
@@ -156,7 +156,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .map-btn{width:44px;height:44px;border-radius:50%;background:rgba(27,58,140,0.07);border:0.5px solid rgba(27,58,140,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#1B3A8C;font-size:16px;-webkit-appearance:none;touch-action:manipulation;position:relative;z-index:401;}
 .bell-btn{width:44px;height:44px;border-radius:50%;background:rgba(27,58,140,0.07);border:0.5px solid rgba(27,58,140,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#1B3A8C;-webkit-appearance:none;touch-action:manipulation;position:relative;z-index:401;}
 .pp-pill{width:44px;height:44px;border-radius:50%;background:rgba(27,58,140,0.1);border:1px solid rgba(27,58,140,0.3);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cr);cursor:pointer;font-weight:600;-webkit-appearance:none;touch-action:manipulation;position:relative;z-index:401;}
-.venue-bar{margin:14px 18px;background:rgba(27,58,140,0.05);border:0.5px solid rgba(27,58,140,0.2);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-user-select:none;user-select:none;width:calc(100% - 36px);text-align:left;-webkit-appearance:none;font-family:inherit;}
+.venue-bar{margin:14px 18px;background:rgba(27,58,140,0.05);border:0.5px solid rgba(27,58,140,0.2);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
 @keyframes vp{0%{box-shadow:0 0 0 0 rgba(27,58,140,0.4);}70%{box-shadow:0 0 0 8px rgba(27,58,140,0);}100%{box-shadow:0 0 0 0 rgba(27,58,140,0);}}
 .v-pulse{width:9px;height:9px;border-radius:50%;background:var(--fl);flex-shrink:0;animation:vp 2.2s infinite;}
 .v-name{font-size:14px;color:var(--cr);font-weight:600;}
@@ -502,10 +502,9 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .ft-orient-note{position:absolute;bottom:8px;right:12px;font-size:9px;color:rgba(255,90,50,0.4);}
 @keyframes threadFlow{to{stroke-dashoffset:-14;}}
 @keyframes ftScanLine{0%,100%{opacity:0.06;}50%{opacity:0.14;}}
-/* Prevent iOS touch-scroll layer on inactive Find Them screen from blocking other screens */
 /* Find Them mode toggle */
 .ft-mode-toggle{display:flex;margin:10px 18px 0;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:3px;gap:3px;}
-.ft-mode-btn{flex:1;padding:9px 6px;background:transparent;border-radius:9px;font-size:12px;font-weight:600;color:var(--ash);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;text-align:center;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.ft-mode-btn{flex:1;padding:9px 6px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:600;color:var(--ash);cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;-webkit-appearance:none;}
 .ft-mode-btn.active{background:rgba(255,90,50,0.15);color:var(--fl-lt);border:0.5px solid rgba(255,90,50,0.3);}
 /* Warmer/Colder big panel */
 .ft-warmer-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 28px 20px;min-height:260px;}
@@ -1395,7 +1394,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
       <button class="pp-pill" id="user-initial" onclick="openPP()" aria-label="Profile">?</button>
     </div>
   </div>
-  <button type="button" class="venue-bar" id="venue-bar" onclick="doCheckInVenue()"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></button>
+  <div class="venue-bar" id="venue-bar" onclick="doCheckInVenue()"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></div>
   <div class="streak-bar"><span style="font-size:16px;">🔥</span><span class="streak-text">3-week check-in streak — you're a regular</span><span class="streak-cnt">3🔥</span></div>
   <div class="sec-lbl" id="nearby-lbl">Who's here right now</div>
   <!-- RADIAL LAYOUT — populated by JS -->
@@ -1557,14 +1556,14 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ft-badge" id="ft-badge">Sofia nearby</div>
   </div>
 
-  <!-- Mode toggle (hidden until screen is active) -->
-  <div class="ft-mode-toggle" id="ft-mode-toggle" style="display:none;">
+  <!-- Mode toggle -->
+  <div class="ft-mode-toggle">
     <div class="ft-mode-btn active" id="ft-mode-btn-warmer" onclick="switchFtMode('warmer')">🌡 Warmer / Colder</div>
     <div class="ft-mode-btn" id="ft-mode-btn-compass" onclick="switchFtMode('compass')">🧭 Compass</div>
   </div>
 
   <!-- Warmer/Colder panel -->
-  <div class="ft-warmer-panel" id="ft-warmer-panel" style="display:none;">
+  <div class="ft-warmer-panel" id="ft-warmer-panel">
     <div class="ft-warm-icon" id="ft-warm-icon">🌤</div>
     <div class="ft-warm-lbl" id="ft-warm-lbl" style="color:#FF5A32;">Getting warmer</div>
     <div class="ft-warm-dist" id="ft-warm-dist">~20 ft away</div>
@@ -2593,7 +2592,6 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   }catch(err){console.error('Boot error:',err);clearTimeout(safetyTimer);hideLoading();_show('s-splash');}
 });
-
 function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
 function setInitial(name){
   const el=document.getElementById('user-initial');
@@ -3223,9 +3221,6 @@ function initFindThem(matchName){
   _renderSentHints();
   var dot=document.getElementById('hint-notif-dot');
   if(dot)dot.classList.remove('show');
-  // Show mode toggle now that screen is active
-  var toggle = document.getElementById('ft-mode-toggle');
-  if(toggle) toggle.style.display = 'flex';
   // Start in warmer/colder mode by default
   _ftSimPct = 45 + Math.random() * 20;
   _ftSimDir = 1;
@@ -3268,8 +3263,6 @@ function stopFindThem(){
   if(ftOrientationActive){window.removeEventListener('deviceorientation',handleOrientation,true);ftOrientationActive=false;}
   if(ftSimInterval){clearInterval(ftSimInterval);ftSimInterval=null;}
   if(_ftWarmInterval){clearInterval(_ftWarmInterval);_ftWarmInterval=null;}
-  var toggle = document.getElementById('ft-mode-toggle');
-  if(toggle) toggle.style.display = 'none';
 }
 
 // ── HINT SYSTEM ──
@@ -3666,7 +3659,7 @@ function injectEmberDemoCards(){
 
 async function loadEmberProfiles(){
   /* Load profiles excluding self, people already liked, and existing matches */
-  const{data:liked}=await sb.from('ember_likes').select('liked_user_id').eq('user_id',currentUser.id).then(r=>r).catch(()=>({data:[]}));
+  const{data:liked}=await sb.from('ember_likes').select('liked_user_id').eq('user_id',currentUser.id);
   const likedIds=(liked||[]).map(r=>r.liked_user_id);
 
   let q=sb.from('profiles').select('id,name,age,photo_url,icebreaker,prompt_1_q,prompt_1_a,intention,gender,interested_in').neq('id',currentUser.id);
@@ -5068,15 +5061,15 @@ function mapView(view,btn){
 const VENUE_ID   = 'anchor-and-vine';
 const VENUE_NAME = 'The Anchor & Vine';
 const VENUE_TYPE = 'bar'; // options: bar | cafe | restaurant | concert | outdoor
-var currentCheckInId    = null;
-var presenceSub         = null;
-var likesSub            = null;
-var matchesSub          = null;
-var msgSub              = null;
-var presenceCache       = [];
-var activeSheetUser     = null;
-var currentMatchId      = null;
-var currentMatchProfile = null;
+let currentCheckInId    = null;
+let presenceSub         = null;
+let likesSub            = null;
+let matchesSub          = null;
+let msgSub              = null;
+let presenceCache       = [];
+let activeSheetUser     = null;
+let currentMatchId      = null;
+let currentMatchProfile = null;
 
 const POSITIONS = [
   {left:'50%',top:'50%'},{left:'22%',top:'22%'},{left:'78%',top:'22%'},
@@ -5090,43 +5083,26 @@ const BG_COLORS = [
   'rgba(100,180,220,0.14)','rgba(155,95,224,0.14)',
 ];
 
-function doCheckInVenue() {
-  if (!currentUser || !currentProfile) { showToastMsg('Please sign in to check in.'); return; }
-
-  /* ── Checkout ── */
+async function doCheckInVenue() {
+  if (!currentUser) return;
   if (currentCheckInId) {
+    await sb.from('check_ins').delete().eq('id', currentCheckInId);
     currentCheckInId = null;
     updateCheckInUI(false);
-    renderPresence(presenceCache, {});
-    updateVenueSub(presenceCache.length);
     showToastMsg('Checked out. You\'re no longer visible here.');
-    try { sb.from('check_ins').delete().eq('user_id', currentUser.id).then(function(){}); } catch(e){}
     return;
   }
-
-  /* ── Check in: update UI immediately, no async needed ── */
-  currentCheckInId = 'local';
+  await sb.from('check_ins').delete().eq('user_id', currentUser.id);
+  const {data, error} = await sb.from('check_ins').insert({
+    user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
+  }).select().single();
+  if (error) { showToastMsg('Could not check in: ' + error.message); return; }
+  currentCheckInId = data.id;
   updateCheckInUI(true);
-
-  /* Add own profile as the first bubble in the radial */
-  var selfRow = { user_id: currentUser.id, profiles: currentProfile };
-  renderPresence([selfRow].concat(presenceCache), {});
-  updateVenueSub(presenceCache.length);
-  showToastMsg("You\'re in. Visible to other Favilla users here. \u2746");
-  if (navigator.vibrate) navigator.vibrate(20);
-  try { recordCheckinHistory(VENUE_ID, VENUE_NAME); } catch(e){}
-
-  /* Sync with Supabase in background — no await, avoids Safari async TDZ bug */
-  try {
-    sb.from('check_ins').delete().eq('user_id', currentUser.id)
-      .then(function() {
-        return sb.from('check_ins').insert({
-          user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME
-        }).select().single();
-      })
-      .then(function(res) { if (res && res.data) currentCheckInId = res.data.id; })
-      .catch(function(e) { console.warn('check-in sync:', e); });
-  } catch(e) {}
+  showToastMsg('You\'re in. Visible to other Favilla users here. ✦');
+  if(navigator.vibrate)navigator.vibrate(20);
+  recordCheckinHistory(VENUE_ID,VENUE_NAME);
+  loadPresence();
 }
 
 function updateCheckInUI(in_) {
