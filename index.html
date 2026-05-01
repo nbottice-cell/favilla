@@ -5097,38 +5097,43 @@ const BG_COLORS = [
   'rgba(100,180,220,0.14)','rgba(155,95,224,0.14)',
 ];
 
-async function doCheckInVenue() {
-  /* Capture all outer-scope const/let into local vars BEFORE the first await.
-     Safari iOS has a bug where const/let at script scope appear uninitialized
-     (TDZ) when accessed after an await resumes inside an async function. */
-  var _sb   = sb;
-  var _user = currentUser;
-  var _vid  = VENUE_ID;
-  var _vname= VENUE_NAME;
+function doCheckInVenue() {
+  if (!currentUser || !currentProfile) { showToastMsg('Please sign in to check in.'); return; }
 
-  if (!_user) { showToastMsg('Please sign in to check in.'); return; }
-
+  /* ── Checkout ── */
   if (currentCheckInId) {
-    await _sb.from('check_ins').delete().eq('id', currentCheckInId);
     currentCheckInId = null;
     updateCheckInUI(false);
+    renderPresence(presenceCache, {});
+    updateVenueSub(presenceCache.length);
     showToastMsg('Checked out. You\'re no longer visible here.');
+    try { sb.from('check_ins').delete().eq('user_id', currentUser.id).then(function(){}); } catch(e){}
     return;
   }
 
-  await _sb.from('check_ins').delete().eq('user_id', _user.id);
-  var res = await _sb.from('check_ins').insert({
-    user_id: _user.id, venue_id: _vid, venue_name: _vname,
-  }).select().single();
-  var data = res.data, error = res.error;
-
-  if (error) { showToastMsg('Could not check in: ' + error.message); return; }
-  currentCheckInId = data.id;
+  /* ── Check in: update UI immediately, no async needed ── */
+  currentCheckInId = 'local';
   updateCheckInUI(true);
-  showToastMsg('You\'re in. Visible to other Favilla users here. ✦');
-  if(navigator.vibrate)navigator.vibrate(20);
-  recordCheckinHistory(_vid, _vname);
-  loadPresence();
+
+  /* Add own profile as the first bubble in the radial */
+  var selfRow = { user_id: currentUser.id, profiles: currentProfile };
+  renderPresence([selfRow].concat(presenceCache), {});
+  updateVenueSub(presenceCache.length);
+  showToastMsg("You\'re in. Visible to other Favilla users here. \u2746");
+  if (navigator.vibrate) navigator.vibrate(20);
+  try { recordCheckinHistory(VENUE_ID, VENUE_NAME); } catch(e){}
+
+  /* Sync with Supabase in background — no await, avoids Safari async TDZ bug */
+  try {
+    sb.from('check_ins').delete().eq('user_id', currentUser.id)
+      .then(function() {
+        return sb.from('check_ins').insert({
+          user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME
+        }).select().single();
+      })
+      .then(function(res) { if (res && res.data) currentCheckInId = res.data.id; })
+      .catch(function(e) { console.warn('check-in sync:', e); });
+  } catch(e) {}
 }
 
 function updateCheckInUI(in_) {
