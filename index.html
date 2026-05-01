@@ -2593,13 +2593,6 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   }catch(err){console.error('Boot error:',err);clearTimeout(safetyTimer);hideLoading();_show('s-splash');}
 });
-/* iOS: inline onclick on divs inside scroll containers is unreliable.
-   Use document-level touchstart delegation which is proven to fire. */
-document.addEventListener('touchstart', function(e){
-  if(e.target.closest && e.target.closest('#venue-bar')){
-    doCheckInVenue();
-  }
-}, {passive:true});
 
 function hideLoading(){const el=document.getElementById('loading');el.classList.add('gone');setTimeout(()=>el.remove(),500);}
 function setInitial(name){
