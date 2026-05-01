@@ -2594,23 +2594,13 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   }catch(err){console.error('Boot error:',err);clearTimeout(safetyTimer);hideLoading();_show('s-splash');}
 });
-/* Tap diagnostic — remove once venue bar issue resolved */
-document.addEventListener('touchstart', function(e){
-  var el = e.target;
-  var id = el.id || '';
-  var cls = (el.className && typeof el.className === 'string') ? el.className.split(' ')[0] : '';
-  showToastMsg('start: ' + (id || cls || el.tagName));
-}, {passive:true});
-document.addEventListener('touchcancel', function(e){
-  showToastMsg('touchcancel — iOS stole the gesture');
-}, {passive:true});
-
-/* Belt-and-suspenders touch handler for venue bar */
+/* iOS: touchend never fires when the scroll container cancels the gesture.
+   Use touchstart instead — it fires immediately before iOS can steal it. */
 document.addEventListener('DOMContentLoaded', function(){
   var vb = document.getElementById('venue-bar');
   if(vb){
-    vb.addEventListener('touchend', function(e){
-      e.preventDefault();
+    vb.addEventListener('touchstart', function(e){
+      e.preventDefault(); /* prevent ghost click */
       doCheckInVenue();
     }, {passive:false});
   }
