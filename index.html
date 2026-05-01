@@ -5090,45 +5090,47 @@ const BG_COLORS = [
 ];
 
 async function doCheckInVenue() {
-  showToastMsg('Step 1: doCheckInVenue() called');
-  await new Promise(r => setTimeout(r, 1200));
+  try {
+    showToastMsg('Step 1: function called');
+    await new Promise(r => setTimeout(r, 1500));
 
-  if (!currentUser) {
-    showToastMsg('Step 2: No user — not signed in');
-    return;
+    if (!currentUser) { showToastMsg('Step 2: no user'); return; }
+    showToastMsg('Step 2: user ok');
+    await new Promise(r => setTimeout(r, 1500));
+
+    showToastMsg('Step 3: checkInId=' + currentCheckInId);
+    await new Promise(r => setTimeout(r, 1500));
+
+    if (currentCheckInId) {
+      showToastMsg('Step 4: checking out...');
+      await sb.from('check_ins').delete().eq('id', currentCheckInId);
+      currentCheckInId = null;
+      updateCheckInUI(false);
+      showToastMsg('Done: checked out');
+      return;
+    }
+
+    showToastMsg('Step 4: inserting check-in...');
+    await new Promise(r => setTimeout(r, 1500));
+
+    await sb.from('check_ins').delete().eq('user_id', currentUser.id);
+    const {data, error} = await sb.from('check_ins').insert({
+      user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
+    }).select().single();
+
+    if (error) { showToastMsg('DB ERROR: ' + error.message); return; }
+    showToastMsg('Step 5: saved id=' + data.id);
+    await new Promise(r => setTimeout(r, 1500));
+
+    currentCheckInId = data.id;
+    updateCheckInUI(true);
+    showToastMsg('Done: you are visible ✦');
+    if(navigator.vibrate)navigator.vibrate(20);
+    recordCheckinHistory(VENUE_ID,VENUE_NAME);
+    loadPresence();
+  } catch(err) {
+    showToastMsg('EXCEPTION: ' + err.message);
   }
-  showToastMsg('Step 2: User found — ' + (currentUser.email || currentUser.id));
-  await new Promise(r => setTimeout(r, 1200));
-
-  if (currentCheckInId) {
-    showToastMsg('Step 3: Already checked in — checking out now');
-    await sb.from('check_ins').delete().eq('id', currentCheckInId);
-    currentCheckInId = null;
-    updateCheckInUI(false);
-    showToastMsg('Done: Checked out successfully');
-    return;
-  }
-  showToastMsg('Step 3: No existing check-in — inserting new one');
-  await new Promise(r => setTimeout(r, 1200));
-
-  await sb.from('check_ins').delete().eq('user_id', currentUser.id);
-  const {data, error} = await sb.from('check_ins').insert({
-    user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
-  }).select().single();
-
-  if (error) {
-    showToastMsg('Step 4 ERROR: ' + error.message);
-    return;
-  }
-  showToastMsg('Step 4: Check-in saved — id ' + data.id);
-  await new Promise(r => setTimeout(r, 1200));
-
-  currentCheckInId = data.id;
-  updateCheckInUI(true);
-  showToastMsg('Done: You are now visible in the room ✦');
-  if(navigator.vibrate)navigator.vibrate(20);
-  recordCheckinHistory(VENUE_ID,VENUE_NAME);
-  loadPresence();
 }
 
 function updateCheckInUI(in_) {
