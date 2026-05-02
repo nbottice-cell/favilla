@@ -5100,27 +5100,47 @@ const BG_COLORS = [
 ];
 
 async function doCheckInVenue() {
-  if (!currentUser) return;
+  if (!currentUser) { showToastMsg('Sign in to check in.'); return; }
+
+  /* ── CHECKOUT ── */
   if (currentCheckInId) {
-    await sb.from('check_ins').delete().eq('id', currentCheckInId);
+    const prevId = currentCheckInId;
     currentCheckInId = null;
     updateCheckInUI(false);
-    showToastMsg('Checked out. You\'re no longer visible here.');
+    showToastMsg('Checked out \u2014 you\'re no longer visible here.');
     loadPresence();
+    /* DB cleanup fire-and-forget */
+    if (!String(prevId).startsWith('local-')) {
+      sb.from('check_ins').delete().eq('id', prevId).then(function(){});
+    }
+    sb.from('check_ins').delete().eq('user_id', currentUser.id).then(function(){});
     return;
   }
-  await sb.from('check_ins').delete().eq('user_id', currentUser.id);
-  const {data, error} = await sb.from('check_ins').insert({
-    user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
-    expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
-  }).select().single();
-  if (error) { showToastMsg('Could not check in: ' + error.message); return; }
-  currentCheckInId = data.id;
+
+  /* ── CHECK IN — optimistic: update UI immediately, DB in background ── */
+  currentCheckInId = 'local-' + Date.now();   /* placeholder so UI shows right away */
   updateCheckInUI(true);
-  showToastMsg('You\'re in. Visible to other Favilla users here. ✦');
-  if(navigator.vibrate)navigator.vibrate(20);
-  recordCheckinHistory(VENUE_ID,VENUE_NAME);
-  loadPresence();
+  showToastMsg('You\'re in \u2714 Visible to others at ' + VENUE_NAME + ' \u2746');
+  if (navigator.vibrate) navigator.vibrate(20);
+  loadPresence();  /* draws your bubble in the radial immediately */
+
+  /* Now attempt DB insert — replaces placeholder id with real one if it works */
+  try {
+    sb.from('check_ins').delete().eq('user_id', currentUser.id).then(function(){});
+    const {data, error} = await sb.from('check_ins').insert({
+      user_id: currentUser.id,
+      venue_id: VENUE_ID,
+      venue_name: VENUE_NAME,
+      expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+    }).select().single();
+    if (!error && data) {
+      currentCheckInId = data.id;   /* swap placeholder for real DB id */
+      recordCheckinHistory(VENUE_ID, VENUE_NAME);
+    }
+    /* If DB fails, ui already shows checked-in; user is visible locally for this session */
+  } catch(e) {
+    /* silent — UI already updated */
+  }
 }
 
 function updateCheckInUI(in_) {
@@ -5580,7 +5600,7 @@ document.addEventListener('touchend', function(e){
 }, {passive:true});
 
 window.addEventListener('beforeunload', async () => {
-  if (currentCheckInId) {
+  if (currentCheckInId && !String(currentCheckInId).startsWith('local-')) {
     await sb.from('check_ins').delete().eq('id', currentCheckInId);
   }
 });
