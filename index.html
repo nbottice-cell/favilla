@@ -3315,6 +3315,11 @@ var _HINT_OPTS_BY_TYPE = {
 // Shared across all venue types
 var _HINT_LOOK = ['Dark jacket','Red top','White shirt','Black dress','Floral top','All black','Colorful outfit','Wearing glasses','Sunglasses on','Baseball cap','Beanie','Hoodie on','Blazer on','Long hair','Hair up','Curly hair','Bright sneakers','Bag with me'];
 
+/* Venue config — must be declared before the IIFE below that references VENUE_TYPE */
+var VENUE_ID   = 'anchor-and-vine';
+var VENUE_NAME = 'The Anchor & Vine';
+var VENUE_TYPE = 'bar'; // options: bar | cafe | restaurant | concert | outdoor
+
 var _HINT_OPTS = (function(){
   var t = _HINT_OPTS_BY_TYPE[VENUE_TYPE] || _HINT_OPTS_BY_TYPE['bar'];
   return { location: t.location, look: _HINT_LOOK, doing: t.doing };
@@ -5082,26 +5087,24 @@ function mapView(view,btn){
 }
 
 /* ── PRESENCE & CHECK-IN ──────────── */
-const VENUE_ID   = 'anchor-and-vine';
-const VENUE_NAME = 'The Anchor & Vine';
-const VENUE_TYPE = 'bar'; // options: bar | cafe | restaurant | concert | outdoor
-let currentCheckInId    = null;
-let presenceSub         = null;
-let likesSub            = null;
-let matchesSub          = null;
-let msgSub              = null;
-let presenceCache       = [];
-let activeSheetUser     = null;
-let currentMatchId      = null;
-let currentMatchProfile = null;
+/* VENUE_ID / VENUE_NAME / VENUE_TYPE declared earlier (before the _HINT_OPTS IIFE) */
+var currentCheckInId    = null;
+var presenceSub         = null;
+var likesSub            = null;
+var matchesSub          = null;
+var msgSub              = null;
+var presenceCache       = [];
+var activeSheetUser     = null;
+var currentMatchId      = null;
+var currentMatchProfile = null;
 
-const POSITIONS = [
+var POSITIONS = [
   {left:'50%',top:'50%'},{left:'22%',top:'22%'},{left:'78%',top:'22%'},
   {left:'16%',top:'74%'},{left:'82%',top:'74%'},{left:'50%',top:'14%'},
   {left:'50%',top:'86%'},{left:'14%',top:'50%'},
 ];
-const AV_SIZES  = ['c','m','m','o','o','o','o','o'];
-const BG_COLORS = [
+var AV_SIZES  = ['c','m','m','o','o','o','o','o'];
+var BG_COLORS = [
   'rgba(255,90,50,0.14)','rgba(255,90,50,0.12)','rgba(60,110,220,0.15)',
   'rgba(40,160,100,0.13)','rgba(180,100,160,0.14)','rgba(212,146,26,0.14)',
   'rgba(100,180,220,0.14)','rgba(155,95,224,0.14)',
