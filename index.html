@@ -1394,7 +1394,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
       <button class="pp-pill" id="user-initial" onclick="openPP()" aria-label="Profile">?</button>
     </div>
   </div>
-  <div class="venue-bar" id="venue-bar" onclick="doCheckInVenue()"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></div>
+  <div class="venue-bar" id="venue-bar"><div class="v-pulse" id="v-pulse"></div><div><div class="v-name" id="v-name">The Anchor &amp; Vine</div><div class="v-sub" id="v-sub">Tap to check in</div></div><div id="checkin-status" style="font-size:11px;color:var(--fl-lt);font-weight:600;margin-left:auto;"></div></div>
   <div class="streak-bar"><span style="font-size:16px;">🔥</span><span class="streak-text">3-week check-in streak — you're a regular</span><span class="streak-cnt">3🔥</span></div>
   <div class="sec-lbl" id="nearby-lbl">Who's here right now</div>
   <!-- RADIAL LAYOUT — populated by JS -->
@@ -1423,7 +1423,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--cr);margin-bottom:8px;">Quiet in here.</div>
     <div style="font-size:13px;color:var(--ash);line-height:1.7;" id="empty-state-msg">Check in to appear when others arrive.</div>
   </div>
-  <div class="enter-btn" id="enter-btn" onclick="doCheckInVenue()">
+  <div class="enter-btn" id="enter-btn">
     <div class="enter-title" id="enter-title">Enter the Room</div>
     <div class="enter-sub" id="enter-sub">Check in to see and be seen</div>
   </div>
@@ -2576,6 +2576,14 @@ function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))docu
 
 /* ── BOOT ────────────────────────────── */
 window.addEventListener('DOMContentLoaded',async()=>{
+  /* Wire check-in buttons directly — more reliable than onclick attributes on mobile */
+  (function(){
+    function _ci(e){ e.preventDefault(); doCheckInVenue(); }
+    var vbar=document.getElementById('venue-bar');
+    var eBtn=document.getElementById('enter-btn');
+    if(vbar){ vbar.addEventListener('click',doCheckInVenue); vbar.addEventListener('touchend',_ci,{passive:false}); }
+    if(eBtn){ eBtn.addEventListener('click',doCheckInVenue); eBtn.addEventListener('touchend',_ci,{passive:false}); }
+  })();
   const safetyTimer=setTimeout(()=>{try{hideLoading();}catch(e){}try{_show('s-splash');}catch(e){}},4000);
   try{
   const{data:{session}}=await sb.auth.getSession();
@@ -5099,48 +5107,58 @@ const BG_COLORS = [
   'rgba(100,180,220,0.14)','rgba(155,95,224,0.14)',
 ];
 
-async function doCheckInVenue() {
-  if (!currentUser) { showToastMsg('Sign in to check in.'); return; }
-
-  /* ── CHECKOUT ── */
-  if (currentCheckInId) {
-    const prevId = currentCheckInId;
-    currentCheckInId = null;
-    updateCheckInUI(false);
-    showToastMsg('Checked out \u2014 you\'re no longer visible here.');
-    loadPresence();
-    /* DB cleanup fire-and-forget */
-    if (!String(prevId).startsWith('local-')) {
-      sb.from('check_ins').delete().eq('id', prevId).then(function(){});
-    }
-    sb.from('check_ins').delete().eq('user_id', currentUser.id).then(function(){});
-    return;
-  }
-
-  /* ── CHECK IN — optimistic: update UI immediately, DB in background ── */
-  currentCheckInId = 'local-' + Date.now();   /* placeholder so UI shows right away */
-  updateCheckInUI(true);
-  showToastMsg('You\'re in \u2714 Visible to others at ' + VENUE_NAME + ' \u2746');
-  if (navigator.vibrate) navigator.vibrate(20);
-  loadPresence();  /* draws your bubble in the radial immediately */
-
-  /* Now attempt DB insert — replaces placeholder id with real one if it works */
+/* ── CHECK-IN  (synchronous UI, async DB) ── */
+function doCheckInVenue() {
   try {
-    sb.from('check_ins').delete().eq('user_id', currentUser.id).then(function(){});
-    const {data, error} = await sb.from('check_ins').insert({
-      user_id: currentUser.id,
-      venue_id: VENUE_ID,
+    if (!currentUser) {
+      showToastMsg('Sign in first to check in.');
+      return;
+    }
+
+    /* ── CHECKOUT ── */
+    if (currentCheckInId) {
+      var prevId = currentCheckInId;
+      currentCheckInId = null;
+      updateCheckInUI(false);
+      showToastMsg('Checked out \u2014 you\'re no longer visible here.');
+      renderPresence(presenceCache, {});        /* remove your bubble immediately */
+      if (!String(prevId).startsWith('local-')) {
+        sb.from('check_ins').delete().eq('id', prevId)
+          .then(function(){}).catch(function(){});
+      }
+      sb.from('check_ins').delete().eq('user_id', currentUser.id)
+        .then(function(){}).catch(function(){});
+      return;
+    }
+
+    /* ── CHECK IN — UI updates NOW, DB syncs in background ── */
+    currentCheckInId = 'local-' + Date.now();
+    updateCheckInUI(true);
+    showToastMsg('You\'re in \u2714  Visible at ' + VENUE_NAME + ' \u2746');
+    if (navigator.vibrate) navigator.vibrate(20);
+    renderPresence(presenceCache, {});          /* draw your bubble immediately */
+    _doCheckinDB();                             /* async DB sync — does not block UI */
+
+  } catch(err) {
+    showToastMsg('Check-in error: ' + (err && err.message ? err.message : String(err)));
+  }
+}
+
+async function _doCheckinDB() {
+  try {
+    await sb.from('check_ins').delete().eq('user_id', currentUser.id);
+    var res = await sb.from('check_ins').insert({
+      user_id:    currentUser.id,
+      venue_id:   VENUE_ID,
       venue_name: VENUE_NAME,
       expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
     }).select().single();
-    if (!error && data) {
-      currentCheckInId = data.id;   /* swap placeholder for real DB id */
+    if (!res.error && res.data) {
+      currentCheckInId = res.data.id;
       recordCheckinHistory(VENUE_ID, VENUE_NAME);
     }
-    /* If DB fails, ui already shows checked-in; user is visible locally for this session */
-  } catch(e) {
-    /* silent — UI already updated */
-  }
+    loadPresence(); /* refresh radial with real DB data */
+  } catch(e) { /* silent — UI is already showing checked-in */ }
 }
 
 function updateCheckInUI(in_) {
@@ -5599,9 +5617,9 @@ document.addEventListener('touchend', function(e){
   }
 }, {passive:true});
 
-window.addEventListener('beforeunload', async () => {
+window.addEventListener('beforeunload', function() {
   if (currentCheckInId && !String(currentCheckInId).startsWith('local-')) {
-    await sb.from('check_ins').delete().eq('id', currentCheckInId);
+    sb.from('check_ins').delete().eq('id', currentCheckInId).then(function(){}).catch(function(){});
   }
 });
 
