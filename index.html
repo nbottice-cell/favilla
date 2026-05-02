@@ -2470,6 +2470,14 @@ function _show(id, direction='forward', pushHistory=true){
   _transitioning = true;
   const _safetyId = setTimeout(()=>{ _transitioning=false; }, 900);
 
+  /* Hard fallback: if GSAP stalls and screen stays invisible, force it visible */
+  const _visibilityId = setTimeout(()=>{
+    if(incoming.classList.contains('active')&&parseFloat(getComputedStyle(incoming).opacity)<0.5){
+      incoming.style.opacity='1';incoming.style.transform='none';
+      document.querySelectorAll('.screen').forEach(s=>{if(s!==incoming)s.classList.remove('active');});
+    }
+  }, 600);
+
   /* Choose animation based on direction */
   const yIn  = direction==='back' ? -28 : 28;
   const yOut = direction==='back' ?  28 : -28;
@@ -2482,6 +2490,7 @@ function _show(id, direction='forward', pushHistory=true){
   const tl = gsap.timeline({
     onComplete: ()=>{
       clearTimeout(_safetyId);
+      clearTimeout(_visibilityId);
       document.querySelectorAll('.screen').forEach(s=>{
         if(s!==incoming){
           s.classList.remove('active');
@@ -2512,10 +2521,11 @@ window.addEventListener('popstate', function(e){
 /* ── PANELS ──────────────────────────── */
 function openPP(){
   if(currentProfile){
-    const n=currentProfile.name;
-    document.getElementById('pp-av').innerHTML=n.charAt(0).toUpperCase()+'<div class="pp-edit">✎</div>';
-    document.getElementById('pp-pi').textContent=n.charAt(0).toUpperCase();
-    document.getElementById('pp-name').textContent=n+', '+currentProfile.age;
+    const n=currentProfile.name||'';
+    const initial=n?n.charAt(0).toUpperCase():'?';
+    document.getElementById('pp-av').innerHTML=initial+'<div class="pp-edit">✎</div>';
+    document.getElementById('pp-pi').textContent=initial;
+    document.getElementById('pp-name').textContent=(n||(currentProfile.age?'User':'')||'Your profile')+(currentProfile.age?', '+currentProfile.age:'');
     document.getElementById('pp-email').textContent=currentUser?.email||'';
   }
   document.getElementById('profile-panel').classList.add('open');
@@ -3719,7 +3729,13 @@ function renderEmberCard(){
 
   /* Animate card entering from right */
   if(!_reducedMotion){
-    gsap.fromTo(card,{x:340,opacity:0,rotate:4},{x:0,opacity:1,rotate:0,duration:0.32,ease:'power2.out'});
+    try{
+      gsap.fromTo(card,{x:340,opacity:0,rotate:4},{x:0,opacity:1,rotate:0,duration:0.32,ease:'power2.out'});
+      /* Safety: if GSAP stalls, guarantee the card is visible after the animation window */
+      setTimeout(function(){if(card.parentNode&&parseFloat(getComputedStyle(card).opacity)<0.5){card.style.opacity='1';card.style.transform='none';}},500);
+    }catch(e){
+      card.style.opacity='1';card.style.transform='none';
+    }
   }
 }
 
@@ -5090,11 +5106,13 @@ async function doCheckInVenue() {
     currentCheckInId = null;
     updateCheckInUI(false);
     showToastMsg('Checked out. You\'re no longer visible here.');
+    loadPresence();
     return;
   }
   await sb.from('check_ins').delete().eq('user_id', currentUser.id);
   const {data, error} = await sb.from('check_ins').insert({
     user_id: currentUser.id, venue_id: VENUE_ID, venue_name: VENUE_NAME,
+    expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
   }).select().single();
   if (error) { showToastMsg('Could not check in: ' + error.message); return; }
   currentCheckInId = data.id;
@@ -5142,20 +5160,49 @@ function renderPresence(users,regularSets){
   var emptyMsg=document.getElementById('empty-state-msg');
   var seeAll=document.getElementById('see-all-btn');
   container.querySelectorAll('.pn').forEach(function(n){n.remove();});
-  if(users.length===0){
+
+  var iCheckedIn=!!currentCheckInId;
+  var hasOthers=users.length>0;
+
+  /* Show empty state only if nobody is here at all */
+  if(!hasOthers&&!iCheckedIn){
     container.style.display='none';empty.style.display='block';seeAll.style.display='none';
-    if(emptyMsg)emptyMsg.textContent=currentCheckInId?"You're in the room. Others will appear the moment they check in.":"Check in to appear when others arrive.";
+    if(emptyMsg)emptyMsg.textContent='Check in to appear when others arrive.';
     return;
   }
   container.style.display='';empty.style.display='none';
+  if(emptyMsg&&iCheckedIn&&!hasOthers)emptyMsg.textContent='';
+
   if(users.length>5){seeAll.style.display='flex';document.getElementById('see-all-count').textContent=users.length;}
   else{seeAll.style.display='none';}
-  users.slice(0,POSITIONS.length).forEach(function(row,i){
+
+  /* "You" bubble always at center (POSITIONS[0]) when checked in */
+  var offset=0;
+  if(iCheckedIn&&currentProfile){
+    var youPos=POSITIONS[0];
+    var youName=currentProfile.name||'You';
+    var youInitial=youName.charAt(0).toUpperCase();
+    var youAvContent=currentProfile.photo_url
+      ?('<img src="'+currentProfile.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">')
+      :youInitial;
+    var youNode=document.createElement('div');
+    youNode.className='pn';
+    youNode.style.cssText='left:'+youPos.left+';top:'+youPos.top+';';
+    youNode.innerHTML=
+      '<div class="pav c" style="background:rgba(255,90,50,0.18);border:2px solid rgba(255,90,50,0.7);">'+youAvContent+'<div class="ponline"></div></div>'+
+      '<div style="font-size:12px;color:var(--fl-lt);font-weight:700;margin-top:6px;text-align:center;">You</div>';
+    container.appendChild(youNode);
+    offset=1; /* other users start at POSITIONS[1] */
+  }
+
+  /* Other users — shifted by offset so they don't overlap the "you" bubble */
+  users.slice(0,POSITIONS.length-offset).forEach(function(row,i){
     var p=row.profiles;if(!p)return;
     var initial=p.name?p.name.charAt(0).toUpperCase():'?';
     var label=p.name+(p.age?', '+p.age:'');
-    var pos=POSITIONS[i],size=AV_SIZES[i]||'o',bg=BG_COLORS[i];
-    var isFirst=i===0;
+    var posIdx=i+offset;
+    var pos=POSITIONS[posIdx],size=AV_SIZES[posIdx]||'o',bg=BG_COLORS[posIdx];
+    var isFirst=i===0&&!iCheckedIn; /* featured snippet only on first other when not checked in */
     var isReg=regularSets&&regularSets[row.user_id]&&regularSets[row.user_id].has(VENUE_ID);
     var snippet='',isTrunc=false;
     if(isFirst){
