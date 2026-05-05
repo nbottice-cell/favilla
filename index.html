@@ -77,6 +77,17 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .toast-text{font-size:14px;color:#EEE8E0;line-height:1.45;font-family:'Inter',sans-serif;}
 .toast-text strong{color:var(--cr);}
 @media(max-width:499px){.toast{top:calc(env(safe-area-inset-top,44px) + 10px);}}
+/* Sticky headers: stick at the safe-area edge, not behind the notch/Dynamic Island */
+@media(max-width:499px){
+  .sp-hdr,.ft-hdr,.em-hdr,.mp-hdr,.dr-hdr,.venues-hdr,.bl-hdr,.al-hdr,.fn-hdr{
+    top:env(safe-area-inset-top,0px);
+  }
+  /* Chat + other flex-column screens that zero out screen padding-top —
+     push the header down by the safe area so it clears the notch */
+  .ch-hdr,.vp-hdr,.spot-hdr,.cp-hdr{
+    padding-top:max(14px,calc(env(safe-area-inset-top,0px) + 14px));
+  }
+}
 
 /* SPLASH */
 #s-splash{background:#F6F2ED;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 36px 48px;text-align:center;}
@@ -272,7 +283,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 /* CHAT */
 #s-chat{background:var(--sl-bg);padding-top:0;display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .ch-hdr{background:var(--sl-hdr);padding:14px 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid rgba(27,58,140,0.1);flex-shrink:0;}
-.bk-btn{font-size:20px;color:var(--ash);cursor:pointer;padding:4px 8px 4px 0;min-width:44px;min-height:44px;display:flex;align-items:center;background:none;border:none;font-family:'Inter',sans-serif;flex-shrink:0;}
+.bk-btn{font-size:20px;color:var(--ash);cursor:pointer;padding:4px 8px 4px 0;min-width:44px;min-height:44px;display:flex;align-items:center;background:none;border:none;font-family:'Inter',sans-serif;flex-shrink:0;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 .ch-av{width:40px;height:40px;border-radius:50%;background:rgba(255,90,50,0.18);border:1px solid rgba(255,90,50,0.35);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cr);font-weight:600;}
 .ch-name{font-size:16px;color:#1A1C22;font-weight:600;font-family:'Inter',sans-serif;letter-spacing:-0.3px;}
 .ch-status{font-size:12px;color:var(--fl-lt);margin-top:2px;}
