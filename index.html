@@ -3297,14 +3297,12 @@ async function initFindThem(matchName){
   if(badge)badge.textContent=name+' nearby';
   if(themLbl)themLbl.textContent=name;
   if(themLegend)themLegend.textContent=name+' (approx)';
-  // Render hint pills and clear notification badge
-  _renderReceivedHints();
-  _renderSentHints();
   var dot=document.getElementById('hint-notif-dot');
   if(dot)dot.classList.remove('show');
 
   // Reset real-data state
   _ftMyPos=null; _ftTheirPos=null; _ftHasRealData=false; _ftOtherUserId=null;
+  _sentHints=[]; _receivedHints=[];
 
   // Look up the other user's ID from the match record
   if(currentMatchId&&currentUser){
@@ -3315,6 +3313,12 @@ async function initFindThem(matchName){
       }
     }catch(e){}
   }
+
+  // Load real hints from Supabase and subscribe to new ones
+  await _loadExistingHints();
+  _renderReceivedHints();
+  _renderSentHints();
+  _subscribeHints();
 
   // Set up Supabase broadcast channel for real-time location exchange
   if(_ftOtherUserId&&currentUser&&sb.channel){
@@ -3403,7 +3407,8 @@ function stopFindThem(){
   if(ftSimInterval){clearInterval(ftSimInterval);ftSimInterval=null;}
   if(_ftWarmInterval){clearInterval(_ftWarmInterval);_ftWarmInterval=null;}
   if(_ftGeoWatch!==null){navigator.geolocation.clearWatch(_ftGeoWatch);_ftGeoWatch=null;}
-  if(_ftChannel){try{sb.removeChannel(_ftChannel);}catch(e){}  _ftChannel=null;}
+  if(_ftChannel){try{sb.removeChannel(_ftChannel);}catch(e){} _ftChannel=null;}
+  if(_ftHintSub){try{sb.removeChannel(_ftHintSub);}catch(e){} _ftHintSub=null;}
   _ftMyPos=null; _ftTheirPos=null; _ftHasRealData=false;
 }
 
@@ -3411,7 +3416,7 @@ function stopFindThem(){
 var _sentHints = [];
 var _receivedHints = [];
 var _selectedHints = { location: null, look: null, doing: null };
-var _hintSimTimer = null;
+var _ftHintSub = null;
 
 var _HINT_OPTS_BY_TYPE = {
   bar: {
@@ -3506,7 +3511,7 @@ function selectHintOption(el, hint, cat){
   _updateSendBtnReady();
 }
 
-function sendHint(){
+async function sendHint(){
   var hints = Object.values(_selectedHints).filter(function(v){ return v !== null; });
   ['location','look','doing'].forEach(function(cat){
     var el = document.getElementById('hint-custom-'+cat);
@@ -3514,40 +3519,28 @@ function sendHint(){
     if(t) hints.push(t);
   });
   if(hints.length === 0) return;
+
+  // Save to Supabase — one row per hint so each arrives as a separate pill
+  if(currentMatchId && currentUser){
+    for(var i=0;i<hints.length;i++){
+      try{
+        await sb.from('messages').insert({
+          match_id:    currentMatchId,
+          sender_id:   currentUser.id,
+          content:     hints[i],
+          message_type:'hint'
+        });
+      }catch(e){ dbg('Hint save error: '+e.message); }
+    }
+  }
+
   hints.forEach(function(h){ _sentHints.push(h); });
-  // Close picker
   var overlay = document.getElementById('hint-picker-overlay');
   if(overlay) overlay.classList.remove('open');
   _selectedHints = { location: null, look: null, doing: null };
-  // Update sent pills
   _renderSentHints();
-  // Show toast
   var name = (currentMatchProfile&&currentMatchProfile.name)||'them';
-  var toastText = hints.length === 1
-    ? 'Hint sent to ' + name + ' \u2192 ' + hints[0]
-    : hints.length + ' hints sent to ' + name;
-  showToastMsg(toastText);
-  // Simulate match receiving hint — after a short delay, trigger a "new hint" notification back
-  // so the demo shows the notification badge working
-  if(_hintSimTimer) clearTimeout(_hintSimTimer);
-  _hintSimTimer = setTimeout(function(){
-    var matchName = (currentMatchProfile&&currentMatchProfile.name)||'them';
-    // Simulate them dropping a hint back (makes the notification demo work)
-    var autoHints = ['Looking your way','Near the exit','Just smiled at you'];
-    var auto = autoHints[Math.floor(Math.random()*autoHints.length)];
-    _receivedHints.push(auto);
-    // Show notification badge on 📍 in chat
-    var dot = document.getElementById('hint-notif-dot');
-    if(dot) dot.classList.add('show');
-    // If user is already on findthem screen, refresh pills
-    var ftScreen = document.getElementById('s-findthem');
-    if(ftScreen && ftScreen.classList.contains('active')){
-      _renderReceivedHints();
-      if(dot) dot.classList.remove('show');
-    } else {
-      showToastMsg(matchName+' dropped a hint \u2714');
-    }
-  }, 3000);
+  showToastMsg(hints.length===1 ? 'Hint sent to '+name+' \u2192 '+hints[0] : hints.length+' hints sent to '+name);
 }
 
 function _renderReceivedHints(){
@@ -3582,6 +3575,51 @@ function _renderSentHints(){
     wrap.appendChild(el);
   });
 }
+async function _loadExistingHints(){
+  if(!currentMatchId||!currentUser||!_ftOtherUserId) return;
+  try{
+    var res=await sb.from('messages')
+      .select('sender_id,content')
+      .eq('match_id',currentMatchId)
+      .eq('message_type','hint')
+      .order('created_at',{ascending:true});
+    if(res.data){
+      _sentHints=[];
+      _receivedHints=[];
+      res.data.forEach(function(row){
+        if(row.sender_id===currentUser.id) _sentHints.push(row.content);
+        else _receivedHints.push(row.content);
+      });
+    }
+  }catch(e){ dbg('Load hints error: '+e.message); }
+}
+
+function _subscribeHints(){
+  if(!currentMatchId||!currentUser||!_ftOtherUserId) return;
+  if(_ftHintSub){try{sb.removeChannel(_ftHintSub);}catch(e){}}
+  _ftHintSub=sb.channel('ft-hints-'+currentMatchId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',
+      filter:'match_id=eq.'+currentMatchId},
+      function(payload){
+        var row=payload.new;
+        if(row.message_type!=='hint') return;
+        if(row.sender_id===_ftOtherUserId){
+          _receivedHints.push(row.content);
+          var dot=document.getElementById('hint-notif-dot');
+          var ftScreen=document.getElementById('s-findthem');
+          if(ftScreen&&ftScreen.classList.contains('active')){
+            _renderReceivedHints();
+            if(dot) dot.classList.remove('show');
+          } else {
+            if(dot) dot.classList.add('show');
+            var matchName=(currentMatchProfile&&currentMatchProfile.name)||'them';
+            showToastMsg(matchName+' dropped a hint \u2714');
+          }
+        }
+      })
+    .subscribe();
+}
+
 function setTemperature(pct){
   pct=Math.max(0,Math.min(100,pct));
   var stops=[[0,[91,184,255]],[25,[112,200,224]],[50,[255,184,64]],[75,[255,122,90]],[100,[255,45,26]]];
