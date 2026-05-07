@@ -3214,6 +3214,58 @@ function proposeDateAndCalendar(btn){
 var ftOrientationActive=false, ftSimInterval=null;
 var _ftMode='warmer', _ftSimPct=50, _ftSimDir=1, _ftWarmInterval=null;
 
+/* GPS + real-time location tracking state */
+var _ftOtherUserId = null;
+var _ftMyPos       = null;  // { lat, lng }
+var _ftTheirPos    = null;  // { lat, lng }
+var _ftMyHeading   = 0;     // degrees clockwise from north
+var _ftGeoWatch    = null;
+var _ftChannel     = null;
+var _ftHasRealData = false; // true once both positions known
+
+/* Haversine distance in feet */
+function _haversineFt(lat1,lng1,lat2,lng2){
+  var R=20902231; // Earth radius in feet
+  var dLat=(lat2-lat1)*Math.PI/180;
+  var dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+    Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+/* Bearing from point 1 → point 2 (degrees clockwise from north, 0-360) */
+function _bearingDeg(lat1,lng1,lat2,lng2){
+  var dLng=(lng2-lng1)*Math.PI/180;
+  var y=Math.sin(dLng)*Math.cos(lat2*Math.PI/180);
+  var x=Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180)-
+    Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos(dLng);
+  return(Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+
+function _broadcastMyPos(lat,lng){
+  if(!_ftChannel||!currentUser) return;
+  _ftChannel.send({type:'broadcast',event:'loc',payload:{lat,lng,uid:currentUser.id}});
+}
+
+function _updateCompassAndDistance(){
+  if(!_ftMyPos||!_ftTheirPos) return;
+  _ftHasRealData=true;
+  var ft=_haversineFt(_ftMyPos.lat,_ftMyPos.lng,_ftTheirPos.lat,_ftTheirPos.lng);
+  /* Map distance to temperature: 0ft=100%, 200ft=0% */
+  var pct=Math.max(0,Math.min(100,100-(ft/200)*100));
+  setTemperature(pct);
+  /* Update compass arrow if in compass mode */
+  if(_ftMode==='compass'){
+    var bearing=_bearingDeg(_ftMyPos.lat,_ftMyPos.lng,_ftTheirPos.lat,_ftTheirPos.lng);
+    /* Arrow rotation: bearing relative to where phone is pointing */
+    var arrowDeg=(bearing-_ftMyHeading+360)%360;
+    rotateArrow(arrowDeg);
+    var note=document.getElementById('ft-orient-note');
+    if(note) note.textContent='Pointing toward '+((currentMatchProfile&&currentMatchProfile.name)||'them');
+  }
+}
+
 function switchFtMode(mode){
   _ftMode=mode;
   document.getElementById('ft-mode-btn-warmer').classList.toggle('active', mode==='warmer');
@@ -3237,7 +3289,7 @@ function _ftWarmTick(){
   _ftSimPct = Math.max(5, Math.min(95, _ftSimPct));
   setTemperature(_ftSimPct);
 }
-function initFindThem(matchName){
+async function initFindThem(matchName){
   var name=matchName||(currentMatchProfile&&currentMatchProfile.name)||'them';
   var badge=document.getElementById('ft-badge');
   var themLbl=document.getElementById('ft-them-lbl');
@@ -3250,7 +3302,54 @@ function initFindThem(matchName){
   _renderSentHints();
   var dot=document.getElementById('hint-notif-dot');
   if(dot)dot.classList.remove('show');
-  // Start in warmer/colder mode by default
+
+  // Reset real-data state
+  _ftMyPos=null; _ftTheirPos=null; _ftHasRealData=false; _ftOtherUserId=null;
+
+  // Look up the other user's ID from the match record
+  if(currentMatchId&&currentUser){
+    try{
+      var mr=await sb.from('matches').select('user_id_1,user_id_2').eq('id',currentMatchId).maybeSingle();
+      if(mr.data){
+        _ftOtherUserId=mr.data.user_id_1===currentUser.id?mr.data.user_id_2:mr.data.user_id_1;
+      }
+    }catch(e){}
+  }
+
+  // Set up Supabase broadcast channel for real-time location exchange
+  if(_ftOtherUserId&&currentUser&&sb.channel){
+    if(_ftChannel){try{sb.removeChannel(_ftChannel);}catch(e){}}
+    var chanName='ft-loc-'+[currentUser.id,_ftOtherUserId].sort().join('-');
+    _ftChannel=sb.channel(chanName)
+      .on('broadcast',{event:'loc'},function(msg){
+        if(msg&&msg.payload&&msg.payload.uid===_ftOtherUserId){
+          _ftTheirPos={lat:msg.payload.lat,lng:msg.payload.lng};
+          _updateCompassAndDistance();
+          // Once we have real data, stop the simulation
+          if(_ftWarmInterval&&_ftMyPos){clearInterval(_ftWarmInterval);_ftWarmInterval=null;}
+        }
+      })
+      .subscribe();
+  }
+
+  // Start GPS watch — broadcast position to match partner
+  if(navigator.geolocation){
+    if(_ftGeoWatch!==null) navigator.geolocation.clearWatch(_ftGeoWatch);
+    _ftGeoWatch=navigator.geolocation.watchPosition(
+      function(pos){
+        _ftMyPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+        _broadcastMyPos(_ftMyPos.lat,_ftMyPos.lng);
+        if(_ftTheirPos){
+          _updateCompassAndDistance();
+          if(_ftWarmInterval){clearInterval(_ftWarmInterval);_ftWarmInterval=null;}
+        }
+      },
+      function(err){dbg('GPS: '+err.message);},
+      {enableHighAccuracy:true,maximumAge:3000,timeout:15000}
+    );
+  }
+
+  // Start simulation as fallback (stops automatically once real data arrives)
   _ftSimPct = 45 + Math.random() * 20;
   _ftSimDir = 1;
   switchFtMode('warmer');
@@ -3267,18 +3366,29 @@ function startOrientationListener(){
 function handleOrientation(e){
   var heading;
   if(e.webkitCompassHeading != null){
-    /* iOS — webkitCompassHeading is 0-360 clockwise from magnetic north.
-       The arrow SVG points up at 0deg. We want the arrow to point
-       in the same direction the phone is facing, so rotate by heading. */
-    heading = e.webkitCompassHeading;
+    heading = e.webkitCompassHeading; // iOS: 0-360 clockwise from magnetic north
   } else if(e.alpha != null){
-    /* Android — alpha is counter-clockwise from arbitrary zero.
-       Convert to clockwise: negate and normalise to 0-360. */
-    heading = (360 - e.alpha) % 360;
+    heading = (360 - e.alpha) % 360;  // Android: convert to clockwise from north
   } else {
     return;
   }
-  rotateArrow(heading);
+  _ftMyHeading = heading;
+
+  if(_ftMyPos && _ftTheirPos){
+    /* We have both positions — point the arrow at them */
+    var bearing = _bearingDeg(_ftMyPos.lat,_ftMyPos.lng,_ftTheirPos.lat,_ftTheirPos.lng);
+    /* Arrow offset: if phone faces north (heading=0) and they're east (bearing=90),
+       rotate arrow 90° clockwise. If phone faces them exactly, arrow points straight up. */
+    var arrowDeg = (bearing - heading + 360) % 360;
+    rotateArrow(arrowDeg);
+    var note = document.getElementById('ft-orient-note');
+    if(note) note.textContent = 'Pointing toward ' + ((currentMatchProfile&&currentMatchProfile.name)||'them');
+  } else {
+    /* No position data yet — just spin with heading as placeholder */
+    rotateArrow(0); // hold arrow still until we have real data
+    var note = document.getElementById('ft-orient-note');
+    if(note) note.textContent = _ftOtherUserId ? 'Waiting for location data...' : 'Arrow follows your heading';
+  }
 }
 function rotateArrow(deg){var g=document.getElementById('ft-arrow-group');if(g)g.style.transform='rotate('+deg+'deg)';}
 function startSimulatedArrow(){
@@ -3292,11 +3402,14 @@ function stopFindThem(){
   if(ftOrientationActive){window.removeEventListener('deviceorientation',handleOrientation,true);ftOrientationActive=false;}
   if(ftSimInterval){clearInterval(ftSimInterval);ftSimInterval=null;}
   if(_ftWarmInterval){clearInterval(_ftWarmInterval);_ftWarmInterval=null;}
+  if(_ftGeoWatch!==null){navigator.geolocation.clearWatch(_ftGeoWatch);_ftGeoWatch=null;}
+  if(_ftChannel){try{sb.removeChannel(_ftChannel);}catch(e){}  _ftChannel=null;}
+  _ftMyPos=null; _ftTheirPos=null; _ftHasRealData=false;
 }
 
 // ── HINT SYSTEM ──
 var _sentHints = [];
-var _receivedHints = ['Near the bar','Dark jacket','Sitting down'];
+var _receivedHints = [];
 var _selectedHints = { location: null, look: null, doing: null };
 var _hintSimTimer = null;
 
@@ -3439,8 +3552,14 @@ function sendHint(){
 
 function _renderReceivedHints(){
   var wrap = document.getElementById('ft-received-pills');
+  var area = document.getElementById('ft-hints-area');
   if(!wrap) return;
   wrap.innerHTML = '';
+  if(_receivedHints.length === 0){
+    if(area) area.style.display = 'none';
+    return;
+  }
+  if(area) area.style.display = 'block';
   _receivedHints.forEach(function(h, i){
     var el = document.createElement('div');
     el.className = 'ft-hint-pill' + (i===0?' active':'');
