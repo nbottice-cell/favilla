@@ -3511,7 +3511,9 @@ function selectHintOption(el, hint, cat){
   _updateSendBtnReady();
 }
 
+var _ftSending = false;
 async function sendHint(){
+  if(_ftSending) return;
   var hints = Object.values(_selectedHints).filter(function(v){ return v !== null; });
   ['location','look','doing'].forEach(function(cat){
     var el = document.getElementById('hint-custom-'+cat);
@@ -3520,25 +3522,32 @@ async function sendHint(){
   });
   if(hints.length === 0) return;
 
-  // Save to Supabase — one row per hint so each arrives as a separate pill
+  // Lock immediately and close picker — prevents double-tap
+  _ftSending = true;
+  var btn = document.getElementById('hint-send-btn');
+  if(btn){ btn.textContent = 'Sending…'; btn.classList.remove('ready'); }
+  var overlay = document.getElementById('hint-picker-overlay');
+  if(overlay) overlay.classList.remove('open');
+  _selectedHints = { location: null, look: null, doing: null };
+
+  // Save to Supabase, capture IDs for deletion
   if(currentMatchId && currentUser){
     for(var i=0;i<hints.length;i++){
       try{
-        await sb.from('messages').insert({
+        var res = await sb.from('messages').insert({
           match_id:    currentMatchId,
           sender_id:   currentUser.id,
           content:     hints[i],
           message_type:'hint'
-        });
+        }).select('id').single();
+        _sentHints.push({id: res.data ? res.data.id : null, content: hints[i]});
       }catch(e){ dbg('Hint save error: '+e.message); }
     }
   }
 
-  hints.forEach(function(h){ _sentHints.push(h); });
-  var overlay = document.getElementById('hint-picker-overlay');
-  if(overlay) overlay.classList.remove('open');
-  _selectedHints = { location: null, look: null, doing: null };
   _renderSentHints();
+  if(btn){ btn.textContent = 'Send hint \u2192'; }
+  _ftSending = false;
   var name = (currentMatchProfile&&currentMatchProfile.name)||'them';
   showToastMsg(hints.length===1 ? 'Hint sent to '+name+' \u2192 '+hints[0] : hints.length+' hints sent to '+name);
 }
@@ -3568,18 +3577,48 @@ function _renderSentHints(){
   if(_sentHints.length === 0){ area.style.display='none'; return; }
   area.style.display = 'block';
   wrap.innerHTML = '';
-  _sentHints.forEach(function(h){
+  _sentHints.forEach(function(h, idx){
+    var content = (typeof h === 'object') ? h.content : h;
+    var msgId = (typeof h === 'object') ? h.id : null;
     var el = document.createElement('div');
     el.className = 'ft-sent-pill';
-    el.innerHTML = '<span>'+h+'</span>';
+    el.innerHTML = '<span>'+content+'</span>';
+    // Long-press to delete
+    var pressTimer;
+    el.addEventListener('touchstart', function(){ pressTimer = setTimeout(function(){ showHintDeleteAction(msgId, idx, el); }, 600); }, {passive:true});
+    el.addEventListener('touchend', function(){ clearTimeout(pressTimer); });
+    el.addEventListener('touchmove', function(){ clearTimeout(pressTimer); });
     wrap.appendChild(el);
   });
+}
+function showHintDeleteAction(msgId, idx, pillEl){
+  var sheet = document.createElement('div');
+  sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;border-radius:16px 16px 0 0;padding:20px 16px 40px;z-index:9999;box-shadow:0 -4px 24px rgba(0,0,0,.5);';
+  sheet.innerHTML = '<div style="text-align:center;margin-bottom:16px;font-size:13px;color:#888;">Hint sent</div>'
+    +'<button id="hda-remove" style="width:100%;padding:14px;background:#ff3b5c;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;margin-bottom:10px;">Remove hint</button>'
+    +'<button id="hda-cancel" style="width:100%;padding:14px;background:rgba(255,255,255,.08);color:#fff;border:none;border-radius:12px;font-size:16px;">Cancel</button>';
+  var backdrop = document.createElement('div');
+  backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;';
+  document.body.appendChild(backdrop);
+  document.body.appendChild(sheet);
+  function close(){ document.body.removeChild(sheet); document.body.removeChild(backdrop); }
+  sheet.querySelector('#hda-remove').addEventListener('click', function(){ close(); removeHint(msgId, idx); });
+  sheet.querySelector('#hda-cancel').addEventListener('click', close);
+  backdrop.addEventListener('click', close);
+}
+async function removeHint(msgId, idx){
+  _sentHints.splice(idx, 1);
+  _renderSentHints();
+  if(msgId){
+    try{ await sb.from('messages').delete().eq('id', msgId); }
+    catch(e){ dbg('Remove hint error: '+e.message); }
+  }
 }
 async function _loadExistingHints(){
   if(!currentMatchId||!currentUser||!_ftOtherUserId) return;
   try{
     var res=await sb.from('messages')
-      .select('sender_id,content')
+      .select('id,sender_id,content')
       .eq('match_id',currentMatchId)
       .eq('message_type','hint')
       .order('created_at',{ascending:true});
@@ -3587,7 +3626,7 @@ async function _loadExistingHints(){
       _sentHints=[];
       _receivedHints=[];
       res.data.forEach(function(row){
-        if(row.sender_id===currentUser.id) _sentHints.push(row.content);
+        if(row.sender_id===currentUser.id) _sentHints.push({id:row.id, content:row.content});
         else _receivedHints.push(row.content);
       });
     }
