@@ -194,6 +194,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .top-match-badge{background:rgba(255,90,50,0.13);border:0.5px solid rgba(255,90,50,0.35);border-radius:10px;padding:3px 10px;font-size:10px;color:var(--fl-lt);font-weight:600;}
 .you-center{position:absolute;top:50%;left:50%;z-index:10;transform:translate(-50%,-50%);}
 .you-dot{width:12px;height:12px;border-radius:50%;background:var(--fl);box-shadow:0 0 0 4px rgba(255,90,50,0.2);}
+.spark-ember{position:absolute;border-radius:50%;background:rgba(255,115,55,0.72);box-shadow:0 0 5px rgba(255,100,40,0.45);pointer-events:none;bottom:0;}
 
 .enter-btn{margin:8px 18px 10px;background:rgba(27,58,140,0.06);border:0.5px solid rgba(27,58,140,0.22);border-radius:16px;padding:15px 18px;cursor:pointer;}
 .enter-title{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--cr);font-weight:600;}
@@ -1410,6 +1411,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
   <div class="sec-lbl" id="nearby-lbl">Who's here right now</div>
   <!-- RADIAL LAYOUT — populated by JS -->
   <div class="radial" id="radial-container">
+    <div id="ember-layer" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;"></div>
     <div class="orbit" style="width:240px;height:240px;"></div>
     <div class="orbit" style="width:160px;height:160px;"></div>
     <div class="orbit" style="width:90px;height:90px;"></div>
@@ -2586,6 +2588,30 @@ function openNT(){document.getElementById('notif-tray').classList.add('open');}
 function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))document.getElementById('notif-tray').classList.remove('open');}
 
 /* ── BOOT ────────────────────────────── */
+function initSparkEmbers(){
+  var layer=document.getElementById('ember-layer');
+  if(!layer||layer._init)return;
+  layer._init=true;
+  var cfg=[
+    {pct:17,sz:3,op:0.42,dur:5.5,del:0.0, dx:8},
+    {pct:42,sz:4,op:0.28,dur:7.2,del:1.4, dx:-12},
+    {pct:66,sz:3,op:0.48,dur:6.1,del:3.1, dx:10},
+    {pct:29,sz:5,op:0.30,dur:8.0,del:0.7, dx:-8},
+    {pct:57,sz:3,op:0.44,dur:5.3,del:4.2, dx:7},
+    {pct:11,sz:4,op:0.36,dur:6.8,del:2.0, dx:-11},
+    {pct:79,sz:3,op:0.33,dur:7.6,del:5.5, dx:13},
+  ];
+  cfg.forEach(function(c){
+    var el=document.createElement('div');
+    el.className='spark-ember';
+    el.style.cssText='width:'+c.sz+'px;height:'+c.sz+'px;left:'+c.pct+'%;';
+    layer.appendChild(el);
+    gsap.timeline({repeat:-1,delay:c.del,repeatDelay:c.dur*0.22})
+      .fromTo(el,{opacity:0,y:0,x:0},{opacity:c.op,y:-105,x:c.dx*0.35,duration:c.dur*0.38,ease:'power1.out'})
+      .to(el,{opacity:0,y:-265,x:c.dx,duration:c.dur*0.62,ease:'power1.in'},'<0.12');
+  });
+}
+
 window.addEventListener('DOMContentLoaded',async()=>{
   /* Wire check-in buttons directly — more reliable than onclick attributes on mobile */
   (function(){
@@ -2607,6 +2633,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
       setInitial(p.name);
       hideLoading();
       _show('s-spark');
+      initSparkEmbers();
       loadPresence();
       subscribePresence();
       subscribeLikes();
