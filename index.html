@@ -204,6 +204,11 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .nb-title{font-size:13px;color:var(--cr);font-weight:600;}
 .nb-sub{font-size:12px;color:var(--ash);margin-top:2px;}
 .nb-btn{padding:7px 13px;background:rgba(27,58,140,0.08);border:0.5px solid rgba(27,58,140,0.25);border-radius:9px;font-size:11px;color:#1B3A8C;font-weight:600;cursor:pointer;white-space:nowrap;}
+#activity-ticker{overflow:hidden;height:30px;display:flex;align-items:center;border-top:0.5px solid rgba(255,90,50,0.1);background:rgba(255,90,50,0.04);margin-top:6px;}
+#ticker-track{display:flex;align-items:center;white-space:nowrap;will-change:transform;}
+@keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.t-item{font-size:11px;color:var(--ash);padding:0 6px;letter-spacing:0.15px;flex-shrink:0;}
+.t-sep{color:rgba(255,90,50,0.4);font-size:8px;flex-shrink:0;padding:0 4px;}
 
 /* PROFILE CARD SHEET */
 .sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
@@ -1448,6 +1453,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div style="flex:1;"><div class="nb-title">Bonfire at Rooftop 22 tonight</div><div class="nb-sub">28 active now · 0.3 mi away</div></div>
     <div class="nb-btn" onclick="navTo('s-heatmap')">View Map</div>
   </div>
+  <div id="activity-ticker"><div id="ticker-track"></div></div>
 </div>
 
 <!-- ═══ PROFILE CARD SHEET ═══ -->
@@ -2589,6 +2595,34 @@ function openNT(){document.getElementById('notif-tray').classList.add('open');}
 function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))document.getElementById('notif-tray').classList.remove('open');}
 
 /* ── BOOT ────────────────────────────── */
+function initActivityTicker(){
+  var track=document.getElementById('ticker-track');
+  if(!track||track._init)return;
+  track._init=true;
+  var msgs=[
+    'Someone liked you',
+    '3 new people at The Anchor',
+    'Rooftop 22 just hit 18 people',
+    'Someone viewed your profile',
+    'Blue Note is picking up',
+    'A match nearby just checked in',
+    'An almost connection expires tonight',
+    'New tonight — 5 people at Blue Note',
+    'Check in to be seen right now',
+  ];
+  /* Prepend real names from presence cache */
+  if(typeof presenceCache!=='undefined'&&presenceCache.length){
+    presenceCache.slice(0,3).forEach(function(row){
+      if(row.profiles&&row.profiles.name) msgs.unshift(row.profiles.name+' just checked in');
+    });
+  }
+  var inner=msgs.map(function(m){
+    return '<span class="t-item">✦ '+m+'</span><span class="t-sep">◆</span>';
+  }).join('');
+  track.innerHTML=inner+inner; /* duplicate for seamless loop */
+  track.style.animation='ticker-scroll '+(msgs.length*6)+'s linear infinite';
+}
+
 function initBlobBreathing(){
   var heatmap=document.getElementById('s-heatmap');
   if(!heatmap||heatmap._blobsDone)return;
@@ -5454,6 +5488,7 @@ async function loadPresence(){
   renderPresence(presenceCache,regularSets);
   updateVenueSub(presenceCache.length);
   renderDrawerList(presenceCache);
+  initActivityTicker();
 }
 
 function renderPresence(users,regularSets){
