@@ -5448,7 +5448,7 @@ function renderPresence(users,regularSets){
   container.style.display='';empty.style.display='none';
   if(emptyMsg&&iCheckedIn&&!hasOthers)emptyMsg.textContent='';
 
-  if(users.length>5){seeAll.style.display='flex';document.getElementById('see-all-count').textContent=users.length;}
+  if(users.length>5){seeAll.style.display='flex';animateCount(document.getElementById('see-all-count'),users.length);}
   else{seeAll.style.display='none';}
 
   /* "You" bubble always at center (POSITIONS[0]) when checked in */
@@ -5500,6 +5500,27 @@ function renderPresence(users,regularSets){
   animatePresenceGlow();
 }
 
+function animateCount(el, newVal) {
+  var oldVal = parseInt(el.textContent) || 0;
+  newVal = parseInt(newVal);
+  if (isNaN(newVal) || oldVal === newVal) { el.textContent = newVal; return; }
+  var dir = newVal > oldVal ? 1 : -1;
+  var h = el.offsetHeight || 18;
+  gsap.killTweensOf(el);
+  gsap.fromTo(el,
+    {y: 0, opacity: 1},
+    {y: -dir * h * 0.65, opacity: 0, duration: 0.16, ease: 'power1.in',
+     onComplete: function() {
+       el.textContent = newVal;
+       gsap.fromTo(el,
+         {y: dir * h * 0.65, opacity: 0},
+         {y: 0, opacity: 1, duration: 0.20, ease: 'power2.out'}
+       );
+     }
+    }
+  );
+}
+
 function animatePresenceGlow(){
   var durations=[2.55,3.10,2.30,3.40,2.80,2.10,3.20];
   var delays=[0,0.72,1.44,0.36,1.08,1.80,0.54];
@@ -5515,11 +5536,21 @@ function animatePresenceGlow(){
 }
 
 function updateVenueSub(count) {
+  var vSub = document.getElementById('v-sub');
   if (currentCheckInId) {
-    document.getElementById('v-sub').textContent =
-      'Checked in · ' + (count > 0
-        ? count + ' other' + (count === 1 ? '' : 's') + ' here on Favilla'
-        : 'You\'re the first one here');
+    if (count > 0) {
+      var sfx = (count === 1 ? ' other' : ' others') + ' here on Favilla';
+      var cEl = document.getElementById('v-sub-count');
+      if (!cEl) {
+        vSub.innerHTML = 'Checked in · <span id="v-sub-count">' + count + '</span><span id="v-sub-sfx">' + sfx + '</span>';
+      } else {
+        animateCount(cEl, count);
+        var sfxEl = document.getElementById('v-sub-sfx');
+        if (sfxEl) sfxEl.textContent = sfx;
+      }
+    } else {
+      vSub.textContent = "You're the first one here";
+    }
   }
   document.getElementById('nearby-lbl').textContent =
     count > 0 ? 'Who\'s here right now' : 'No one checked in yet';
