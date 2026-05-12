@@ -5497,6 +5497,21 @@ function renderPresence(users,regularSets){
     node.onclick=function(){openProfileSheet(row,isReg);};
     container.appendChild(node);
   });
+  animatePresenceGlow();
+}
+
+function animatePresenceGlow(){
+  var durations=[2.55,3.10,2.30,3.40,2.80,2.10,3.20];
+  var delays=[0,0.72,1.44,0.36,1.08,1.80,0.54];
+  document.querySelectorAll('#radial-container .pav').forEach(function(el,i){
+    var dur=durations[i%durations.length];
+    var del=delays[i%delays.length];
+    gsap.fromTo(el,
+      {boxShadow:'0 0 0px 0px rgba(255,90,50,0)'},
+      {boxShadow:'0 0 11px 3px rgba(255,90,50,0.28), 0 0 0 2px rgba(255,90,50,0.11)',
+       duration:dur*0.5,repeat:-1,yoyo:true,ease:'sine.inOut',delay:del}
+    );
+  });
 }
 
 function updateVenueSub(count) {
