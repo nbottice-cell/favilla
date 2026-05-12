@@ -2413,6 +2413,7 @@ function navTo(id){
   _show(id,'forward');
   if(id==='s-matches') loadMatchesList();
   if(id==='s-ember')   bootEmber();
+  if(id==='s-heatmap') initBlobBreathing();
 }
 function goHome(){
   navStack.length=0;
@@ -2588,6 +2589,32 @@ function openNT(){document.getElementById('notif-tray').classList.add('open');}
 function closeNT(e){if(!e||e.target===document.getElementById('notif-tray'))document.getElementById('notif-tray').classList.remove('open');}
 
 /* ── BOOT ────────────────────────────── */
+function initBlobBreathing(){
+  var heatmap=document.getElementById('s-heatmap');
+  if(!heatmap||heatmap._blobsDone)return;
+  heatmap._blobsDone=true;
+  heatmap.querySelectorAll('.blob').forEach(function(blob){
+    var countEl=blob.querySelector('.b-core span');
+    var count=countEl?parseInt(countEl.textContent)||0:0;
+    /* speed: more people = faster cycle */
+    var dur=Math.max(1.8,5.8/(1+count*0.04));
+    blob.querySelectorAll('.b-ring,.b-core').forEach(function(el){
+      el.style.animationDuration=dur.toFixed(2)+'s';
+    });
+    /* intensity: more people = brighter glow */
+    var core=blob.querySelector('.b-core');
+    if(!core)return;
+    var t=Math.min(1,count/35);
+    var r1=Math.round(10+t*22), r2=Math.round(2+t*8);
+    var opLo=(0.18+t*0.38).toFixed(2), opHi=(0.38+t*0.46).toFixed(2);
+    gsap.fromTo(core,
+      {boxShadow:'0 0 '+r1+'px '+r2+'px rgba(255,100,50,'+opLo+')'},
+      {boxShadow:'0 0 '+(r1+14)+'px '+(r2+5)+'px rgba(255,115,55,'+opHi+')',
+       duration:dur*0.5,repeat:-1,yoyo:true,ease:'sine.inOut'}
+    );
+  });
+}
+
 function initSparkEmbers(){
   var layer=document.getElementById('ember-layer');
   if(!layer||layer._init)return;
