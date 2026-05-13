@@ -204,11 +204,11 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .nb-title{font-size:13px;color:var(--cr);font-weight:600;}
 .nb-sub{font-size:12px;color:var(--ash);margin-top:2px;}
 .nb-btn{padding:7px 13px;background:rgba(27,58,140,0.08);border:0.5px solid rgba(27,58,140,0.25);border-radius:9px;font-size:11px;color:#1B3A8C;font-weight:600;cursor:pointer;white-space:nowrap;}
-#activity-ticker{overflow:hidden;height:30px;display:flex;align-items:center;border-top:0.5px solid rgba(255,90,50,0.1);background:rgba(255,90,50,0.04);margin-top:6px;}
+#activity-ticker{position:sticky;bottom:0;overflow:hidden;height:34px;display:flex;align-items:center;border-top:0.5px solid rgba(255,90,50,0.18);background:var(--sl-bg);box-shadow:0 -6px 16px rgba(246,242,237,0.92);z-index:10;}
 #ticker-track{display:flex;align-items:center;white-space:nowrap;will-change:transform;}
 @keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-.t-item{font-size:11px;color:var(--ash);padding:0 6px;letter-spacing:0.15px;flex-shrink:0;}
-.t-sep{color:rgba(255,90,50,0.4);font-size:8px;flex-shrink:0;padding:0 4px;}
+.t-item{font-size:11.5px;color:#8A7A6E;padding:0 8px;letter-spacing:0.2px;flex-shrink:0;}
+.t-sep{color:rgba(255,90,50,0.5);font-size:7px;flex-shrink:0;padding:0 4px;}
 
 /* PROFILE CARD SHEET */
 .sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:500;opacity:0;pointer-events:none;transition:opacity 0.25s;display:flex;align-items:flex-end;}
@@ -2601,14 +2601,14 @@ function initActivityTicker(){
   track._init=true;
   var msgs=[
     'Someone liked you',
-    '3 new people at The Anchor',
-    'Rooftop 22 just hit 18 people',
+    '3 new people just arrived at The Anchor',
     'Someone viewed your profile',
-    'Blue Note is picking up',
+    'Rooftop 22 is picking up — 18 here',
     'A match nearby just checked in',
+    'Someone sparked you in the last hour',
+    'Blue Note just hit 12 people',
     'An almost connection expires tonight',
-    'New tonight — 5 people at Blue Note',
-    'Check in to be seen right now',
+    '5 new faces at The Anchor tonight',
   ];
   /* Prepend real names from presence cache */
   if(typeof presenceCache!=='undefined'&&presenceCache.length){
@@ -2620,7 +2620,7 @@ function initActivityTicker(){
     return '<span class="t-item">✦ '+m+'</span><span class="t-sep">◆</span>';
   }).join('');
   track.innerHTML=inner+inner; /* duplicate for seamless loop */
-  track.style.animation='ticker-scroll '+(msgs.length*6)+'s linear infinite';
+  track.style.animation='ticker-scroll '+(msgs.length*5)+'s linear infinite';
 }
 
 function initBlobBreathing(){
