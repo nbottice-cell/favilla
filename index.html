@@ -2694,6 +2694,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   clearTimeout(safetyTimer);
   if(session){
     currentUser=session.user;
+    sessionStartTime=new Date().toISOString();
     await _clearSessionData(currentUser.id);
     const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
     if(p){
@@ -2740,8 +2741,8 @@ async function doSignUp(){
 async function _clearSessionData(uid){
   try{ await sb.from('likes').delete().eq('user_id', uid); }catch(e){}
   try{ await sb.from('likes').delete().eq('liked_user_id', uid); }catch(e){}
-  /* Clear all check-ins at this venue so no stale presence from any previous session */
-  try{ await sb.from('check_ins').delete().eq('venue_id', VENUE_ID); }catch(e){}
+  /* Nuclear: wipe every check_in row so no stale presence from any account */
+  try{ await sb.from('check_ins').delete().neq('id','00000000-0000-0000-0000-000000000000'); }catch(e){}
 }
 async function doLogin(){
   const em=document.getElementById('li-email').value.trim();
@@ -2755,6 +2756,7 @@ async function doLogin(){
   btn.disabled=false;btn.textContent='Let me in →';
   if(error){showErr(err,error.message);return;}
   currentUser=data.user;
+  sessionStartTime=new Date().toISOString();
   await _clearSessionData(currentUser.id);
   const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
   navStack.length=0;
@@ -5458,6 +5460,7 @@ var likesSub            = null;
 var matchesSub          = null;
 var msgSub              = null;
 var presenceCache       = [];
+var sessionStartTime    = null;
 var activeSheetUser     = null;
 var currentMatchId      = null;
 var currentMatchProfile = null;
@@ -5542,10 +5545,12 @@ function updateCheckInUI(in_) {
 
 async function loadPresence(){
   if(!currentUser||!currentProfile)return;
+  var _since = sessionStartTime || new Date().toISOString();
   var res=await sb.from('check_ins')
     .select('id,user_id,profiles(name,age,photo_url,icebreaker,prompt_1_q,prompt_1_a,prompt_2_q,prompt_2_a,prompt_3_q,prompt_3_a,intention,gender)')
     .eq('venue_id',VENUE_ID)
     .gt('expires_at',new Date().toISOString())
+    .gte('created_at',_since)
     .neq('user_id',currentUser.id);
   if(res.error){console.error('Presence error',res.error);return;}
   presenceCache=(res.data||[]).filter(function(r){return r.profiles;});
