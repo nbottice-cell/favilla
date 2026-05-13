@@ -546,6 +546,7 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
 .ft-hint-pill span{font-size:12px;color:var(--cr-dim);}
 .ft-hint-pill.active span{color:#FFB840;}
 .ft-drop-btn{margin:12px 18px 14px;background:rgba(255,90,50,0.1);border:0.5px solid rgba(255,90,50,0.28);border-radius:12px;padding:13px;text-align:center;font-size:13px;color:var(--fl-lt);font-weight:600;cursor:pointer;}
+.ft-edit-hints-btn{font-size:12px;color:var(--fl-lt);font-weight:600;cursor:pointer;padding:3px 10px;background:rgba(255,90,50,0.08);border:0.5px solid rgba(255,90,50,0.25);border-radius:10px;}
 .ft-your-hints-area{margin:4px 18px 0;}
 .ft-your-lbl{font-size:10px;color:var(--ash);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
 .ft-sent-pill{display:flex;align-items:center;gap:5px;background:rgba(255,90,50,0.08);border:0.5px solid rgba(255,90,50,0.28);border-radius:20px;padding:6px 13px;}
@@ -1645,10 +1646,13 @@ html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',san
     <div class="ft-hint-pills" id="ft-received-pills"></div>
   </div>
   <div class="ft-your-hints-area" id="ft-your-hints-area" style="display:none;">
-    <div class="ft-your-lbl">You sent</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="ft-your-lbl" style="margin-bottom:0;">You sent</div>
+      <div class="ft-edit-hints-btn" onclick="openHintPicker()">Edit</div>
+    </div>
     <div class="ft-hint-pills" id="ft-sent-pills"></div>
   </div>
-  <div class="ft-drop-btn" onclick="openHintPicker()">Drop a hint &#8594;</div>
+  <div class="ft-drop-btn" id="ft-drop-btn" onclick="openHintPicker()">Drop a hint &#8594;</div>
 </div>
 
 <!-- ═══════════ HINT PICKER ═══════════ -->
@@ -3389,6 +3393,8 @@ async function initFindThem(matchName){
   if(themLegend)themLegend.textContent=name+' (approx)';
   var dot=document.getElementById('hint-notif-dot');
   if(dot)dot.classList.remove('show');
+  var dropBtn=document.getElementById('ft-drop-btn');
+  if(dropBtn){dropBtn.style.display='';dropBtn.textContent='Drop a hint \u2192';}
 
   // Reset real-data state
   _ftMyPos=null; _ftTheirPos=null; _ftHasRealData=false; _ftOtherUserId=null;
@@ -3674,9 +3680,15 @@ function _renderReceivedHints(){
 function _renderSentHints(){
   var area = document.getElementById('ft-your-hints-area');
   var wrap = document.getElementById('ft-sent-pills');
+  var dropBtn = document.getElementById('ft-drop-btn');
   if(!wrap || !area) return;
-  if(_sentHints.length === 0){ area.style.display='none'; return; }
+  if(_sentHints.length === 0){
+    area.style.display='none';
+    if(dropBtn) dropBtn.textContent='Drop a hint \u2192';
+    return;
+  }
   area.style.display = 'block';
+  if(dropBtn) dropBtn.style.display='none';
   wrap.innerHTML = '';
   _sentHints.forEach(function(h, idx){
     var content = (typeof h === 'object') ? h.content : h;
@@ -3765,6 +3777,19 @@ function _subscribeHints(){
             var matchName=(currentMatchProfile&&currentMatchProfile.name)||'them';
             showToastMsg(matchName+' dropped a hint \u2714');
           }
+        }
+      })
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages',
+      filter:'match_id=eq.'+currentMatchId},
+      function(payload){
+        /* Sender replaced their hints — clear stale received hints so the
+           incoming INSERTs repopulate cleanly */
+        var row=payload.old;
+        if(!row||row.message_type!=='hint') return;
+        if(row.sender_id===_ftOtherUserId){
+          _receivedHints=[];
+          var ftScreen=document.getElementById('s-findthem');
+          if(ftScreen&&ftScreen.classList.contains('active')) _renderReceivedHints();
         }
       })
     .subscribe();
@@ -5807,7 +5832,8 @@ async function doSpark() {
       if (!existing) {
         await createMatch(likedId, likedProfile);
       } else {
-        dbg('Poll: match row exists, showing overlay ' + existing.id.substring(0,8));
+        dbg('Poll: match row exists, clearing messages for fresh start ' + existing.id.substring(0,8));
+        try{ await sb.from('messages').delete().eq('match_id', existing.id); }catch(e){}
         showMatchOverlay(likedProfile, existing.id);
       }
     }
@@ -5824,7 +5850,8 @@ async function createMatch(otherUserId, otherProfile) {
     .maybeSingle();
 
   if (existing) {
-    dbg('Row exists — showing overlay now');
+    dbg('Row exists — clearing old messages for fresh start');
+    try{ await sb.from('messages').delete().eq('match_id', existing.id); }catch(e){}
     showMatchOverlay(otherProfile, existing.id);
     return;
   }
