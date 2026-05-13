@@ -5545,12 +5545,10 @@ function updateCheckInUI(in_) {
 
 async function loadPresence(){
   if(!currentUser||!currentProfile)return;
-  var _since = sessionStartTime || new Date().toISOString();
   var res=await sb.from('check_ins')
     .select('id,user_id,profiles(name,age,photo_url,icebreaker,prompt_1_q,prompt_1_a,prompt_2_q,prompt_2_a,prompt_3_q,prompt_3_a,intention,gender)')
     .eq('venue_id',VENUE_ID)
     .gt('expires_at',new Date().toISOString())
-    .gte('created_at',_since)
     .neq('user_id',currentUser.id);
   if(res.error){console.error('Presence error',res.error);return;}
   presenceCache=(res.data||[]).filter(function(r){return r.profiles;});
