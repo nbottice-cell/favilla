@@ -5684,17 +5684,19 @@ function openProfileSheet(row,isRegular){
   var p=row.profiles;if(!p)return;
   activeSheetUser=row;
 
-  /* Check if this person already sparked us during THIS session (same venue, last 24h) */
+  /* Check if this person already sparked us (same venue, last 24h) — show "Spark back" */
   if(currentUser){
+    var _sheetUserId = row.user_id;
     var since24h = new Date(Date.now() - 24*60*60*1000).toISOString();
     sb.from('likes').select('id')
-      .eq('user_id', row.user_id)
+      .eq('user_id', _sheetUserId)
       .eq('liked_user_id', currentUser.id)
       .eq('venue_id', VENUE_ID)
       .gte('created_at', since24h)
       .maybeSingle()
       .then(function(res){
-        if(res.data){
+        /* Guard: only update if the same person's sheet is still open */
+        if(activeSheetUser && activeSheetUser.user_id === _sheetUserId && res.data){
           var sparkBtn=document.getElementById('sheet-spark-btn');
           if(sparkBtn) sparkBtn.innerHTML='&#x2746; Spark back';
         }
@@ -5832,8 +5834,14 @@ async function doSpark() {
       if (!existing) {
         await createMatch(likedId, likedProfile);
       } else {
-        dbg('Poll: match row exists, clearing messages for fresh start ' + existing.id.substring(0,8));
+        dbg('Poll: match row exists, clearing messages and likes for fresh start ' + existing.id.substring(0,8));
         try{ await sb.from('messages').delete().eq('match_id', existing.id); }catch(e){}
+        try{
+          await sb.from('likes').delete()
+            .eq('user_id', currentUser.id).eq('liked_user_id', likedId);
+          await sb.from('likes').delete()
+            .eq('user_id', likedId).eq('liked_user_id', currentUser.id);
+        }catch(e){}
         showMatchOverlay(likedProfile, existing.id);
       }
     }
@@ -5850,8 +5858,14 @@ async function createMatch(otherUserId, otherProfile) {
     .maybeSingle();
 
   if (existing) {
-    dbg('Row exists — clearing old messages for fresh start');
+    dbg('Row exists — clearing old messages and likes for fresh start');
     try{ await sb.from('messages').delete().eq('match_id', existing.id); }catch(e){}
+    try{
+      await sb.from('likes').delete()
+        .eq('user_id', currentUser.id).eq('liked_user_id', otherUserId);
+      await sb.from('likes').delete()
+        .eq('user_id', otherUserId).eq('liked_user_id', currentUser.id);
+    }catch(e){}
     showMatchOverlay(otherProfile, existing.id);
     return;
   }
