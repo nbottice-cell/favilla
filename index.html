@@ -14,19 +14,51 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Main accent — deep cobalt (blue flame base) */
-  --fl:#1B3A8C;--fl-lt:#2E52AA;
-  /* Spark/Ember/main — warm off-white */
-  --sl-bg:#F6F2ED;--sl-card:#ECE7DF;--sl-hdr:#E4DFDA;
-  --cr:#1A1C22;--cr-dim:#4A4C58;--ash:#7A7888;
-  /* Blind — dark slate (former main identity) */
-  --pu:#1B3A8C;--pu-lt:#6B90D0;
+  /* ===== CORE PALETTE ===== */
+  --favilla-bg: #F6F1EA;
+  --favilla-surface: #FFFDF9;
+  --favilla-surface-soft: #F3ECE4;
+
+  --favilla-text: #1D1A17;
+  --favilla-text-muted: #6E655D;
+
+  --favilla-accent: #C96A3B;
+  --favilla-accent-soft: #D9895B;
+
+  --favilla-gold: #D1A15B;
+
+  --favilla-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  --favilla-glow: 0 0 30px rgba(201,106,59,0.08);
+
+  --favilla-radius-xl: 28px;
+  --favilla-radius-lg: 22px;
+  --favilla-radius-md: 16px;
+
+  --favilla-transition: all 240ms cubic-bezier(0.22,1,0.36,1);
+
+  /* ===== LEGACY ALIASES (keep existing CSS working) ===== */
+  --fl: var(--favilla-accent);
+  --fl-lt: var(--favilla-accent-soft);
+  --sl-bg: var(--favilla-bg);
+  --sl-card: var(--favilla-surface-soft);
+  --sl-hdr: var(--favilla-surface-soft);
+  --cr: var(--favilla-text);
+  --cr-dim: #3D3530;
+  --ash: var(--favilla-text-muted);
+  --gold: var(--favilla-gold);
+  /* Blind mode — keep dark */
+  --pu: var(--favilla-accent);
+  --pu-lt: var(--favilla-accent-soft);
   --vl-bg:#13151A;--vl-card:#1E2230;--vl-hdr:#191C24;
   --vc:#EEE8E0;--vc-dim:#C0B8B0;
-  /* Venues — same warm off-white */
-  --wm-bg:#F6F2ED;--wm-card:#ECE7DF;--wm-hdr:#2C2420;
-  --wo:#1B3A8C;--wa:#2E52AA;--wt:#1A1C22;--wt-dim:#7A7888;
-  --gold:#1B3A8C;
+  /* Venues */
+  --wm-bg: var(--favilla-bg);
+  --wm-card: var(--favilla-surface-soft);
+  --wm-hdr:#2C2420;
+  --wo: var(--favilla-accent);
+  --wa: var(--favilla-accent-soft);
+  --wt: var(--favilla-text);
+  --wt-dim: var(--favilla-text-muted);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;background:var(--sl-bg);font-family:'Inter',sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased;}
