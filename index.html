@@ -2694,7 +2694,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   clearTimeout(safetyTimer);
   if(session){
     currentUser=session.user;
-    await _clearMyLikes(currentUser.id);
+    await _clearSessionData(currentUser.id);
     const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
     if(p){
       currentProfile=p;
@@ -2737,11 +2737,10 @@ async function doSignUp(){
   if(error){showErr(err,error.message);return;}
   currentUser=data.user;navStack.length=0;_show('s-onboard');
 }
-async function _clearMyLikes(uid){
-  try{
-    await sb.from('likes').delete().eq('user_id', uid);
-    await sb.from('likes').delete().eq('liked_user_id', uid);
-  }catch(e){ dbg('clearMyLikes error: '+e.message); }
+async function _clearSessionData(uid){
+  try{ await sb.from('likes').delete().eq('user_id', uid); }catch(e){}
+  try{ await sb.from('likes').delete().eq('liked_user_id', uid); }catch(e){}
+  try{ await sb.from('check_ins').delete().eq('user_id', uid); }catch(e){}
 }
 async function doLogin(){
   const em=document.getElementById('li-email').value.trim();
@@ -2755,7 +2754,7 @@ async function doLogin(){
   btn.disabled=false;btn.textContent='Let me in →';
   if(error){showErr(err,error.message);return;}
   currentUser=data.user;
-  await _clearMyLikes(currentUser.id);
+  await _clearSessionData(currentUser.id);
   const{data:p}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
   navStack.length=0;
   if(p){
