@@ -2740,7 +2740,8 @@ async function doSignUp(){
 async function _clearSessionData(uid){
   try{ await sb.from('likes').delete().eq('user_id', uid); }catch(e){}
   try{ await sb.from('likes').delete().eq('liked_user_id', uid); }catch(e){}
-  try{ await sb.from('check_ins').delete().eq('user_id', uid); }catch(e){}
+  /* Clear all check-ins at this venue so no stale presence from any previous session */
+  try{ await sb.from('check_ins').delete().eq('venue_id', VENUE_ID); }catch(e){}
 }
 async function doLogin(){
   const em=document.getElementById('li-email').value.trim();
