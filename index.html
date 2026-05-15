@@ -4695,6 +4695,30 @@ const CP_QUESTIONS = [
   /* Personality */
   {q:"How do you feel about pets?", a:"Love animals — they make life better", b:"Not a pet person — not my thing"},
   {q:"You show people you care by...", a:"Actions — showing up and doing things", b:"Words — telling people directly how you feel"},
+  /* Social style */
+  {q:"At a party where you barely know anyone, you...", a:"Find one person and go deep — quality over quantity", b:"Work the room — I love meeting strangers"},
+  {q:"Your ideal relationship energy is...", a:"We have our own lives and come together intentionally", b:"We're each other's person — always in each other's world"},
+  /* Plans & pace */
+  {q:"When you're on holiday, you tend to...", a:"Plan the days — know what's happening and when", b:"Go completely with the flow — see what comes up"},
+  {q:"Spontaneous plans are...", a:"The best — the greatest nights are always unplanned", b:"Stressful — I need time to mentally prepare"},
+  {q:"You feel most burned out from...", a:"Too many social things back to back", b:"Too many days alone with nothing on"},
+  /* Conflict */
+  {q:"When you are upset at someone close to you, you...", a:"Go quiet — I need time before I can talk about it", b:"Say it straight away — I cannot pretend nothing is wrong"},
+  {q:"When a relationship hits a rough patch...", a:"I want to work through it — most things can be fixed", b:"I trust my gut — I know pretty quickly when something is not right"},
+  /* Money & lifestyle */
+  {q:"When it comes to money, you are more...", a:"Careful — save first, spend thoughtfully", b:"A spender — you only live once and experiences cost money"},
+  {q:"When it comes to social media, you are...", a:"Private — my life is not for public consumption", b:"Open — it is part of how I stay connected"},
+  /* Values */
+  {q:"When it comes to ambition...", a:"I have big goals and I am actively working toward them", b:"I value balance — life is not just about what you achieve"},
+  {q:"Physical affection in a relationship is...", a:"A love language — I need it to feel close to someone", b:"Nice but not the main thing — other kinds of closeness matter more"},
+  {q:"When it comes to religion or spirituality...", a:"It plays a real role in my life", b:"It is not something I actively think about or practise"},
+  /* Personality */
+  {q:"When you are in a bad mood, you need...", a:"Space — leave me alone and I will come back around", b:"Connection — being around people helps me reset"},
+  {q:"Your living space is usually...", a:"Tidy and organised — mess stresses me out", b:"Lived in — I know where everything is, it works for me"},
+  {q:"When you are really into someone, you tend to...", a:"Play it cool — I do not want to come across as too keen", b:"Go all in — I show it pretty clearly"},
+  {q:"When it comes to health and fitness...", a:"It is a real priority — I have a routine and I keep it", b:"I try but it is not the centre of my life"},
+  {q:"You argue by...", a:"Staying calm — I shut down when things get heated", b:"Going all in — I need to say everything I am feeling"},
+  {q:"When someone cancels on you last minute, you...", a:"Feel relieved honestly — unexpected free time is a gift", b:"Feel annoyed — I had planned around it"},
 ];
 
 /* Entry points */
@@ -4731,7 +4755,9 @@ function cpSetupAndShow(){
     var idx=Math.floor(Math.random()*pool.length);
     cpQuestions.push(pool.splice(idx,1)[0]);
   }
-  cpUsedQuestions=cpQuestions.slice(); /* remember this session to skip next time */
+  /* remember the last 10 used so the next two sessions feel fresh */
+  cpUsedQuestions=cpUsedQuestions.concat(cpQuestions);
+  if(cpUsedQuestions.length>10)cpUsedQuestions=cpUsedQuestions.slice(cpUsedQuestions.length-10);
   cpAnswers=[]; cpCurrentQ=0;
 
   /* Update header text */
@@ -4964,7 +4990,7 @@ function ibrPickQuestion(){
   if(available.length===0){ibrRecentQuestions=[];available=IBR_QUESTIONS.slice();}
   var q=available[Math.floor(Math.random()*available.length)];
   ibrRecentQuestions.push(q);
-  if(ibrRecentQuestions.length>6)ibrRecentQuestions.shift();
+  if(ibrRecentQuestions.length>20)ibrRecentQuestions.shift();
   return q;
 }
 
@@ -5014,7 +5040,55 @@ const IBR_QUESTIONS = [
   "What is something you would not compromise on in a relationship?",
   "What is something you have changed your mind about in the last few years?",
   "What is a hill you will die on that most people would find ridiculous?",
-  "What is something you are quietly proud of that you never really talk about?"
+  "What is something you are quietly proud of that you never really talk about?",
+  /* More philosophical nonsense */
+  "Is sand just small rocks, or are rocks just big sand?",
+  "If you could know the exact date you will die, would you want to?",
+  "Can something be both deeply important and completely meaningless at the same time?",
+  "If you replaced grass on every lawn with something else, what would it be?",
+  "Is it better to be honest and unpopular or kind and occasionally wrong?",
+  "If everyone jumped at the same time, what would actually happen?",
+  /* More unhinged */
+  "What extinct animal would cause the most chaos if it came back?",
+  "If you were a scented candle, what would your fragrance be called?",
+  "What animal would be best at doing your job?",
+  "If your life had a laugh track, when would it kick in most often?",
+  "Which household appliance would win in a fight and why?",
+  "What is a skill you have that no one in your life has ever thought to ask you about?",
+  "If you could add one mandatory room to every house by law, what would it be?",
+  "What is the most suspicious thing about you that is actually completely innocent?",
+  /* More specific scenarios */
+  "You see someone walking around with a tag still on their shirt. Do you tell them?",
+  "Someone is singing happy birthday at a restaurant near your table. Do you join in?",
+  "You get to a restaurant and one item sounds amazing but is slightly embarrassing to say out loud. Do you order it?",
+  "Your Uber driver starts aggressively singing along to the radio. Your move?",
+  "You are at a party and the playlist is genuinely bad. Do you say something?",
+  "Someone texts you something that was clearly meant for someone else. Do you respond?",
+  "You book a hotel and arrive to find a mirror directly facing the bed. What do you do?",
+  /* More would you rather */
+  "Would you rather always arrive too early or always arrive too late?",
+  "Would you rather have a photographic memory or be able to forget anything on command?",
+  "Would you rather be able to speak every language or play every instrument perfectly?",
+  "Would you rather know all the spoilers for your life or be surprised by everything?",
+  "Would you rather text only or call only for the rest of your life?",
+  "Would you rather always feel slightly too warm or always feel slightly too cold?",
+  "Would you rather have unlimited coffee or unlimited free food for a year?",
+  /* More debates */
+  "Does the middle armrest on a plane belong to the window seat or the middle seat?",
+  "Is it rude to eat the last piece of something without asking first?",
+  "Is corn allowed in salsa — there is a right answer here?",
+  "Is it acceptable to wear pajamas as a flight outfit?",
+  "Should you always return the shopping cart or is the cart return optional?",
+  "Is guacamole ever worth the extra charge?",
+  "Is it acceptable to eat a full meal standing over the sink when no one is watching?",
+  /* More open-ended personal */
+  "What is something you have been meaning to learn for years but just have not started yet?",
+  "What is the most spontaneous thing you have ever done?",
+  "What is the last thing that made you laugh until you genuinely could not stop?",
+  "What is something you are better at than you let on?",
+  "What would your closest friends say is your most predictable quality?",
+  "What is a place you visited that completely surprised you?",
+  "What do you think someone assumes about you when they first meet you?"
 ];
 
 function openIBR(){
