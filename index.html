@@ -2448,6 +2448,7 @@ async function fetchProfileById(userId){
 function goTo(id,from){
   if(from)navStack.push(from);
   _show(id,'forward');
+  if(id==='s-heatmap') initBlobBreathing();
 }
 function goBack(){
   if(navStack.length>0){_show(navStack.pop(),'back');}else{goHome();}
@@ -2702,9 +2703,8 @@ function initBlobBreathing(){
       dot.style.borderRadius='50%';
       dot.style.width=sz+'px';
       dot.style.height=sz+'px';
-      dot.style.left=Math.round(cx)+'px';
-      dot.style.top=Math.round(cy)+'px';
-      dot.style.transform='translate(-50%,-50%)';
+      dot.style.left=Math.round(cx-sz/2)+'px';
+      dot.style.top=Math.round(cy-sz/2)+'px';
       dot.style.background=col+startOp+')';
       dot.style.pointerEvents='none';
       dot.style.opacity=startOp;
