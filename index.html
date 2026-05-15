@@ -963,10 +963,10 @@ html,body{width:100%;height:100%;background:linear-gradient(180deg,#F8F4EE 0%,#F
 .b-core{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;z-index:2;}
 .b-tag{position:absolute;top:calc(50% + 28px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:var(--cr-dim);background:rgba(14,16,24,0.9);padding:2px 8px;border-radius:5px;pointer-events:none;z-index:3;text-align:center;line-height:1.55;}
 .b-dn{display:block;font-size:9px;color:rgba(255,255,255,0.4);}
-@keyframes bf-c{0%,100%{opacity:0.68;transform:translate(-50%,-50%) scale(1) translateY(0);}33%{opacity:0.82;transform:translate(-50%,-50%) scale(1.10) translateY(-2px);}66%{opacity:0.74;transform:translate(-50%,-50%) scale(1.06) translateY(1px);}}
+@keyframes bf-c{0%,100%{opacity:0.65;transform:translate(-50%,-50%) scale(1);}50%{opacity:0.75;transform:translate(-50%,-50%) scale(1.06);}}
 @keyframes bf-r{0%{transform:translate(-50%,-50%) scale(0.85);opacity:0.5;}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0;}}
 @keyframes bf-r2{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.32;}100%{transform:translate(-50%,-50%) scale(3.4);opacity:0;}}
-@keyframes wu-c{0%,100%{opacity:0.56;transform:translate(-50%,-50%) scale(1) translateY(0);}50%{opacity:0.72;transform:translate(-50%,-50%) scale(1.12) translateY(-2px);}}
+@keyframes wu-c{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1);}50%{opacity:0.64;transform:translate(-50%,-50%) scale(1.07);}}
 @keyframes wu-r{0%{transform:translate(-50%,-50%) scale(0.88);opacity:0.42;}100%{transform:translate(-50%,-50%) scale(2.4);opacity:0;}}
 @keyframes q-c{0%,100%{opacity:0.35;transform:translate(-50%,-50%) scale(1);}50%{opacity:0.5;transform:translate(-50%,-50%) scale(1.09);}}
 @keyframes q-r{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.28;}100%{transform:translate(-50%,-50%) scale(2.0);opacity:0;}}
@@ -2193,9 +2193,6 @@ html,body{width:100%;height:100%;background:linear-gradient(180deg,#F8F4EE 0%,#F
         </div>
         <div class="b-tag">Blue Note<span class="b-dn">🕯 Quiet</span></div>
       </div>
-      <div class="u-dot" style="left:37%;top:41%;width:6px;height:6px;background:rgba(243,236,228,0.22);animation-delay:0.2s;"></div>
-      <div class="u-dot" style="left:46%;top:52%;width:6px;height:6px;background:rgba(243,236,228,0.18);animation-delay:0.9s;"></div>
-      <div class="u-dot" style="left:69%;top:21%;width:5px;height:5px;background:rgba(243,236,228,0.18);animation-delay:0.4s;"></div>
       <div class="you-pin" style="left:37%;top:52%;"><div class="yp-dot"></div></div>
     </div>
     <div class="mp-legend">
@@ -2671,12 +2668,10 @@ function initBlobBreathing(){
   heatmap.querySelectorAll('.blob').forEach(function(blob){
     var countEl=blob.querySelector('.b-core span');
     var count=countEl?parseInt(countEl.textContent)||0:0;
-    /* speed: more people = faster cycle */
-    var dur=Math.max(1.8,5.8/(1+count*0.04));
+    var dur=Math.max(2.2,5.8/(1+count*0.04));
     blob.querySelectorAll('.b-ring,.b-core').forEach(function(el){
       el.style.animationDuration=dur.toFixed(2)+'s';
     });
-    /* intensity: more people = brighter glow */
     var core=blob.querySelector('.b-core');
     if(!core)return;
     var t=Math.min(1,count/35);
@@ -2687,6 +2682,30 @@ function initBlobBreathing(){
       {boxShadow:'0 0 '+(r1+18)+'px '+(r2+7)+'px rgba(209,161,91,'+opHi+')',
        duration:dur*0.45,repeat:-1,yoyo:true,ease:'sine.inOut'}
     );
+    /* Spark dots — count-correlated, orbiting at ring edge */
+    var ringEl=blob.querySelector('.b-ring');
+    var ringRadius=ringEl?parseInt(ringEl.style.width||'60')/2:30;
+    var numDots=Math.min(10,Math.max(1,Math.round(count/3.5)));
+    for(var i=0;i<numDots;i++){
+      var angle=(i/numDots)*Math.PI*2+(Math.random()-0.5)*0.7;
+      var orbitR=ringRadius*(0.9+Math.random()*0.45);
+      var ox=Math.round(Math.cos(angle)*orbitR);
+      var oy=Math.round(Math.sin(angle)*orbitR);
+      var sz=(1.5+Math.random()*2).toFixed(1);
+      var useGold=Math.random()>0.65;
+      var baseOp=(0.4+t*0.4).toFixed(2);
+      var dot=document.createElement('div');
+      dot.style.cssText='position:absolute;border-radius:50%;width:'+sz+'px;height:'+sz+'px;left:50%;top:50%;margin-left:'+ox+'px;margin-top:'+oy+'px;background:'+(useGold?'rgba(209,161,91,':'rgba(201,106,59,')+baseOp+');pointer-events:none;';
+      blob.appendChild(dot);
+      gsap.to(dot,{
+        y:(Math.random()*6-3).toFixed(1),
+        x:(Math.random()*4-2).toFixed(1),
+        opacity:(parseFloat(baseOp)*0.35).toFixed(2),
+        duration:1.8+Math.random()*2,
+        repeat:-1,yoyo:true,ease:'sine.inOut',
+        delay:Math.random()*3
+      });
+    }
   });
 }
 
