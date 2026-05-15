@@ -963,12 +963,13 @@ html,body{width:100%;height:100%;background:linear-gradient(180deg,#F8F4EE 0%,#F
 .b-core{position:absolute;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;z-index:2;}
 .b-tag{position:absolute;top:calc(50% + 28px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:var(--cr-dim);background:rgba(14,16,24,0.9);padding:2px 8px;border-radius:5px;pointer-events:none;z-index:3;text-align:center;line-height:1.55;}
 .b-dn{display:block;font-size:9px;color:rgba(255,255,255,0.4);}
-@keyframes bf-c{0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1);}50%{opacity:0.72;transform:translate(-50%,-50%) scale(1.05);}}
-@keyframes bf-r{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.35;}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0;}}
-@keyframes wu-c{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1);}50%{opacity:0.62;transform:translate(-50%,-50%) scale(1.07);}}
-@keyframes wu-r{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.35;}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0;}}
-@keyframes q-c{0%,100%{opacity:0.3;transform:translate(-50%,-50%) scale(1);}50%{opacity:0.4;transform:translate(-50%,-50%) scale(1.05);}}
-@keyframes q-r{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.22;}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0;}}
+@keyframes bf-c{0%,100%{opacity:0.68;transform:translate(-50%,-50%) scale(1) translateY(0);}33%{opacity:0.82;transform:translate(-50%,-50%) scale(1.10) translateY(-2px);}66%{opacity:0.74;transform:translate(-50%,-50%) scale(1.06) translateY(1px);}}
+@keyframes bf-r{0%{transform:translate(-50%,-50%) scale(0.85);opacity:0.5;}100%{transform:translate(-50%,-50%) scale(2.8);opacity:0;}}
+@keyframes bf-r2{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.32;}100%{transform:translate(-50%,-50%) scale(3.4);opacity:0;}}
+@keyframes wu-c{0%,100%{opacity:0.56;transform:translate(-50%,-50%) scale(1) translateY(0);}50%{opacity:0.72;transform:translate(-50%,-50%) scale(1.12) translateY(-2px);}}
+@keyframes wu-r{0%{transform:translate(-50%,-50%) scale(0.88);opacity:0.42;}100%{transform:translate(-50%,-50%) scale(2.4);opacity:0;}}
+@keyframes q-c{0%,100%{opacity:0.35;transform:translate(-50%,-50%) scale(1);}50%{opacity:0.5;transform:translate(-50%,-50%) scale(1.09);}}
+@keyframes q-r{0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.28;}100%{transform:translate(-50%,-50%) scale(2.0);opacity:0;}}
 @keyframes uf{0%,100%{transform:translate(-50%,-50%) translateY(0);}50%{transform:translate(-50%,-50%) translateY(-3px);}}
 .u-dot{position:absolute;border-radius:50%;transform:translate(-50%,-50%);animation:uf 3s ease-in-out infinite;}
 .you-pin{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;z-index:2;}
@@ -2168,9 +2169,10 @@ html,body{width:100%;height:100%;background:linear-gradient(180deg,#F8F4EE 0%,#F
       <div class="road" style="left:65%;top:0;bottom:0;width:1px;"></div>
       <!-- BONFIRE -->
       <div class="blob" style="left:42%;top:46%;cursor:pointer;z-index:5;" onclick="openVenuePage('anchor-and-vine','s-heatmap')">
-        <div class="b-ring" style="width:92px;height:92px;border-color:rgba(201,106,59,0.42);animation:bf-r 2.4s ease-out infinite;"></div>
-        <div class="b-ring" style="width:92px;height:92px;border-color:rgba(201,106,59,0.22);animation:bf-r 2.4s ease-out infinite 0.8s;"></div>
-        <div class="b-core" style="width:56px;height:56px;background:rgba(201,106,59,0.72);border:1.5px solid rgba(255,160,110,0.5);animation:bf-c 2.2s ease-in-out infinite;">
+        <div class="b-ring" style="width:92px;height:92px;border-color:rgba(201,106,59,0.5);animation:bf-r 2.2s ease-out infinite;"></div>
+        <div class="b-ring" style="width:92px;height:92px;border-color:rgba(201,106,59,0.28);animation:bf-r 2.2s ease-out infinite 0.75s;"></div>
+        <div class="b-ring" style="width:92px;height:92px;border-color:rgba(209,161,91,0.18);animation:bf-r2 3.0s ease-out infinite 1.4s;"></div>
+        <div class="b-core" style="width:60px;height:60px;background:rgba(201,106,59,0.82);border:1.5px solid rgba(255,160,110,0.6);animation:bf-c 1.8s ease-in-out infinite;">
           <span style="font-size:14px;color:#fff;font-weight:700;position:relative;z-index:2;">32</span>
         </div>
         <div class="b-tag">The Anchor &amp; Vine<span class="b-dn">🔥 Bonfire</span></div>
@@ -2678,12 +2680,12 @@ function initBlobBreathing(){
     var core=blob.querySelector('.b-core');
     if(!core)return;
     var t=Math.min(1,count/35);
-    var r1=Math.round(10+t*22), r2=Math.round(2+t*8);
-    var opLo=(0.18+t*0.38).toFixed(2), opHi=(0.38+t*0.46).toFixed(2);
+    var r1=Math.round(14+t*30), r2=Math.round(4+t*12);
+    var opLo=(0.25+t*0.42).toFixed(2), opHi=(0.50+t*0.42).toFixed(2);
     gsap.fromTo(core,
-      {boxShadow:'0 0 '+r1+'px '+r2+'px rgba(255,100,50,'+opLo+')'},
-      {boxShadow:'0 0 '+(r1+14)+'px '+(r2+5)+'px rgba(201,106,59,'+opHi+')',
-       duration:dur*0.5,repeat:-1,yoyo:true,ease:'sine.inOut'}
+      {boxShadow:'0 0 '+r1+'px '+r2+'px rgba(201,106,59,'+opLo+')'},
+      {boxShadow:'0 0 '+(r1+18)+'px '+(r2+7)+'px rgba(209,161,91,'+opHi+')',
+       duration:dur*0.45,repeat:-1,yoyo:true,ease:'sine.inOut'}
     );
   });
 }
